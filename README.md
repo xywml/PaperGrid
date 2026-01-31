@@ -17,22 +17,22 @@
 
 ```yaml
 services:
-	app:
-		image: ghcr.io/xywml/papergrid:latest
-		container_name: papergrid
-		ports:
-			- "6066:3000"
-		environment:
-			DATABASE_URL: "file:/data/db.sqlite"
-			# 反向代理后必须改成你的公网地址
-			NEXTAUTH_URL: "http://localhost:6066"
-			# AUTH_TRUST_HOST: "1"
-		volumes:
-			- papergrid_data:/data
-		restart: unless-stopped
+  app:
+    image: ghcr.io/xywml/papergrid:latest
+    container_name: papergrid
+    ports:
+      - "6066:3000"
+    environment:
+      DATABASE_URL: "file:/data/db.sqlite"
+      # 反向代理后必须改成你的公网地址
+      NEXTAUTH_URL: "http://localhost:6066"
+      # AUTH_TRUST_HOST: "1"
+    volumes:
+      - papergrid_data:/data
+    restart: unless-stopped
 
 volumes:
-	papergrid_data:
+  papergrid_data:
 ```
 
 运行：
