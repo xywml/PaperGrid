@@ -26,7 +26,8 @@ services:
       DATABASE_URL: "file:/data/db.sqlite"
       # 反向代理后必须改成你的公网地址
       NEXTAUTH_URL: "http://localhost:6066"
-      # AUTH_TRUST_HOST: "1"
+      # 仅本地开发可开启（生产环境不要设置）
+      AUTH_TRUST_HOST: "1"
     volumes:
       - papergrid_data:/data
     restart: unless-stopped
