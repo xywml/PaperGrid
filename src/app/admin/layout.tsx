@@ -51,6 +51,8 @@ export default async function AdminLayout({
   const session = await auth()
   const defaultAvatarUrl = (await getSetting<string>('site.defaultAvatarUrl', '')) || ''
   const adminInitialSetup = await isDefaultAdmin()
+  const rawVersion = process.env.APP_VERSION || ''
+  const appVersion = rawVersion ? (rawVersion.startsWith('v') ? rawVersion : `v${rawVersion}`) : ''
 
   if (!session?.user) {
     redirect('/auth/signin')
@@ -80,6 +82,11 @@ export default async function AdminLayout({
 
           {/* User Menu */}
           <div className="flex items-center gap-4">
+            {appVersion && (
+              <span className="inline-flex items-center rounded-md border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs text-gray-600 dark:border-gray-700 dark:bg-gray-900/40 dark:text-gray-300">
+                <span className="font-mono">{appVersion}</span>
+              </span>
+            )}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-9 w-9 rounded-full">

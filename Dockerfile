@@ -39,10 +39,12 @@ RUN npm config set registry $NPM_REGISTRY \
   && npm install --prefix /app/prisma-cli --omit=dev
 
 FROM node:22-alpine AS runner
+ARG APP_VERSION
 WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NEXT_CACHE_DIR=/data/.next-cache
+ENV APP_VERSION=$APP_VERSION
 
 # non-root user + 初始化数据卷目录（用于写 SQLite 与生成 NEXTAUTH_SECRET）
 RUN addgroup -g 1001 -S nodejs \
