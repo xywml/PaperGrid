@@ -28,6 +28,7 @@ interface CommentListProps {
   refreshTrigger?: number
   defaultAvatarUrl?: string
   allowGuest?: boolean
+  unlockToken?: string
 }
 
 export function CommentList({
@@ -35,6 +36,7 @@ export function CommentList({
   refreshTrigger,
   defaultAvatarUrl = '',
   allowGuest,
+  unlockToken,
 }: CommentListProps) {
   const [comments, setComments] = useState<Comment[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -43,12 +45,14 @@ export function CommentList({
   const fetchComments = async () => {
     try {
       setIsLoading(true)
-      const response = await fetch(`/api/comments?slug=${postSlug}`)
+      const response = await fetch(`/api/comments?slug=${postSlug}`, {
+        headers: unlockToken ? { Authorization: `Bearer ${unlockToken}` } : undefined,
+      })
       const data = await response.json()
 
       if (response.ok) {
         setComments(data.comments)
-      } else if (response.status === 403) {
+      } else if (response.status === 401 || response.status === 403) {
         setComments([])
       }
     } catch (error) {
@@ -60,7 +64,7 @@ export function CommentList({
 
   useEffect(() => {
     fetchComments()
-  }, [postSlug, refreshTrigger])
+  }, [postSlug, refreshTrigger, unlockToken])
 
   if (isLoading) {
     return (
@@ -126,6 +130,7 @@ export function CommentList({
             defaultAvatarUrl={defaultAvatarUrl}
             postSlug={postSlug}
             allowGuest={allowGuest}
+            unlockToken={unlockToken}
             onReplySuccess={fetchComments}
           />
         ))}
@@ -142,6 +147,7 @@ function CommentItem({
   postSlug,
   allowGuest,
   onReplySuccess,
+  unlockToken,
   depth = 0,
 }: {
   comment: Comment
@@ -151,6 +157,7 @@ function CommentItem({
   postSlug: string
   allowGuest?: boolean
   onReplySuccess?: () => void
+  unlockToken?: string
   depth?: number
 }) {
   const [showReplyForm, setShowReplyForm] = useState(false)
@@ -224,6 +231,7 @@ function CommentItem({
             parentId={comment.id}
             compact
             autoFocus
+            unlockToken={unlockToken}
             onCancel={() => setShowReplyForm(false)}
             onSuccess={() => {
               setShowReplyForm(false)
@@ -244,6 +252,7 @@ function CommentItem({
               defaultAvatarUrl={defaultAvatarUrl}
               postSlug={postSlug}
               allowGuest={allowGuest}
+              unlockToken={unlockToken}
               onReplySuccess={onReplySuccess}
               depth={depth + 1}
             />

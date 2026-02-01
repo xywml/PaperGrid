@@ -2,7 +2,7 @@ import { prisma } from '@/lib/prisma'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Calendar, Clock, Eye } from 'lucide-react'
+import { Calendar, Clock, Eye, Lock } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { zhCN } from 'date-fns/locale'
 import Link from 'next/link'
@@ -73,6 +73,7 @@ export default async function PostsPage({ searchParams }: PostsPageProps) {
         coverImage: true,
         publishedAt: true,
         readingTime: true,
+        isProtected: true,
         author: {
           select: {
             name: true,
@@ -239,6 +240,15 @@ export default async function PostsPage({ searchParams }: PostsPageProps) {
                               <Clock className="h-3 w-3" />
                               <span>{post.readingTime || 1} 分钟阅读</span>
                             </div>
+                            {post.isProtected && (
+                              <>
+                                <span>•</span>
+                                <div className="flex items-center gap-1">
+                                  <Lock className="h-3 w-3" />
+                                  <span>加密</span>
+                                </div>
+                              </>
+                            )}
                           </div>
                           <CardTitle className="line-clamp-2 hover:text-blue-600 dark:hover:text-blue-400">
                             {post.title}
@@ -385,6 +395,12 @@ export default async function PostsPage({ searchParams }: PostsPageProps) {
                             <p className="line-clamp-2 text-sm font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400">
                               {post.title}
                             </p>
+                            {post.isProtected && (
+                              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                <Lock className="mr-1 inline h-3 w-3" />
+                                加密文章
+                              </p>
+                            )}
                             <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                               <Eye className="mr-1 inline h-3 w-3" />
                               {post.viewCount?.count || 0} 次阅读

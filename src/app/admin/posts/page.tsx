@@ -37,14 +37,24 @@ export default async function PostsPage({
   // 获取文章列表
   const posts = await prisma.post.findMany({
     where,
-    include: {
+    select: {
+      id: true,
+      title: true,
+      excerpt: true,
+      status: true,
+      createdAt: true,
+      updatedAt: true,
       author: {
         select: {
           name: true,
           email: true,
         },
       },
-      category: true,
+      category: {
+        select: {
+          name: true,
+        },
+      },
       _count: {
         select: {
           comments: true,

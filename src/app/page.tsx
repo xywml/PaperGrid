@@ -3,7 +3,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
-import { Calendar, Clock, Eye } from 'lucide-react'
+import { Calendar, Clock, Eye, Lock } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { zhCN } from 'date-fns/locale'
 import { HeroSection } from '@/components/home/hero-section'
@@ -27,6 +27,7 @@ export default async function HomePage() {
         excerpt: true,
         publishedAt: true,
         readingTime: true,
+        isProtected: true,
         author: {
           select: {
             name: true,
@@ -152,11 +153,20 @@ export default async function HomePage() {
                             <span>•</span>
                             <span>{post.author.name}</span>
                             <span>•</span>
-                            <span className="flex items-center gap-1">
-                              <Clock className="h-4 w-4" />
-                              <span>{post.readingTime || 1} 分钟阅读</span>
-                            </span>
-                          </div>
+                          <span className="flex items-center gap-1">
+                            <Clock className="h-4 w-4" />
+                            <span>{post.readingTime || 1} 分钟阅读</span>
+                          </span>
+                          {post.isProtected && (
+                            <>
+                              <span>•</span>
+                              <span className="flex items-center gap-1">
+                                <Lock className="h-4 w-4" />
+                                <span>加密</span>
+                              </span>
+                            </>
+                          )}
+                        </div>
                           <CardTitle className="line-clamp-2 text-xl hover:text-blue-600 dark:hover:text-blue-400">
                             {post.title}
                           </CardTitle>

@@ -10,7 +10,7 @@ export async function RecentCommentsTimeline({ limit = 5 }: { limit?: number } =
 
   const safeLimit = Number.isFinite(limit) ? Math.min(Math.max(limit, 1), 10) : 5
   const comments = await prisma.comment.findMany({
-    where: { status: 'APPROVED' },
+    where: { status: 'APPROVED', post: { isProtected: false } },
     orderBy: { createdAt: 'desc' },
     take: safeLimit,
     select: {
@@ -62,4 +62,3 @@ export async function RecentCommentsTimeline({ limit = 5 }: { limit?: number } =
     </div>
   )
 }
-

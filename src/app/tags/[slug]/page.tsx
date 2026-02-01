@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Calendar, Clock, Eye, Tag as TagIcon, ArrowLeft } from 'lucide-react'
+import { Calendar, Clock, Eye, Tag as TagIcon, ArrowLeft, Lock } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { zhCN } from 'date-fns/locale'
 import Link from 'next/link'
@@ -66,6 +66,7 @@ export default async function TagPage({ params, searchParams }: TagPageProps) {
         coverImage: true,
         publishedAt: true,
         readingTime: true,
+        isProtected: true,
         author: {
           select: {
             name: true,
@@ -211,6 +212,15 @@ export default async function TagPage({ params, searchParams }: TagPageProps) {
                             <Clock className="h-3 w-3" />
                             <span>{post.readingTime || 1} 分钟阅读</span>
                           </div>
+                          {post.isProtected && (
+                            <>
+                              <span>•</span>
+                              <div className="flex items-center gap-1">
+                                <Lock className="h-3 w-3" />
+                                <span>加密</span>
+                              </div>
+                            </>
+                          )}
                         </div>
                         <CardTitle className="line-clamp-2 hover:text-blue-600 dark:hover:text-blue-400">
                           {post.title}

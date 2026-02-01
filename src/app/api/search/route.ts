@@ -36,24 +36,22 @@ export async function GET(request: NextRequest) {
     const searchTerm = trimmed.toLowerCase()
 
     // 搜索文章
+    const titleMatch = { title: { contains: searchTerm } }
+    const excerptMatch = { excerpt: { contains: searchTerm } }
+    const contentMatch = { content: { contains: searchTerm } }
+    const tagMatch = { postTags: { some: { tag: { name: { contains: searchTerm } } } } }
+
     const posts = await prisma.post.findMany({
       where: {
         status: 'PUBLISHED',
         OR: [
           {
-            title: {
-              contains: searchTerm,
-            },
+            isProtected: false,
+            OR: [titleMatch, excerptMatch, contentMatch, tagMatch],
           },
           {
-            excerpt: {
-              contains: searchTerm,
-            },
-          },
-          {
-            content: {
-              contains: searchTerm,
-            },
+            isProtected: true,
+            OR: [titleMatch, excerptMatch, tagMatch],
           },
         ],
       },
@@ -62,6 +60,7 @@ export async function GET(request: NextRequest) {
         title: true,
         slug: true,
         excerpt: true,
+        isProtected: true,
         publishedAt: true,
         author: {
           select: {
@@ -153,6 +152,7 @@ export async function GET(request: NextRequest) {
         title: post.title,
         slug: post.slug,
         excerpt: post.excerpt,
+        isProtected: post.isProtected,
         category: post.category?.name || null,
         categorySlug: post.category?.slug || null,
         tags: post.postTags.map((pt) => pt.tag.name),

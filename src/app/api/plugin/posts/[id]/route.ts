@@ -19,7 +19,20 @@ export async function GET(
 
     const post = await prisma.post.findUnique({
       where: { id },
-      include: {
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        content: true,
+        excerpt: true,
+        coverImage: true,
+        status: true,
+        locale: true,
+        createdAt: true,
+        updatedAt: true,
+        publishedAt: true,
+        readingTime: true,
+        isProtected: true,
         author: {
           select: {
             id: true,
@@ -119,7 +132,19 @@ export async function PATCH(
           },
         }),
       },
-      include: {
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        excerpt: true,
+        coverImage: true,
+        status: true,
+        locale: true,
+        createdAt: true,
+        updatedAt: true,
+        publishedAt: true,
+        readingTime: true,
+        isProtected: true,
         author: {
           select: {
             id: true,

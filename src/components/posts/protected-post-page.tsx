@@ -1,258 +1,170 @@
-import { prisma } from '@/lib/prisma'
-import { notFound } from 'next/navigation'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Separator } from '@/components/ui/separator'
-import { MDXContent } from '@/components/posts/mdx-content'
+'use client'
+
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import Link from 'next/link'
 import { Calendar, Clock, Eye, User, ArrowLeft, ArrowRight, Edit3, Scissors, Lock } from 'lucide-react'
 import { formatDistanceToNow, format } from 'date-fns'
 import { zhCN } from 'date-fns/locale'
-import Link from 'next/link'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 import { TableOfContents, type HeadingItem } from '@/components/posts/table-of-contents'
 import { CommentSection } from '@/components/comments/comment-section'
 import { PostTitleSync } from '@/components/posts/post-title-sync'
-import { getSetting } from '@/lib/settings'
+import { PostPasswordGate } from '@/components/posts/post-password-gate'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { ViewCount } from '@/components/posts/view-count'
 import { extractHeadingsFromMarkdown } from '@/lib/markdown'
-import { ProtectedPostPage } from '@/components/posts/protected-post-page'
+import { MDXContentClient } from '@/components/posts/mdx-content-client'
 
-export const revalidate = 60
+const UNLOCK_STORAGE_PREFIX = 'pg_post_unlock_'
 
-interface PostPageProps {
-  params: Promise<{
+type PostTagItem = {
+  tag: {
+    id: string
+    name: string
     slug: string
-  }>
+  }
 }
 
-export default async function PostPage({ params }: PostPageProps) {
-  const { slug } = await params
+type ProtectedPost = {
+  id: string
+  title: string
+  slug: string
+  excerpt: string | null
+  coverImage: string | null
+  publishedAt: string | Date | null
+  updatedAt: string | Date
+  readingTime: number | null
+  categoryId: string | null
+  isProtected: boolean
+  author: { name: string | null; image: string | null }
+  category: { name: string; slug: string } | null
+  postTags: PostTagItem[]
+  viewCount: { count: number } | null
+}
 
-  const [commentsEnabledRaw, allowGuest, ownerNameRaw, defaultAvatarUrl, ownerRoleRaw] = await Promise.all([
-    getSetting<boolean>('comments.enabled', true),
-    getSetting<boolean>('comments.allowGuest', false),
-    getSetting<string>('site.ownerName', '千叶'),
-    getSetting<string>('site.defaultAvatarUrl', ''),
-    getSetting<string>('profile.role', '全栈开发者'),
-  ])
-  const commentsEnabled = commentsEnabledRaw ?? true
-  const ownerName = ownerNameRaw || '千叶'
-  const ownerRole = ownerRoleRaw || '全栈开发者'
+type RelatedPost = {
+  id: string
+  title: string
+  slug: string
+  excerpt: string | null
+  coverImage: string | null
+  publishedAt: string | Date | null
+  isProtected?: boolean
+  viewCount?: { count: number } | null
+}
 
-  // 获取文章详情
-  const basePost = await prisma.post.findFirst({
-    where: {
-      slug,
-      status: 'PUBLISHED',
-    },
-    select: {
-      id: true,
-      title: true,
-      slug: true,
-      content: true,
-      excerpt: true,
-      coverImage: true,
-      status: true,
-      publishedAt: true,
-      updatedAt: true,
-      readingTime: true,
-      categoryId: true,
-      isProtected: true,
-      author: {
-        select: {
-          name: true,
-          image: true,
-        },
-      },
-      category: {
-        select: {
-          name: true,
-          slug: true,
-        },
-      },
-      postTags: {
-        select: {
-          tag: {
-            select: {
-              id: true,
-              name: true,
-              slug: true,
-            },
-          },
-        },
-      },
-      viewCount: {
-        select: {
-          count: true,
-        },
-      },
-    },
-  })
+type SimplePost = { id: string; title: string; slug: string } | null
 
-  if (!basePost) {
-    notFound()
-  }
+interface ProtectedPostPageProps {
+  post: ProtectedPost
+  prevPost: SimplePost
+  nextPost: SimplePost
+  relatedPosts: RelatedPost[]
+  commentsEnabled: boolean
+  allowGuest: boolean
+  ownerName: string
+  ownerRole: string
+  defaultAvatarUrl: string
+}
 
-  if (basePost.isProtected) {
-    const relatedPostsPromise = basePost.category
-      ? prisma.post.findMany({
-          where: {
-            status: 'PUBLISHED',
-            categoryId: basePost.categoryId,
-            id: {
-              not: basePost.id,
-            },
-          },
-          take: 4,
-          orderBy: {
-            publishedAt: 'desc',
-          },
-          select: {
-            id: true,
-            title: true,
-            slug: true,
-            excerpt: true,
-            coverImage: true,
-            publishedAt: true,
-            isProtected: true,
-            viewCount: {
-              select: { count: true },
-            },
-          },
-        })
-      : Promise.resolve([])
+function getStorageKey(postId: string) {
+  return `${UNLOCK_STORAGE_PREFIX}${postId}`
+}
 
-    const [prevPost, nextPost, relatedPosts] = await Promise.all([
-      prisma.post.findFirst({
-        where: {
-          status: 'PUBLISHED',
-          publishedAt: {
-            lt: basePost.publishedAt!,
-          },
-        },
-        orderBy: {
-          publishedAt: 'desc',
-        },
-        select: {
-          id: true,
-          title: true,
-          slug: true,
-        },
-      }),
-      prisma.post.findFirst({
-        where: {
-          status: 'PUBLISHED',
-          publishedAt: {
-            gt: basePost.publishedAt!,
-          },
-        },
-        orderBy: {
-          publishedAt: 'asc',
-        },
-        select: {
-          id: true,
-          title: true,
-          slug: true,
-        },
-      }),
-      relatedPostsPromise,
-    ])
+export function ProtectedPostPage({
+  post,
+  prevPost,
+  nextPost,
+  relatedPosts,
+  commentsEnabled,
+  allowGuest,
+  ownerName,
+  ownerRole,
+  defaultAvatarUrl,
+}: ProtectedPostPageProps) {
+  const [content, setContent] = useState<string | null>(null)
+  const [headings, setHeadings] = useState<HeadingItem[]>([])
+  const [unlockToken, setUnlockToken] = useState<string | null>(null)
+  const [fetching, setFetching] = useState(false)
+  const [loadError, setLoadError] = useState('')
 
-    const { content: _content, ...safePost } = basePost
-    return (
-      <ProtectedPostPage
-        post={safePost}
-        prevPost={prevPost}
-        nextPost={nextPost}
-        relatedPosts={relatedPosts}
-        commentsEnabled={commentsEnabled}
-        allowGuest={!!allowGuest}
-        ownerName={ownerName}
-        ownerRole={ownerRole}
-        defaultAvatarUrl={defaultAvatarUrl || ''}
-      />
-    )
-  }
-
-  const post = { ...basePost, content: basePost.content || '' }
-
-  const relatedPostsPromise = post.category
-    ? prisma.post.findMany({
-        where: {
-          status: 'PUBLISHED',
-          categoryId: post.categoryId,
-          id: {
-            not: post.id,
-          },
-        },
-        take: 4,
-        orderBy: {
-          publishedAt: 'desc',
-        },
-        select: {
-          id: true,
-          title: true,
-          slug: true,
-          excerpt: true,
-          coverImage: true,
-          publishedAt: true,
-          isProtected: true,
-          viewCount: {
-            select: { count: true },
-          },
+  const loadContent = useCallback(async (token: string) => {
+    setFetching(true)
+    setLoadError('')
+    try {
+      const res = await fetch(`/api/posts/protected?slug=${post.slug}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
       })
-    : Promise.resolve([])
+      const data = await res.json()
+      if (!res.ok) {
+        if (res.status === 401 || res.status === 403) {
+          try {
+            sessionStorage.removeItem(getStorageKey(post.id))
+          } catch {
+            // ignore
+          }
+          setUnlockToken(null)
+        }
+        setContent(null)
+        setLoadError(data.error || '解锁已失效，请重新输入密码')
+        return
+      }
+      const nextContent = typeof data.content === 'string' ? data.content : ''
+      setContent(nextContent)
+      const nextHeadings = extractHeadingsFromMarkdown(nextContent, 3).map((heading, index) => ({
+        id: `heading-${index}`,
+        text: heading.text,
+        level: heading.level,
+      }))
+      setHeadings(nextHeadings)
+    } catch (error) {
+      console.error('加载受保护内容失败:', error)
+      setLoadError('加载内容失败，请稍后重试')
+    } finally {
+      setFetching(false)
+    }
+  }, [post.id, post.slug])
 
-  // 获取上一篇和下一篇文章 + 同分类相关文章
-  const [prevPost, nextPost, relatedPosts] = await Promise.all([
-    prisma.post.findFirst({
-      where: {
-        status: 'PUBLISHED',
-        publishedAt: {
-          lt: post.publishedAt!,
-        },
-      },
-      orderBy: {
-        publishedAt: 'desc',
-      },
-      select: {
-        id: true,
-        title: true,
-        slug: true,
-      },
-    }),
-    prisma.post.findFirst({
-      where: {
-        status: 'PUBLISHED',
-        publishedAt: {
-          gt: post.publishedAt!,
-        },
-      },
-      orderBy: {
-        publishedAt: 'asc',
-      },
-      select: {
-        id: true,
-        title: true,
-        slug: true,
-      },
-    }),
-    relatedPostsPromise,
-  ])
+  useEffect(() => {
+    try {
+      const stored = sessionStorage.getItem(getStorageKey(post.id))
+      if (stored) {
+        setUnlockToken(stored)
+        loadContent(stored)
+      }
+    } catch {
+      // ignore
+    }
+  }, [post.id, loadContent])
 
-  const headings: HeadingItem[] = extractHeadingsFromMarkdown(post.content, 3).map(
-    (heading, index) => ({
-      id: `heading-${index}`,
-      text: heading.text,
-      level: heading.level,
+  const handleUnlock = useCallback((payload: { token?: string }) => {
+    if (!payload.token) return
+    try {
+      sessionStorage.setItem(getStorageKey(post.id), payload.token)
+    } catch {
+      // ignore
+    }
+    setUnlockToken(payload.token)
+    loadContent(payload.token)
+  }, [post.id, loadContent])
+
+  const canShowContent = content !== null
+
+  const publishedLabel = useMemo(() => {
+    if (!post.publishedAt) return ''
+    return formatDistanceToNow(new Date(post.publishedAt), {
+      addSuffix: true,
+      locale: zhCN,
     })
-  )
+  }, [post.publishedAt])
 
   return (
     <div className="min-h-screen">
       <PostTitleSync title={post.title} />
+
       {/* 文章头部 */}
       <article className="py-12 sm:py-16 bg-transparent">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
@@ -282,13 +194,7 @@ export default async function PostPage({ params }: PostPageProps) {
             </div>
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
-              <time>
-                {post.publishedAt &&
-                  formatDistanceToNow(new Date(post.publishedAt), {
-                    addSuffix: true,
-                    locale: zhCN,
-                  })}
-              </time>
+              <time>{publishedLabel}</time>
             </div>
             <div className="flex items-center gap-2">
               <Clock className="h-4 w-4" />
@@ -297,7 +203,12 @@ export default async function PostPage({ params }: PostPageProps) {
             <div className="flex items-center gap-2">
               <Eye className="h-4 w-4" />
               <span>
-                <ViewCount slug={slug} initialCount={post.viewCount?.count || 0} /> 次阅读
+                {canShowContent ? (
+                  <ViewCount slug={post.slug} initialCount={post.viewCount?.count || 0} />
+                ) : (
+                  <span>{post.viewCount?.count || 0}</span>
+                )}{" "}
+                次阅读
               </span>
             </div>
             {post.updatedAt && post.publishedAt && new Date(post.updatedAt).getTime() - new Date(post.publishedAt).getTime() > 60000 && (
@@ -308,6 +219,10 @@ export default async function PostPage({ params }: PostPageProps) {
                 </span>
               </div>
             )}
+            <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+              <Lock className="h-3 w-3" />
+              加密文章
+            </div>
           </div>
 
           {/* 分类和标签 */}
@@ -329,6 +244,7 @@ export default async function PostPage({ params }: PostPageProps) {
           </div>
         </div>
       </article>
+
       {/* 分割线与装饰 */}
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 mb-6">
         <div className="relative">
@@ -342,6 +258,7 @@ export default async function PostPage({ params }: PostPageProps) {
           </div>
         </div>
       </div>
+
       {/* 文章内容 */}
       <section className="py-12">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
@@ -361,10 +278,31 @@ export default async function PostPage({ params }: PostPageProps) {
                 </div>
               )}
 
-              {/* MDX内容 */}
+              {/* MDX内容 / 密码门禁 */}
               <Card className="border-none sm:border shadow-none sm:shadow-sm bg-transparent sm:bg-card">
                 <CardContent className="p-0 sm:p-8">
-                  <MDXContent content={post.content} />
+                  {canShowContent ? (
+                    <MDXContentClient content={content} />
+                  ) : (
+                    <>
+                      <PostPasswordGate
+                        slug={post.slug}
+                        title={post.title}
+                        excerpt={post.excerpt}
+                        onUnlock={handleUnlock}
+                      />
+                      {fetching && (
+                        <p className="mt-4 text-sm text-gray-500 dark:text-gray-400 text-center">
+                          正在加载内容...
+                        </p>
+                      )}
+                      {loadError && (
+                        <p className="mt-4 text-sm text-red-600 dark:text-red-400 text-center">
+                          {loadError}
+                        </p>
+                      )}
+                    </>
+                  )}
                 </CardContent>
               </Card>
 
@@ -409,9 +347,14 @@ export default async function PostPage({ params }: PostPageProps) {
               </Card>
 
               {/* 评论区 */}
-              {commentsEnabled && (
+              {commentsEnabled && canShowContent && (
                 <div className="mt-8">
-                  <CommentSection postSlug={slug} allowGuest={!!allowGuest} defaultAvatarUrl={defaultAvatarUrl || undefined} />
+                  <CommentSection
+                    postSlug={post.slug}
+                    allowGuest={!!allowGuest}
+                    defaultAvatarUrl={defaultAvatarUrl || undefined}
+                    unlockToken={unlockToken || undefined}
+                  />
                 </div>
               )}
             </div>
@@ -497,37 +440,4 @@ export default async function PostPage({ params }: PostPageProps) {
       </section>
     </div>
   )
-}
-
-// 生成元数据
-export async function generateMetadata({ params }: PostPageProps) {
-  const { slug } = await params
-
-  const post = await prisma.post.findFirst({
-    where: {
-      slug,
-      status: 'PUBLISHED',
-    },
-    select: {
-      title: true,
-      excerpt: true,
-      coverImage: true,
-    },
-  })
-
-  if (!post) {
-    return {
-      title: '文章未找到',
-    }
-  }
-
-  return {
-    title: post.title,
-    description: post.excerpt || post.title,
-    openGraph: {
-      title: post.title,
-      description: post.excerpt || post.title,
-      images: post.coverImage ? [post.coverImage] : [],
-    },
-  }
 }

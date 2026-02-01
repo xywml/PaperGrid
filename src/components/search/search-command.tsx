@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { Search, File, Folder, Tag as TagIcon, X } from 'lucide-react'
+import { Search, File, Folder, Tag as TagIcon, X, Lock } from 'lucide-react'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -20,6 +20,7 @@ interface SearchResult {
   tags?: string[]
   category?: string
   description?: string
+  isProtected?: boolean
 }
 
 interface SearchResults {
@@ -311,6 +312,12 @@ export function SearchCommand({ open, onOpenChange }: SearchCommandProps) {
                             {item.category && (
                               <Badge variant="outline" className="text-xs">
                                 {item.category}
+                              </Badge>
+                            )}
+                            {item.isProtected && (
+                              <Badge variant="secondary" className="text-xs flex items-center gap-1">
+                                <Lock className="h-3 w-3" />
+                                加密
                               </Badge>
                             )}
                             {item.tags && item.tags.slice(0, 2).map((tag) => (

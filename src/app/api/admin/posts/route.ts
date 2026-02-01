@@ -32,14 +32,24 @@ export async function GET(request: Request) {
 
     const posts = await prisma.post.findMany({
       where,
-      include: {
+      select: {
+        id: true,
+        title: true,
+        excerpt: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true,
         author: {
           select: {
             name: true,
             email: true,
           },
         },
-        category: true,
+        category: {
+          select: {
+            name: true,
+          },
+        },
         _count: {
           select: {
             comments: true,

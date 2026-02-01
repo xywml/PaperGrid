@@ -36,12 +36,15 @@ function PostEditorContent() {
     locale: 'zh',
     categoryId: '',
     createdAt: '',
+    isProtected: false,
+    password: '',
   })
 
   const [categories, setCategories] = useState<any[]>([])
   const [tags, setTags] = useState<any[]>([])
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([])
   const [metaInfo, setMetaInfo] = useState<{ createdAt?: string; updatedAt?: string }>({})
+  const [hasPassword, setHasPassword] = useState(false)
 
   const toInputDateTime = (value?: string | Date | null) => {
     if (!value) return ''
@@ -130,7 +133,10 @@ function PostEditorContent() {
               locale: data.post.locale,
               categoryId: data.post.categoryId || '',
               createdAt: toInputDateTime(data.post.createdAt),
+              isProtected: Boolean(data.post.isProtected),
+              password: '',
             })
+            setHasPassword(Boolean(data.post.hasPassword))
             setSelectedTagIds(
               Array.isArray(data.post.postTags)
                 ? data.post.postTags.map((pt: any) => pt.tagId || pt.tag?.id).filter(Boolean)
@@ -173,8 +179,30 @@ function PostEditorContent() {
     setSaving(true)
 
     try {
+      if (formData.isProtected && !formData.password.trim() && !hasPassword) {
+        toast({
+          title: '无法保存',
+          description: '启用加密时必须设置访问密码',
+          variant: 'destructive',
+        })
+        setSaving(false)
+        return
+      }
+
       const url = postId ? `/api/posts/${postId}` : '/api/posts'
       const method = postId ? 'PATCH' : 'POST'
+      const payload: Record<string, any> = {
+        ...formData,
+        status: publish ? 'PUBLISHED' : 'DRAFT',
+        tags: selectedTagIds,
+      }
+      if (!payload.isProtected) {
+        delete payload.password
+      } else if (!payload.password || !payload.password.trim()) {
+        delete payload.password
+      } else {
+        payload.password = payload.password.trim()
+      }
 
       const response = await fetch(url, {
         method,
@@ -182,9 +210,7 @@ function PostEditorContent() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          ...formData,
-          status: publish ? 'PUBLISHED' : 'DRAFT',
-          tags: selectedTagIds,
+          ...payload,
         }),
       })
 
@@ -204,6 +230,10 @@ function PostEditorContent() {
             createdAt: data.post.createdAt,
             updatedAt: data.post.updatedAt,
           })
+        }
+        setHasPassword(formData.isProtected)
+        if (formData.password.trim()) {
+          setFormData((prev) => ({ ...prev, password: '' }))
         }
         toast({
           title: publish ? '发布成功' : '保存成功',
@@ -449,6 +479,51 @@ function PostEditorContent() {
                 disabled={saving}
               />
             </div>
+
+            <div className="space-y-2">
+              <Label>文章加密</Label>
+              <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                <input
+                  type="checkbox"
+                  checked={formData.isProtected}
+                  disabled={saving}
+                  onChange={(e) => {
+                    const checked = e.target.checked
+                    setFormData((prev) => ({
+                      ...prev,
+                      isProtected: checked,
+                      password: checked ? prev.password : '',
+                    }))
+                    if (!checked) {
+                      setHasPassword(false)
+                    }
+                  }}
+                />
+                启用访问密码
+              </label>
+              <p className="text-xs text-muted-foreground">
+                启用后访问需输入密码，仅当前标签页记住解锁状态。
+              </p>
+            </div>
+
+            {formData.isProtected && (
+              <div className="space-y-2">
+                <Label htmlFor="postPassword">访问密码</Label>
+                <Input
+                  id="postPassword"
+                  type="password"
+                  value={formData.password}
+                  onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                  }
+                  placeholder={hasPassword ? '留空则保持原密码' : '设置访问密码'}
+                  disabled={saving}
+                />
+                {hasPassword && (
+                  <p className="text-xs text-muted-foreground">留空则保持原密码</p>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
 

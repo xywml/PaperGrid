@@ -140,6 +140,8 @@ model Post {
   viewCount   ViewCount?
   analytics   Analytics?
   readingTime Int?       // in minutes
+  isProtected Boolean    @default(false)
+  passwordHash String?
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 

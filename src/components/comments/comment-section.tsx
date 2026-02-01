@@ -8,9 +8,10 @@ interface CommentSectionProps {
   postSlug: string
   allowGuest?: boolean
   defaultAvatarUrl?: string
+  unlockToken?: string
 }
 
-export function CommentSection({ postSlug, allowGuest, defaultAvatarUrl }: CommentSectionProps) {
+export function CommentSection({ postSlug, allowGuest, defaultAvatarUrl, unlockToken }: CommentSectionProps) {
   const [refreshTrigger, setRefreshTrigger] = useState(0)
 
   const handleCommentSuccess = () => {
@@ -19,12 +20,18 @@ export function CommentSection({ postSlug, allowGuest, defaultAvatarUrl }: Comme
 
   return (
     <div className="space-y-6">
-      <CommentForm postSlug={postSlug} allowGuest={!!allowGuest} onSuccess={handleCommentSuccess} />
+      <CommentForm
+        postSlug={postSlug}
+        allowGuest={!!allowGuest}
+        onSuccess={handleCommentSuccess}
+        unlockToken={unlockToken}
+      />
       <CommentList
         postSlug={postSlug}
         refreshTrigger={refreshTrigger}
         defaultAvatarUrl={defaultAvatarUrl}
         allowGuest={allowGuest}
+        unlockToken={unlockToken}
       />
     </div>
   )

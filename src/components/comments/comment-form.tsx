@@ -20,6 +20,7 @@ interface CommentFormProps {
   placeholder?: string
   compact?: boolean
   autoFocus?: boolean
+  unlockToken?: string
 }
 
 export function CommentForm({
@@ -32,6 +33,7 @@ export function CommentForm({
   placeholder,
   compact,
   autoFocus,
+  unlockToken,
 }: CommentFormProps) {
   const { data: session } = useSession()
   const [content, setContent] = useState('')
@@ -82,6 +84,7 @@ export function CommentForm({
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            ...(unlockToken ? { Authorization: `Bearer ${unlockToken}` } : {}),
           },
           body: JSON.stringify({
             content: content.trim(),

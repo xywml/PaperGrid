@@ -56,7 +56,19 @@ export async function GET(req: Request) {
     const total = await prisma.post.count({ where })
     const posts = await prisma.post.findMany({
       where,
-      include: {
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        excerpt: true,
+        coverImage: true,
+        status: true,
+        locale: true,
+        createdAt: true,
+        updatedAt: true,
+        publishedAt: true,
+        readingTime: true,
+        isProtected: true,
         author: {
           select: {
             id: true,
@@ -169,7 +181,19 @@ export async function POST(req: Request) {
             }
           : undefined,
       },
-      include: {
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        excerpt: true,
+        coverImage: true,
+        status: true,
+        locale: true,
+        createdAt: true,
+        updatedAt: true,
+        publishedAt: true,
+        readingTime: true,
+        isProtected: true,
         author: {
           select: {
             id: true,

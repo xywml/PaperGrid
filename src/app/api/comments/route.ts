@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma'
 import { getSetting } from '@/lib/settings'
 import sanitizeHtml from 'sanitize-html'
 import { getClientIp, rateLimit, rateLimitHeaders } from '@/lib/rate-limit'
+import { getPostUnlockTokenFromHeaders, verifyPostUnlockToken } from '@/lib/post-protection'
 
 // GET /api/comments?slug=xxx - 获取文章的所有评论
 export async function GET(request: NextRequest) {
@@ -23,11 +24,24 @@ export async function GET(request: NextRequest) {
     // 查找文章
     const post = await prisma.post.findUnique({
       where: { slug },
-      select: { id: true },
+      select: { id: true, isProtected: true, passwordHash: true },
     })
 
     if (!post) {
       return NextResponse.json({ error: '文章不存在' }, { status: 404 })
+    }
+
+    if (post.isProtected) {
+      if (!post.passwordHash) {
+        return NextResponse.json({ error: '文章已加密' }, { status: 403 })
+      }
+      const token = getPostUnlockTokenFromHeaders(request.headers)
+      const unlocked = token
+        ? verifyPostUnlockToken(token, post.id, post.passwordHash)
+        : false
+      if (!unlocked) {
+        return NextResponse.json({ error: '文章已加密' }, { status: 403 })
+      }
     }
 
     // 获取评论（已审核通过的评论）
@@ -86,7 +100,7 @@ export async function POST(request: NextRequest) {
     // 查找文章
     const post = await prisma.post.findUnique({
       where: { slug },
-      select: { id: true, status: true },
+      select: { id: true, status: true, isProtected: true, passwordHash: true },
     })
 
     if (!post) {
@@ -100,6 +114,19 @@ export async function POST(request: NextRequest) {
     const commentsEnabled = (await getSetting<boolean>('comments.enabled', true)) ?? true
     if (!commentsEnabled) {
       return NextResponse.json({ error: '评论功能已关闭' }, { status: 403 })
+    }
+
+    if (post.isProtected) {
+      if (!post.passwordHash) {
+        return NextResponse.json({ error: '文章已加密' }, { status: 403 })
+      }
+      const token = getPostUnlockTokenFromHeaders(request.headers)
+      const unlocked = token
+        ? verifyPostUnlockToken(token, post.id, post.passwordHash)
+        : false
+      if (!unlocked) {
+        return NextResponse.json({ error: '文章已加密' }, { status: 403 })
+      }
     }
 
     const allowGuest = (await getSetting<boolean>('comments.allowGuest', false)) ?? false

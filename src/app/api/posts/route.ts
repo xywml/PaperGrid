@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server'
 import { PostStatus } from '@prisma/client'
 import slugify from 'slugify'
 import readingTime from 'reading-time'
+import bcrypt from 'bcryptjs'
 
 // GET /api/posts - 获取文章列表
 export async function GET(req: Request) {
@@ -51,7 +52,19 @@ export async function GET(req: Request) {
     // 查询文章列表
     const posts = await prisma.post.findMany({
       where,
-      include: {
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        excerpt: true,
+        coverImage: true,
+        status: true,
+        locale: true,
+        createdAt: true,
+        updatedAt: true,
+        publishedAt: true,
+        readingTime: true,
+        isProtected: true,
         author: {
           select: {
             id: true,
@@ -117,6 +130,8 @@ export async function POST(req: Request) {
       categoryId,
       tags,
       createdAt,
+      isProtected,
+      password,
     } = body
 
     // 验证必填字段
@@ -160,6 +175,19 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: '创建时间格式错误' }, { status: 400 })
     }
 
+    const protectPost = isProtected === true
+    let passwordHash: string | null = null
+    if (protectPost) {
+      const rawPassword = typeof password === 'string' ? password.trim() : ''
+      if (rawPassword.length < 4) {
+        return NextResponse.json({ error: '文章密码至少 4 位' }, { status: 400 })
+      }
+      if (rawPassword.length > 64) {
+        return NextResponse.json({ error: '文章密码过长' }, { status: 400 })
+      }
+      passwordHash = await bcrypt.hash(rawPassword, 10)
+    }
+
     // 创建文章
     const post = await prisma.post.create({
       data: {
@@ -173,6 +201,8 @@ export async function POST(req: Request) {
         locale: locale || 'zh',
         authorId: session.user.id,
         categoryId: resolvedCategoryId,
+        isProtected: protectPost,
+        passwordHash,
         ...(parsedCreatedAt ? { createdAt: parsedCreatedAt } : {}),
         publishedAt: status === PostStatus.PUBLISHED ? new Date() : null,
         postTags: tags
@@ -183,7 +213,20 @@ export async function POST(req: Request) {
             }
           : undefined,
       },
-      include: {
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        content: true,
+        excerpt: true,
+        coverImage: true,
+        status: true,
+        locale: true,
+        createdAt: true,
+        updatedAt: true,
+        publishedAt: true,
+        readingTime: true,
+        isProtected: true,
         author: {
           select: {
             id: true,
