@@ -13,6 +13,7 @@ import { TableOfContents, type HeadingItem } from '@/components/posts/table-of-c
 import { CommentSection } from '@/components/comments/comment-section'
 import { PostTitleSync } from '@/components/posts/post-title-sync'
 import { getSetting } from '@/lib/settings'
+import { getReadingContentClasses, normalizeMobileReadingBackground } from '@/lib/reading-style'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { ViewCount } from '@/components/posts/view-count'
 import { extractHeadingsFromMarkdown } from '@/lib/markdown'
@@ -29,16 +30,19 @@ interface PostPageProps {
 export default async function PostPage({ params }: PostPageProps) {
   const { slug } = await params
 
-  const [commentsEnabledRaw, allowGuest, ownerNameRaw, defaultAvatarUrl, ownerRoleRaw] = await Promise.all([
+  const [commentsEnabledRaw, allowGuest, ownerNameRaw, defaultAvatarUrl, ownerRoleRaw, mobileReadingBackgroundRaw] = await Promise.all([
     getSetting<boolean>('comments.enabled', true),
     getSetting<boolean>('comments.allowGuest', false),
     getSetting<string>('site.ownerName', '千叶'),
     getSetting<string>('site.defaultAvatarUrl', ''),
     getSetting<string>('profile.role', '全栈开发者'),
+    getSetting<string>('ui.mobileReadingBackground', 'grid'),
   ])
   const commentsEnabled = commentsEnabledRaw ?? true
   const ownerName = ownerNameRaw || '千叶'
   const ownerRole = ownerRoleRaw || '全栈开发者'
+  const mobileReadingBackground = normalizeMobileReadingBackground(mobileReadingBackgroundRaw)
+  const { cardClassName: contentCardClassName, contentClassName: contentPaddingClassName } = getReadingContentClasses(mobileReadingBackground)
 
   // 获取文章详情
   const basePost = await prisma.post.findFirst({
@@ -171,6 +175,7 @@ export default async function PostPage({ params }: PostPageProps) {
         ownerName={ownerName}
         ownerRole={ownerRole}
         defaultAvatarUrl={defaultAvatarUrl || ''}
+        mobileReadingBackground={mobileReadingBackground}
       />
     )
   }
@@ -362,8 +367,8 @@ export default async function PostPage({ params }: PostPageProps) {
               )}
 
               {/* MDX内容 */}
-              <Card className="border-none sm:border shadow-none sm:shadow-sm bg-transparent sm:bg-card">
-                <CardContent className="p-0 sm:p-8">
+              <Card className={contentCardClassName}>
+                <CardContent className={contentPaddingClassName}>
                   <MDXContent content={post.content} />
                 </CardContent>
               </Card>

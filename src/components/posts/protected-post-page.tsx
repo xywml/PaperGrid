@@ -14,6 +14,7 @@ import { PostPasswordGate } from '@/components/posts/post-password-gate'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { ViewCount } from '@/components/posts/view-count'
 import { extractHeadingsFromMarkdown } from '@/lib/markdown'
+import { getReadingContentClasses, type MobileReadingBackground } from '@/lib/reading-style'
 import { MDXContentClient } from '@/components/posts/mdx-content-client'
 
 const UNLOCK_STORAGE_PREFIX = 'pg_post_unlock_'
@@ -66,6 +67,7 @@ interface ProtectedPostPageProps {
   ownerName: string
   ownerRole: string
   defaultAvatarUrl: string
+  mobileReadingBackground: MobileReadingBackground
 }
 
 function getStorageKey(postId: string) {
@@ -82,7 +84,9 @@ export function ProtectedPostPage({
   ownerName,
   ownerRole,
   defaultAvatarUrl,
+  mobileReadingBackground,
 }: ProtectedPostPageProps) {
+  const { cardClassName: contentCardClassName, contentClassName: contentPaddingClassName } = getReadingContentClasses(mobileReadingBackground)
   const [content, setContent] = useState<string | null>(null)
   const [headings, setHeadings] = useState<HeadingItem[]>([])
   const [unlockToken, setUnlockToken] = useState<string | null>(null)
@@ -279,8 +283,8 @@ export function ProtectedPostPage({
               )}
 
               {/* MDX内容 / 密码门禁 */}
-              <Card className="border-none sm:border shadow-none sm:shadow-sm bg-transparent sm:bg-card">
-                <CardContent className="p-0 sm:p-8">
+              <Card className={contentCardClassName}>
+                <CardContent className={contentPaddingClassName}>
                   {canShowContent ? (
                     <MDXContentClient content={content} />
                   ) : (

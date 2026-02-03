@@ -52,6 +52,17 @@ export async function GET() {
       })
     }
 
+    if (!payload.find((s) => s.key === 'ui.mobileReadingBackground')) {
+      payload.push({
+        key: 'ui.mobileReadingBackground',
+        value: { style: 'grid' },
+        group: 'ui',
+        editable: true,
+        secret: false,
+        description: '移动端阅读背景样式',
+      })
+    }
+
     return NextResponse.json({ settings: payload })
   } catch (error) {
     console.error('获取设置失败:', error)
@@ -79,7 +90,7 @@ export async function PATCH(request: NextRequest) {
     for (const u of updates) {
       const s = await prisma.setting.findUnique({ where: { key: u.key } })
       if (!s) {
-        if (u.key === 'ui.showDefaultAdminHint') {
+        if (u.key === 'ui.showDefaultAdminHint' || u.key === 'ui.mobileReadingBackground') {
           await prisma.setting.create({
             data: {
               key: u.key,

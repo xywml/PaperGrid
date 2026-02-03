@@ -13,10 +13,11 @@ export default async function YajiPage() {
     <section className="py-12 sm:py-16">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-10">
-          <h1 className="text-4xl font-serif font-bold tracking-tight text-gray-900 dark:text-white sm:text-5xl">
+          <h1 className="text-4xl font-serif font-bold tracking-tight text-gray-900 dark:text-white sm:text-5xl mb-4">
             雅集
           </h1>
-          <p className="mt-3 text-lg text-gray-600 dark:text-gray-400">
+          <div className="mx-auto h-1 w-12 bg-gray-900 dark:bg-white mb-6 opacity-20" />
+          <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
             精选项目与作品，记录创作之路
           </p>
         </div>

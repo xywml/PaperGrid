@@ -3,9 +3,9 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
-import { LayoutDashboard, FileText, FolderKanban, Tags, MessageSquare, Users, Settings, Key, GalleryVerticalEnd } from 'lucide-react'
+import { LayoutDashboard, FileText, FolderKanban, Tags, MessageSquare, Users, Settings, Key, GalleryVerticalEnd, Palette } from 'lucide-react'
 
-const Icons = { LayoutDashboard, FileText, FolderKanban, Tags, MessageSquare, Users, Settings, Key, GalleryVerticalEnd }
+const Icons = { LayoutDashboard, FileText, FolderKanban, Tags, MessageSquare, Users, Settings, Key, GalleryVerticalEnd, Palette }
 
 export function AdminNav({ items, onLinkClick }: { items: { href: string; iconName: string; label: string }[]; onLinkClick?: () => void }) {
   const pathname = usePathname()
