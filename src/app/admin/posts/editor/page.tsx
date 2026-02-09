@@ -1,12 +1,14 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import 'md-editor-rt/lib/style.css'
+import { useState, useEffect, useRef, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { PostMarkdownEditor } from '@/components/admin/post-markdown-editor'
 import {
   Select,
   SelectContent,
@@ -18,8 +20,28 @@ import { ArrowLeft, Save, Eye } from 'lucide-react'
 import Link from 'next/link'
 import { useToast } from '@/hooks/use-toast'
 import { ImagePickerDialog } from '@/components/admin/image-picker-dialog'
+import { cn } from '@/lib/utils'
 
 type PostStatusValue = 'DRAFT' | 'PUBLISHED' | 'ARCHIVED'
+type EditorPanel = 'meta' | 'content'
+
+type CategoryOption = {
+  id: string
+  name: string
+  slug: string
+}
+
+type TagOption = {
+  id: string
+  name: string
+}
+
+type PostTagRef = {
+  tagId?: string | null
+  tag?: {
+    id?: string | null
+  } | null
+}
 
 function getStatusFeedback(status: PostStatusValue) {
   if (status === 'DRAFT') {
@@ -50,6 +72,7 @@ function PostEditorContent() {
 
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [isUploadingImages, setIsUploadingImages] = useState(false)
   const [formData, setFormData] = useState({
     title: '',
     slug: '',
@@ -64,11 +87,15 @@ function PostEditorContent() {
     password: '',
   })
 
-  const [categories, setCategories] = useState<any[]>([])
-  const [tags, setTags] = useState<any[]>([])
+  const [categories, setCategories] = useState<CategoryOption[]>([])
+  const [tags, setTags] = useState<TagOption[]>([])
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([])
   const [metaInfo, setMetaInfo] = useState<{ createdAt?: string; updatedAt?: string }>({})
   const [hasPassword, setHasPassword] = useState(false)
+  const [activePanel, setActivePanel] = useState<EditorPanel>('meta')
+
+  const editorLayoutRef = useRef<HTMLDivElement | null>(null)
+  const [editorLayoutHeight, setEditorLayoutHeight] = useState<number | null>(null)
 
   const toInputDateTime = (value?: string | Date | null) => {
     if (!value) return ''
@@ -164,7 +191,12 @@ function PostEditorContent() {
             setHasPassword(Boolean(data.post.hasPassword))
             setSelectedTagIds(
               Array.isArray(data.post.postTags)
-                ? data.post.postTags.map((pt: any) => pt.tagId || pt.tag?.id).filter(Boolean)
+                ? data.post.postTags
+                    .map((pt: PostTagRef) => pt.tagId || pt.tag?.id)
+                    .filter(
+                      (id: string | null | undefined): id is string =>
+                        typeof id === 'string' && id.length > 0
+                    )
                 : []
             )
             setMetaInfo({
@@ -180,7 +212,45 @@ function PostEditorContent() {
           setLoading(false)
         })
     }
-  }, [postId ?? false])
+  }, [postId])
+
+  useEffect(() => {
+    const container = editorLayoutRef.current
+    if (!container) {
+      return
+    }
+
+    let frameId: number | null = null
+
+    const updateLayoutHeight = () => {
+      frameId = null
+      const { top } = container.getBoundingClientRect()
+      const nextHeight = Math.max(0, Math.floor(window.innerHeight - top))
+      setEditorLayoutHeight((prev) => (prev === nextHeight ? prev : nextHeight))
+    }
+
+    const requestUpdate = () => {
+      if (frameId !== null) {
+        cancelAnimationFrame(frameId)
+      }
+
+      frameId = requestAnimationFrame(updateLayoutHeight)
+    }
+
+    requestUpdate()
+    window.addEventListener('resize', requestUpdate)
+
+    const observer = new ResizeObserver(requestUpdate)
+    observer.observe(container)
+
+    return () => {
+      window.removeEventListener('resize', requestUpdate)
+      observer.disconnect()
+      if (frameId !== null) {
+        cancelAnimationFrame(frameId)
+      }
+    }
+  }, [])
 
   // 自动生成 slug
   const generateSlug = (title: string) => {
@@ -201,19 +271,27 @@ function PostEditorContent() {
   }
 
   const handleSubmit = async (publish = false) => {
+    if (isUploadingImages) {
+      toast({
+        title: '请稍候',
+        description: '图片上传中，请等待上传完成后再保存或发布',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    if (formData.isProtected && !formData.password.trim() && !hasPassword) {
+      toast({
+        title: '无法保存',
+        description: '启用加密时必须设置访问密码',
+        variant: 'destructive',
+      })
+      return
+    }
+
     setSaving(true)
 
     try {
-      if (formData.isProtected && !formData.password.trim() && !hasPassword) {
-        toast({
-          title: '无法保存',
-          description: '启用加密时必须设置访问密码',
-          variant: 'destructive',
-        })
-        setSaving(false)
-        return
-      }
-
       const targetStatus: PostStatusValue = publish
         ? formData.status === 'ARCHIVED'
           ? 'ARCHIVED'
@@ -222,17 +300,18 @@ function PostEditorContent() {
 
       const url = postId ? `/api/posts/${postId}` : '/api/posts'
       const method = postId ? 'PATCH' : 'POST'
-      const payload: Record<string, any> = {
+      const payload: Record<string, unknown> = {
         ...formData,
         status: targetStatus,
         tags: selectedTagIds,
       }
-      if (!payload.isProtected) {
+
+      if (!formData.isProtected) {
         delete payload.password
-      } else if (!payload.password || !payload.password.trim()) {
+      } else if (!formData.password || !formData.password.trim()) {
         delete payload.password
       } else {
-        payload.password = payload.password.trim()
+        payload.password = formData.password.trim()
       }
 
       const response = await fetch(url, {
@@ -292,21 +371,24 @@ function PostEditorContent() {
   }
 
   const publishStatus = formData.status === 'ARCHIVED' ? 'ARCHIVED' : 'PUBLISHED'
+  const submitDisabled = saving || isUploadingImages
 
   if (loading) {
     return (
       <div className="flex items-center justify-center p-12">
-        <div className="text-lg text-gray-600 dark:text-gray-400">
-          加载中...
-        </div>
+        <div className="text-lg text-gray-600 dark:text-gray-400">加载中...</div>
       </div>
     )
   }
 
   return (
-    <div className="max-w-4xl space-y-6">
+    <div
+      ref={editorLayoutRef}
+      className="mx-auto flex min-h-0 w-full max-w-7xl flex-col overflow-hidden"
+      style={editorLayoutHeight !== null ? { height: `${editorLayoutHeight}px` } : undefined}
+    >
       {/* 头部操作栏 */}
-      <div className="flex items-center justify-between">
+      <div className="flex shrink-0 items-center justify-between">
         <div className="flex items-center gap-4">
           <Link href="/admin/posts">
             <Button size="sm" variant="ghost">
@@ -315,11 +397,9 @@ function PostEditorContent() {
             </Button>
           </Link>
           <div>
-            <h1 className="text-2xl font-bold">
-              {postId ? '编辑文章' : '新建文章'}
-            </h1>
+            <h1 className="text-2xl font-bold">{postId ? '编辑文章' : '新建文章'}</h1>
             {postId && metaInfo.updatedAt && (
-              <p className="text-xs text-muted-foreground mt-1">
+              <p className="text-muted-foreground mt-1 text-xs">
                 最后保存时间: {new Date(metaInfo.updatedAt).toLocaleString('zh-CN')}
               </p>
             )}
@@ -330,26 +410,46 @@ function PostEditorContent() {
             size="sm"
             variant="outline"
             onClick={() => handleSubmit(false)}
-            disabled={saving}
+            disabled={submitDisabled}
           >
             <Save className="mr-2 h-4 w-4" />
             {saving ? '保存中...' : '保存草稿'}
           </Button>
-          <Button
-            size="sm"
-            onClick={() => handleSubmit(true)}
-            disabled={saving}
-          >
+          <Button size="sm" onClick={() => handleSubmit(true)} disabled={submitDisabled}>
             <Eye className="mr-2 h-4 w-4" />
             {saving ? '发布中...' : '发布'}
           </Button>
         </div>
       </div>
 
+      <div className="bg-card mt-4 shrink-0 rounded-lg border p-1">
+        <div className="grid grid-cols-2 gap-1">
+          <Button
+            type="button"
+            size="sm"
+            variant={activePanel === 'meta' ? 'default' : 'ghost'}
+            className={cn('w-full', activePanel !== 'meta' && 'text-muted-foreground')}
+            onClick={() => setActivePanel('meta')}
+            disabled={submitDisabled}
+          >
+            基本信息
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant={activePanel === 'content' ? 'default' : 'ghost'}
+            className={cn('w-full', activePanel !== 'content' && 'text-muted-foreground')}
+            onClick={() => setActivePanel('content')}
+            disabled={submitDisabled}
+          >
+            文章内容
+          </Button>
+        </div>
+      </div>
+
       {/* 文章表单 */}
-      <div className="space-y-6">
-        {/* 基本信息 */}
-        <Card>
+      <div className="mt-6 min-h-0 flex-1 space-y-6 overflow-y-auto pr-1">
+        <Card className={cn(activePanel !== 'meta' && 'hidden')}>
           <CardHeader>
             <CardTitle>基本信息</CardTitle>
           </CardHeader>
@@ -368,12 +468,7 @@ function PostEditorContent() {
 
               <div className="space-y-2">
                 <Label htmlFor="slug">URL Slug（自动生成）</Label>
-                <Input
-                  id="slug"
-                  value={formData.slug}
-                  placeholder="post-url-slug"
-                  disabled
-                />
+                <Input id="slug" value={formData.slug} placeholder="post-url-slug" disabled />
               </div>
             </div>
 
@@ -382,9 +477,7 @@ function PostEditorContent() {
               <Textarea
                 id="excerpt"
                 value={formData.excerpt}
-                onChange={(e) =>
-                  setFormData({ ...formData, excerpt: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
                 placeholder="简短描述文章内容..."
                 rows={3}
                 disabled={saving}
@@ -426,9 +519,7 @@ function PostEditorContent() {
                 <Label htmlFor="locale">语言</Label>
                 <Select
                   value={formData.locale}
-                  onValueChange={(value) =>
-                    setFormData({ ...formData, locale: value })
-                  }
+                  onValueChange={(value) => setFormData({ ...formData, locale: value })}
                   disabled={saving}
                 >
                   <SelectTrigger>
@@ -445,9 +536,7 @@ function PostEditorContent() {
                 <Label htmlFor="category">分类</Label>
                 <Select
                   value={formData.categoryId}
-                  onValueChange={(value) =>
-                    setFormData({ ...formData, categoryId: value })
-                  }
+                  onValueChange={(value) => setFormData({ ...formData, categoryId: value })}
                   disabled={saving}
                 >
                   <SelectTrigger>
@@ -467,7 +556,7 @@ function PostEditorContent() {
             <div className="space-y-2">
               <Label>标签</Label>
               {tags.length === 0 ? (
-                <div className="text-sm text-muted-foreground">
+                <div className="text-muted-foreground text-sm">
                   暂无标签，
                   <Link href="/admin/tags" className="text-blue-600 hover:underline">
                     去创建
@@ -504,7 +593,7 @@ function PostEditorContent() {
                   })}
                 </div>
               )}
-              <p className="text-xs text-muted-foreground">可多选</p>
+              <p className="text-muted-foreground text-xs">可多选</p>
             </div>
 
             <div className="space-y-2">
@@ -514,9 +603,7 @@ function PostEditorContent() {
                   id="coverImage"
                   className="sm:flex-1"
                   value={formData.coverImage}
-                  onChange={(e) =>
-                    setFormData({ ...formData, coverImage: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, coverImage: e.target.value })}
                   placeholder="https://example.com/image.jpg"
                   disabled={saving}
                 />
@@ -550,7 +637,7 @@ function PostEditorContent() {
                 />
                 启用访问密码
               </label>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-muted-foreground text-xs">
                 启用后访问需输入密码，仅当前标签页记住解锁状态。
               </p>
             </div>
@@ -562,49 +649,30 @@ function PostEditorContent() {
                   id="postPassword"
                   type="password"
                   value={formData.password}
-                  onChange={(e) =>
-                    setFormData({ ...formData, password: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   placeholder={hasPassword ? '留空则保持原密码' : '设置访问密码'}
                   disabled={saving}
                 />
-                {hasPassword && (
-                  <p className="text-xs text-muted-foreground">留空则保持原密码</p>
-                )}
+                {hasPassword && <p className="text-muted-foreground text-xs">留空则保持原密码</p>}
               </div>
             )}
           </CardContent>
         </Card>
 
-        {/* 内容编辑 */}
-        <Card>
-          <CardHeader>
+        <Card className={cn('flex h-full min-h-0 flex-col', activePanel !== 'content' && 'hidden')}>
+          <CardHeader className="shrink-0">
             <CardTitle>文章内容</CardTitle>
-            <p className="text-sm text-muted-foreground">
-              支持 Markdown 语法
+            <p className="text-muted-foreground text-sm">
+              支持 Markdown 语法，编辑区与预览区同步滚动
             </p>
           </CardHeader>
-          <CardContent>
-            <Textarea
+          <CardContent className="min-h-0 flex-1">
+            <PostMarkdownEditor
               value={formData.content}
-              onChange={(e) =>
-                setFormData({ ...formData, content: e.target.value })
-              }
-              placeholder="# 开始写作...
-
-支持 Markdown 语法,例如:
-
-## 标题
-- 列表项
-**粗体** *斜体*
-
-```javascript
-console.log('代码块')
-```
-"
-              rows={20}
-              className="font-mono text-sm"
+              onChange={(content) => setFormData({ ...formData, content })}
               disabled={saving}
+              height="100%"
+              onUploadingChange={setIsUploadingImages}
             />
           </CardContent>
         </Card>
@@ -615,7 +683,11 @@ console.log('代码块')
 
 export default function PostEditorPage() {
   return (
-    <Suspense fallback={<div className="flex h-full items-center justify-center p-6">正在加载编辑器...</div>}>
+    <Suspense
+      fallback={
+        <div className="flex h-full items-center justify-center p-6">正在加载编辑器...</div>
+      }
+    >
       <PostEditorContent />
     </Suspense>
   )

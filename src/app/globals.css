@@ -172,9 +172,32 @@
     }
   }
 
-  .site-loading-bar {
-    animation: site-loading-bar 0.9s ease-in-out infinite;
-  }
+.site-loading-bar {
+  animation: site-loading-bar 0.9s ease-in-out infinite;
+}
+
+.post-editor-md .cm-scroller,
+.post-editor-preview-scroll {
+  scrollbar-width: thin;
+}
+
+.post-editor-md .cm-scroller::-webkit-scrollbar,
+.post-editor-preview-scroll::-webkit-scrollbar {
+  display: block;
+  width: 10px;
+  height: 10px;
+}
+
+.post-editor-md .cm-scroller::-webkit-scrollbar-thumb,
+.post-editor-preview-scroll::-webkit-scrollbar-thumb {
+  border-radius: 9999px;
+  background: color-mix(in oklab, var(--muted-foreground) 45%, transparent);
+}
+
+.post-editor-md .cm-scroller::-webkit-scrollbar-track,
+.post-editor-preview-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
 }
 
 /* Prism (rehype-prism-plus) - minimal theme */

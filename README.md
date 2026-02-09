@@ -129,6 +129,21 @@ NEXT_PUBLIC_DEFAULT_LOCALE="zh"
 图片访问路径：
 - `GET /api/files/:id`
 
+## 后台文章编辑器
+
+后台文章编辑页已升级为 Markdown 所见即所得编辑器：
+
+- 实时预览（桌面端默认编辑+预览，移动端支持编辑/预览切换）
+- 支持截图粘贴、图片拖拽、工具栏上传
+- 上传后自动回填图片 URL（`![](/api/files/:id)`）
+- 复用文件管理上传链路（格式校验、大小限制、压缩、鉴权、限流）
+
+默认上传规则：
+
+- 支持格式：`jpg/jpeg/png/webp/avif`
+- 单图大小上限：由 `MEDIA_MAX_UPLOAD_MB` 控制（默认 `10MB`）
+- 压缩策略：`BALANCED`（平衡）
+
 ### Nginx 防盗链（valid_referers 起步）
 
 可在反向代理中对 `/api/files/` 增加防盗链：
