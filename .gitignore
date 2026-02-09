@@ -37,6 +37,11 @@ yarn-error.log*
 # vercel
 .vercel
 
+# IDE & tools
+.vscode/
+.kiro/
+.cunzhi-memory/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

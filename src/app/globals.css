@@ -289,3 +289,53 @@
 .dark .mdx-content .token.class-name {
   color: #c4b5fd;
 }
+
+/* md-editor-rt 样式覆盖 */
+.md-editor {
+  --md-bk-color: var(--background) !important;
+  --md-border-color: var(--border) !important;
+  border-radius: var(--radius) !important;
+  border: 1px solid var(--border) !important;
+  min-height: 700px;
+  overflow: hidden;
+}
+
+.md-editor-dark {
+  --md-bk-color: var(--card) !important;
+  --md-border-color: var(--border) !important;
+}
+
+/* 工具栏边缘对齐 */
+.md-editor .md-editor-toolbar-wrapper {
+  border-bottom: 1px solid var(--border) !important;
+  padding-left: 4px !important;
+  padding-right: 4px !important;
+}
+
+.md-editor .md-editor-toolbar {
+  flex-wrap: wrap;
+}
+
+/* 编辑器内容区域滚动条恢复显示（覆盖全局隐藏） */
+.md-editor .md-editor-input-wrapper,
+.md-editor .md-editor-preview-wrapper {
+  scrollbar-width: thin;
+  -ms-overflow-style: auto;
+}
+
+.md-editor .md-editor-input-wrapper::-webkit-scrollbar,
+.md-editor .md-editor-preview-wrapper::-webkit-scrollbar {
+  display: block;
+  width: 6px;
+}
+
+.md-editor .md-editor-input-wrapper::-webkit-scrollbar-thumb,
+.md-editor .md-editor-preview-wrapper::-webkit-scrollbar-thumb {
+  background-color: var(--muted-foreground);
+  border-radius: 3px;
+}
+
+.md-editor .md-editor-input-wrapper::-webkit-scrollbar-track,
+.md-editor .md-editor-preview-wrapper::-webkit-scrollbar-track {
+  background-color: transparent;
+}
