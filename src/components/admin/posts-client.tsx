@@ -186,7 +186,7 @@ export function AdminPostsClient({
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">已发布</CardTitle>
+            <CardTitle className="text-sm font-medium">公开</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.published}</div>
@@ -274,10 +274,10 @@ export function AdminPostsClient({
                           }`}
                         >
                           {post.status === 'PUBLISHED'
-                            ? '已发布'
+                            ? '公开'
                             : post.status === 'DRAFT'
                             ? '草稿'
-                            : '已归档'}
+                            : '隐藏'}
                         </span>
                       </div>
                       <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
@@ -364,10 +364,10 @@ export function AdminPostsClient({
                               }`}
                             >
                               {post.status === 'PUBLISHED'
-                                ? '已发布'
+                                ? '公开'
                                 : post.status === 'DRAFT'
                                 ? '草稿'
-                                : '已归档'}
+                                : '隐藏'}
                             </span>
                           </td>
                           <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">

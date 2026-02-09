@@ -91,8 +91,8 @@ export function PostsFilters({
       >
         <option value="">所有状态</option>
         <option value="DRAFT">草稿</option>
-        <option value="PUBLISHED">已发布</option>
-        <option value="ARCHIVED">已归档</option>
+        <option value="PUBLISHED">公开</option>
+        <option value="ARCHIVED">隐藏</option>
       </select>
       <select
         value={categoryId}

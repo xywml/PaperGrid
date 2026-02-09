@@ -19,6 +19,29 @@ import Link from 'next/link'
 import { useToast } from '@/hooks/use-toast'
 import { ImagePickerDialog } from '@/components/admin/image-picker-dialog'
 
+type PostStatusValue = 'DRAFT' | 'PUBLISHED' | 'ARCHIVED'
+
+function getStatusFeedback(status: PostStatusValue) {
+  if (status === 'DRAFT') {
+    return {
+      title: '保存成功',
+      description: '文章已保存为草稿',
+    }
+  }
+
+  if (status === 'ARCHIVED') {
+    return {
+      title: '保存成功',
+      description: '文章已设为隐藏（前台不可见）',
+    }
+  }
+
+  return {
+    title: '发布成功',
+    description: '文章已公开',
+  }
+}
+
 function PostEditorContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -33,7 +56,7 @@ function PostEditorContent() {
     content: '',
     excerpt: '',
     coverImage: '',
-    status: 'DRAFT',
+    status: 'DRAFT' as PostStatusValue,
     locale: 'zh',
     categoryId: '',
     createdAt: '',
@@ -57,15 +80,16 @@ function PostEditorContent() {
 
   useEffect(() => {
     const created = searchParams.get('created')
-    const published = searchParams.get('published')
+    const status = (searchParams.get('status') as PostStatusValue | null) ?? 'DRAFT'
     if (created === '1') {
+      const feedback = getStatusFeedback(status)
       toast({
-        title: published === '1' ? '发布成功' : '保存成功',
-        description: published === '1' ? '文章已发布' : '文章已保存为草稿',
+        title: feedback.title,
+        description: feedback.description,
       })
       const params = new URLSearchParams(searchParams.toString())
       params.delete('created')
-      params.delete('published')
+      params.delete('status')
       router.replace(`/admin/posts/editor?${params.toString()}`)
     }
   }, [router, searchParams, toast])
@@ -190,11 +214,17 @@ function PostEditorContent() {
         return
       }
 
+      const targetStatus: PostStatusValue = publish
+        ? formData.status === 'ARCHIVED'
+          ? 'ARCHIVED'
+          : 'PUBLISHED'
+        : 'DRAFT'
+
       const url = postId ? `/api/posts/${postId}` : '/api/posts'
       const method = postId ? 'PATCH' : 'POST'
       const payload: Record<string, any> = {
         ...formData,
-        status: publish ? 'PUBLISHED' : 'DRAFT',
+        status: targetStatus,
         tags: selectedTagIds,
       }
       if (!payload.isProtected) {
@@ -224,21 +254,29 @@ function PostEditorContent() {
       // 保存成功
       if (!postId && data.post) {
         // 如果是新创建的文章,跳转到编辑页面
-        router.push(`/admin/posts/editor?id=${data.post.id}&created=1&published=${publish ? '1' : '0'}`)
+        router.push(`/admin/posts/editor?id=${data.post.id}&created=1&status=${targetStatus}`)
       } else {
         if (data.post) {
+          const savedStatus = (data.post.status as PostStatusValue) || targetStatus
+
           setMetaInfo({
             createdAt: data.post.createdAt,
             updatedAt: data.post.updatedAt,
           })
+
+          setFormData((prev) => ({
+            ...prev,
+            status: publish ? savedStatus : prev.status,
+          }))
         }
         setHasPassword(formData.isProtected)
         if (formData.password.trim()) {
           setFormData((prev) => ({ ...prev, password: '' }))
         }
+        const feedback = getStatusFeedback((data.post?.status as PostStatusValue) || targetStatus)
         toast({
-          title: publish ? '发布成功' : '保存成功',
-          description: publish ? '文章已发布' : '文章已保存为草稿',
+          title: feedback.title,
+          description: feedback.description,
         })
       }
     } catch (error) {
@@ -252,6 +290,8 @@ function PostEditorContent() {
       setSaving(false)
     }
   }
+
+  const publishStatus = formData.status === 'ARCHIVED' ? 'ARCHIVED' : 'PUBLISHED'
 
   if (loading) {
     return (
@@ -364,11 +404,11 @@ function PostEditorContent() {
 
             <div className="grid gap-4 md:grid-cols-3">
               <div className="space-y-2">
-                <Label htmlFor="status">状态</Label>
+                <Label htmlFor="status">发布可见性</Label>
                 <Select
-                  value={formData.status}
+                  value={publishStatus}
                   onValueChange={(value) =>
-                    setFormData({ ...formData, status: value })
+                    setFormData({ ...formData, status: value as PostStatusValue })
                   }
                   disabled={saving}
                 >
@@ -376,9 +416,8 @@ function PostEditorContent() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="DRAFT">草稿</SelectItem>
-                    <SelectItem value="PUBLISHED">已发布</SelectItem>
-                    <SelectItem value="ARCHIVED">已归档</SelectItem>
+                    <SelectItem value="PUBLISHED">公开（前台可见）</SelectItem>
+                    <SelectItem value="ARCHIVED">隐藏（仅后台可见）</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
