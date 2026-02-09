@@ -18,6 +18,7 @@ import { ArrowLeft, Save, Eye } from 'lucide-react'
 import Link from 'next/link'
 import { useToast } from '@/hooks/use-toast'
 import { ImagePickerDialog } from '@/components/admin/image-picker-dialog'
+import { MarkdownEditor } from '@/components/admin/markdown-editor'
 
 function PostEditorContent() {
   const router = useRouter()
@@ -546,25 +547,9 @@ function PostEditorContent() {
             </p>
           </CardHeader>
           <CardContent>
-            <Textarea
+            <MarkdownEditor
               value={formData.content}
-              onChange={(e) =>
-                setFormData({ ...formData, content: e.target.value })
-              }
-              placeholder="# 开始写作...
-
-支持 Markdown 语法,例如:
-
-## 标题
-- 列表项
-**粗体** *斜体*
-
-```javascript
-console.log('代码块')
-```
-"
-              rows={20}
-              className="font-mono text-sm"
+              onChange={(v) => setFormData({ ...formData, content: v })}
               disabled={saving}
             />
           </CardContent>
