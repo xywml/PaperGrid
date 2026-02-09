@@ -63,7 +63,7 @@ function parseNullableString(input: unknown): string | null | undefined {
 }
 
 function parseCategoryId(input: unknown): string | null | undefined {
-  if (input === '') return null
+  if (input === null || input === '') return null
   if (typeof input !== 'string') return undefined
   const normalized = input.trim()
   return normalized.length > 0 ? normalized : null
@@ -81,11 +81,15 @@ function parseCreatedAt(input: unknown): Date | null | undefined {
 }
 
 async function hashPostPasswordIfNeeded(isProtected: boolean, password: unknown) {
+  const raw = typeof password === 'string' ? password.trim() : ''
+
   if (!isProtected) {
+    if (raw.length > 0) {
+      return { ok: false as const, error: '未启用加密，无法设置密码' }
+    }
     return { ok: true as const, passwordHash: null as string | null }
   }
 
-  const raw = typeof password === 'string' ? password.trim() : ''
   if (raw.length < 4) {
     return { ok: false as const, error: '文章密码至少 4 位' }
   }

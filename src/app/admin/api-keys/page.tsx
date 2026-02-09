@@ -38,6 +38,14 @@ type ApiKeyRecord = {
   updatedAt: string
 }
 
+function formatIsoToDatetimeLocal(value: string | null): string {
+  if (!value) return ''
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return ''
+  const offsetMs = date.getTimezoneOffset() * 60 * 1000
+  return new Date(date.getTime() - offsetMs).toISOString().slice(0, 16)
+}
+
 export default function AdminApiKeysPage() {
   const { toast } = useToast()
   const [apiKeys, setApiKeys] = useState<ApiKeyRecord[]>([])
@@ -291,7 +299,7 @@ export default function AdminApiKeysPage() {
                         <Input
                           className="mt-1"
                           type="datetime-local"
-                          value={key.expiresAt ? new Date(key.expiresAt).toISOString().slice(0, 16) : ''}
+                          value={formatIsoToDatetimeLocal(key.expiresAt)}
                           onChange={(e) => {
                             const next = e.target.value
                             updateKeyState(key.id, {

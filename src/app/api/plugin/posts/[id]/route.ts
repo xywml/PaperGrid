@@ -62,7 +62,7 @@ function parseNullableString(input: unknown): string | null | undefined {
 }
 
 function parseCategoryId(input: unknown): string | null | undefined {
-  if (input === '') return null
+  if (input === null || input === '') return null
   if (typeof input !== 'string') return undefined
   const normalized = input.trim()
   return normalized.length > 0 ? normalized : null
