@@ -1,0 +1,73 @@
+name: 构建并推送 Docker 镜像
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    name: 构建并推送到 GHCR
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    env:
+      IMAGE: ghcr.io/xywml/papergrid
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 计算版本标签并校验一致性
+        id: meta
+        run: |
+          set -euo pipefail
+          VERSION="$(node -p "require('./package.json').version")"
+          if [[ -z "${VERSION}" ]]; then
+            echo "未能读取应用版本号" >&2
+            exit 1
+          fi
+
+          TAG_VERSION="${VERSION}"
+          if [[ "${TAG_VERSION}" != v* ]]; then
+            TAG_VERSION="v${TAG_VERSION}"
+          fi
+
+          if [[ "${GITHUB_REF_TYPE:-}" == "tag" ]]; then
+            if [[ "${GITHUB_REF_NAME:-}" != "${TAG_VERSION}" ]]; then
+              echo "Git 标签与 package.json 版本不一致: tag=${GITHUB_REF_NAME}, 期望=${TAG_VERSION}" >&2
+              exit 1
+            fi
+            echo "已校验 Git 标签与 package.json 一致: ${TAG_VERSION}"
+          else
+            echo "当前触发类型不是 tag，跳过标签一致性校验（ref_type=${GITHUB_REF_TYPE:-unknown}, ref_name=${GITHUB_REF_NAME:-unknown}）"
+          fi
+
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "tag_version=${TAG_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "使用版本: ${TAG_VERSION}"
+
+      - name: 登录 GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 用本地脚本构建镜像
+        env:
+          IMAGE: ${{ env.IMAGE }}
+        run: ./scripts/build-image.sh
+
+      - name: 推送版本标签
+        env:
+          IMAGE: ${{ env.IMAGE }}
+          TAG_VERSION: ${{ steps.meta.outputs.tag_version }}
+        run: docker push "${IMAGE}:${TAG_VERSION}"
+
+      - name: 推送 latest 标签
+        env:
+          IMAGE: ${{ env.IMAGE }}
+        run: docker push "${IMAGE}:latest"
