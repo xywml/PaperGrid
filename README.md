@@ -1,6 +1,22 @@
-# PaperGrid - 执笔为剑
+<div align="center">
+  <a name="readme-top"></a>
+  <img src="./public/logo.svg" alt="PaperGrid Logo" width="96" height="96" />
+  <h1>PaperGrid - 执笔为剑</h1>
+  <p>
+    一个基于 Next.js App Router 的轻量化个人博客与后台管理系统。<br/>
+    内置认证、文章管理、评论与系统设置，支持中文/英文与深色模式。
+  </p>
+  <p>
+    <a href="https://github.com/xywml/PaperGrid/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/xywml/PaperGrid?style=for-the-badge&logo=github" /></a>
+    <a href="https://github.com/xywml/PaperGrid/forks"><img alt="GitHub forks" src="https://img.shields.io/github/forks/xywml/PaperGrid?style=for-the-badge&logo=github" /></a>
+    <a href="https://github.com/xywml/PaperGrid/tags"><img alt="Version (from tag)" src="https://img.shields.io/github/v/tag/xywml/PaperGrid?style=for-the-badge&logo=github&label=version&sort=semver" /></a>
+    <br/>
+    <a href="https://github.com/xywml/PaperGrid/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/xywml/PaperGrid?style=for-the-badge&logo=github" /></a>
+    <a href="https://github.com/xywml/PaperGrid/blob/main/LICENSE"><img alt="GitHub license" src="https://img.shields.io/github/license/xywml/PaperGrid?style=for-the-badge" /></a>
+    <a href="https://github.com/xywml/PaperGrid/pkgs/container/papergrid"><img alt="GHCR image" src="https://img.shields.io/badge/GHCR-ghcr.io%2Fxywml%2Fpapergrid-2f81f7?style=for-the-badge&logo=github" /></a>
+  </p>
 
-一个基于 Next.js App Router 的轻量化个人博客与后台管理系统，内置认证、文章管理、评论与系统设置，支持中文/英文与深色模式。
+</div>
 
 ## 主要特性
 
@@ -344,6 +360,6 @@ next.config.ts
 package.json
 ```
 
-## 许可证
+## Star History
 
-MIT
+[![Star History Chart](https://api.star-history.com/svg?repos=xywml/PaperGrid&type=date&legend=top-left)](https://www.star-history.com/#xywml/PaperGrid&type=date&legend=top-left)
