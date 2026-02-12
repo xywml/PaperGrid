@@ -50,14 +50,13 @@ export async function sendGotifyNotification(options: GotifyOptions) {
     if (error instanceof Error && error.name === 'AbortError') {
       throw new Error(`Gotify 推送超时（>${timeoutMs}ms）`)
     }
-    throw error
+    throw new Error('Gotify 请求失败，请检查 URL 或网络连接')
   } finally {
     clearTimeout(timer)
   }
 
   if (!res.ok) {
-    const text = await res.text().catch(() => '')
-    throw new Error(`Gotify 推送失败: ${res.status} ${res.statusText} ${text}`)
+    throw new Error(`Gotify 推送失败（HTTP ${res.status}）`)
   }
 
   return res.json().catch(() => ({ status: 'ok' }))

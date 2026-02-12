@@ -29,7 +29,9 @@ export async function POST(request: NextRequest) {
     if (error instanceof GotifyServiceError) {
       return NextResponse.json({ error: error.message }, { status: error.status })
     }
-    const message = error instanceof Error ? error.message : '推送失败'
-    return NextResponse.json({ error: message }, { status: 500 })
+    return NextResponse.json(
+      { error: '推送失败，请检查 Gotify 配置或网络连接' },
+      { status: 500 }
+    )
   }
 }

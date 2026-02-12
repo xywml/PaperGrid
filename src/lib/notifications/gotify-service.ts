@@ -11,6 +11,9 @@ type GotifyConfig = {
   token: string
 }
 
+type GotifySwitchConfig = Pick<GotifyConfig, 'enabled' | 'notifyNew' | 'notifyPending'>
+type GotifyCredentialConfig = Pick<GotifyConfig, 'url' | 'token'>
+
 export type CommentGotifyNotificationInput = {
   status: CommentStatus
   content: string
@@ -34,25 +37,33 @@ export class GotifyServiceError extends Error {
   }
 }
 
-async function getGotifyConfig(): Promise<GotifyConfig> {
-  const [enabledRaw, notifyNewRaw, notifyPendingRaw, settingUrlRaw, settingTokenRaw] = await Promise.all([
+async function getGotifySwitchConfig(): Promise<GotifySwitchConfig> {
+  const [enabledRaw, notifyNewRaw, notifyPendingRaw] = await Promise.all([
     getSetting<boolean>('notifications.gotify.enabled', false),
     getSetting<boolean>('notifications.gotify.notifyNewComment', true),
     getSetting<boolean>('notifications.gotify.notifyPendingComment', true),
-    getSetting<string>('notifications.gotify.url', ''),
-    getSetting<string>('notifications.gotify.token', ''),
   ])
 
   return {
     enabled: enabledRaw ?? false,
     notifyNew: notifyNewRaw ?? true,
     notifyPending: notifyPendingRaw ?? true,
+  }
+}
+
+async function getGotifyCredentialConfig(): Promise<GotifyCredentialConfig> {
+  const [settingUrlRaw, settingTokenRaw] = await Promise.all([
+    getSetting<string>('notifications.gotify.url', ''),
+    getSetting<string>('notifications.gotify.token', ''),
+  ])
+
+  return {
     url: (process.env.GOTIFY_URL || settingUrlRaw || '').trim(),
     token: (process.env.GOTIFY_TOKEN || settingTokenRaw || '').trim(),
   }
 }
 
-function getMissingConfigItems(config: Pick<GotifyConfig, 'url' | 'token'>): string[] {
+function getMissingConfigItems(config: GotifyCredentialConfig): string[] {
   const missing: string[] = []
   if (!config.url) missing.push('url')
   if (!config.token) missing.push('token')
@@ -60,14 +71,15 @@ function getMissingConfigItems(config: Pick<GotifyConfig, 'url' | 'token'>): str
 }
 
 export async function sendCommentGotifyNotification(input: CommentGotifyNotificationInput): Promise<void> {
-  const config = await getGotifyConfig()
-  if (!config.enabled) return
+  const switchConfig = await getGotifySwitchConfig()
+  if (!switchConfig.enabled) return
 
-  const shouldNotifyPending = input.status === 'PENDING' && config.notifyPending
-  const shouldNotifyNew = input.status === 'APPROVED' && config.notifyNew
+  const shouldNotifyPending = input.status === 'PENDING' && switchConfig.notifyPending
+  const shouldNotifyNew = input.status === 'APPROVED' && switchConfig.notifyNew
   if (!shouldNotifyPending && !shouldNotifyNew) return
 
-  const missing = getMissingConfigItems(config)
+  const credentialConfig = await getGotifyCredentialConfig()
+  const missing = getMissingConfigItems(credentialConfig)
   if (missing.length > 0) return
 
   const authorLabel = input.author?.name || input.authorName || '匿名用户'
@@ -80,8 +92,8 @@ export async function sendCommentGotifyNotification(input: CommentGotifyNotifica
   ].join('\n')
 
   await sendGotifyNotification({
-    url: config.url,
-    token: config.token,
+    url: credentialConfig.url,
+    token: credentialConfig.token,
     title,
     message,
     priority: shouldNotifyPending ? 8 : 5,
@@ -95,12 +107,13 @@ export type GotifyTestNotificationInput = {
 }
 
 export async function sendGotifyTestNotification(input: GotifyTestNotificationInput): Promise<void> {
-  const config = await getGotifyConfig()
-  if (!config.enabled) {
+  const switchConfig = await getGotifySwitchConfig()
+  if (!switchConfig.enabled) {
     throw new GotifyServiceError('Gotify 推送未启用', 400)
   }
 
-  const missing = getMissingConfigItems(config)
+  const credentialConfig = await getGotifyCredentialConfig()
+  const missing = getMissingConfigItems(credentialConfig)
   if (missing.length > 0) {
     throw new GotifyServiceError(`Gotify 配置不完整（缺少 ${missing.join(' / ')}）`, 400)
   }
@@ -110,8 +123,8 @@ export async function sendGotifyTestNotification(input: GotifyTestNotificationIn
   const priority = Number.isFinite(input.priority) ? Number(input.priority) : 5
 
   await sendGotifyNotification({
-    url: config.url,
-    token: config.token,
+    url: credentialConfig.url,
+    token: credentialConfig.token,
     title,
     message,
     priority,
