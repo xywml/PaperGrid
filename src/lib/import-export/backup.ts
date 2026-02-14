@@ -102,6 +102,7 @@ type ExistingPostSnapshot = {
 }
 
 const TRUE_VALUES = new Set(['1', 'true', 'yes', 'on'])
+const BCRYPT_HASH_PATTERN = /^\$2[aby]\$(0[4-9]|[12]\d|3[01])\$[./A-Za-z0-9]{53}$/
 const MAX_WARNINGS = 80
 
 function createCounter(): Counter {
@@ -203,6 +204,10 @@ function normalizeLocale(value: unknown): string {
   if (typeof value !== 'string') return 'zh'
   const normalized = value.trim().slice(0, 12)
   return normalized || 'zh'
+}
+
+function isBcryptHash(value: string): boolean {
+  return BCRYPT_HASH_PATTERN.test(value)
 }
 
 function getDataNode(value: unknown): RecordNode | null {
@@ -778,9 +783,14 @@ export async function importBackupData(input: {
     const categorySlug = pickString(item.categorySlug, 120)
     const tagSlugsInPost = toStringArray(item.tagSlugs, 120)
     const wantsProtected = item.isProtected === true
-    const importedPasswordHash = includeSensitive
+    const rawImportedPasswordHash = includeSensitive
       ? pickLongString(item.passwordHash, 255)
       : null
+    const importedPasswordHash = rawImportedPasswordHash && isBcryptHash(rawImportedPasswordHash)
+      ? rawImportedPasswordHash
+      : null
+    const hasInvalidImportedPasswordHash =
+      includeSensitive && Boolean(rawImportedPasswordHash) && !importedPasswordHash
 
     try {
       let categoryId: string | null = null
@@ -834,9 +844,19 @@ export async function importBackupData(input: {
         } else if (existingPost?.passwordHash) {
           isProtected = true
           passwordHash = existingPost.passwordHash
-          pushWarning(summary, `文章 "${slug}" 未提供密码哈希，已保留当前密码`)
+          pushWarning(
+            summary,
+            hasInvalidImportedPasswordHash
+              ? `文章 "${slug}" 提供的密码哈希格式不合法，已忽略并保留当前密码`
+              : `文章 "${slug}" 未提供密码哈希，已保留当前密码`
+          )
         } else {
-          pushWarning(summary, `文章 "${slug}" 标记为加密但缺少密码哈希，已改为不加密`)
+          pushWarning(
+            summary,
+            hasInvalidImportedPasswordHash
+              ? `文章 "${slug}" 提供的密码哈希格式不合法，已忽略并改为不加密`
+              : `文章 "${slug}" 标记为加密但缺少密码哈希，已改为不加密`
+          )
         }
       }
 

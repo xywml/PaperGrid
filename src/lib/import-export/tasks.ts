@@ -72,6 +72,8 @@ const globalForTaskRunner = globalThis as typeof globalThis & {
   __papergridTaskRunningSet?: Set<string>
   __papergridTaskQueue?: string[]
   __papergridTaskLastCleanupAt?: number
+  __papergridTaskRecoveryDone?: boolean
+  __papergridTaskRecoveryPromise?: Promise<void>
 }
 
 const runningTaskSet =
@@ -203,9 +205,89 @@ async function cleanupExpiredTasks() {
 async function ensureTaskDirs() {
   await mkdir(TASK_DATA_DIR, { recursive: true, mode: TASK_DIR_MODE })
   await mkdir(TASK_FILE_DIR, { recursive: true, mode: TASK_DIR_MODE })
+  await recoverUnfinishedTasks()
   void cleanupExpiredTasks().catch((error) => {
     console.error('调度历史任务清理失败:', error)
   })
+}
+
+function parseCreatedAtTime(task: TaskRecord) {
+  const createdAt = Date.parse(task.createdAt)
+  return Number.isFinite(createdAt) ? createdAt : null
+}
+
+function compareTaskByCreationOrder(a: TaskRecord, b: TaskRecord) {
+  const aTime = parseCreatedAtTime(a)
+  const bTime = parseCreatedAtTime(b)
+  if (aTime !== null && bTime !== null) return aTime - bTime
+  if (aTime !== null) return -1
+  if (bTime !== null) return 1
+  return a.id.localeCompare(b.id)
+}
+
+async function recoverUnfinishedTasks() {
+  if (globalForTaskRunner.__papergridTaskRecoveryDone) {
+    return
+  }
+  if (globalForTaskRunner.__papergridTaskRecoveryPromise) {
+    await globalForTaskRunner.__papergridTaskRecoveryPromise
+    return
+  }
+
+  globalForTaskRunner.__papergridTaskRecoveryPromise = (async () => {
+    let taskFiles: string[] = []
+    try {
+      taskFiles = await readdir(TASK_DATA_DIR)
+    } catch (error) {
+      const nodeError = error as NodeJS.ErrnoException
+      if (nodeError.code !== 'ENOENT') {
+        console.error('恢复未完成任务失败:', error)
+      }
+      globalForTaskRunner.__papergridTaskRecoveryDone = true
+      return
+    }
+
+    const resumableTasks: TaskRecord[] = []
+
+    for (const fileName of taskFiles) {
+      if (!fileName.endsWith('.json')) continue
+
+      const jsonPath = path.join(TASK_DATA_DIR, fileName)
+      try {
+        const raw = await readFile(jsonPath, 'utf8')
+        const task = JSON.parse(raw) as TaskRecord
+        if (!task || typeof task.id !== 'string') continue
+        validateTaskId(task.id)
+        if (task.status !== 'pending' && task.status !== 'running') continue
+        resumableTasks.push(task)
+      } catch (error) {
+        console.error('恢复任务读取失败:', error)
+      }
+    }
+
+    resumableTasks.sort(compareTaskByCreationOrder)
+
+    for (const task of resumableTasks) {
+      if (task.status === 'running') {
+        await writeTask({
+          ...task,
+          status: 'pending',
+          startedAt: null,
+          finishedAt: null,
+          error: null,
+        })
+      }
+      scheduleTaskExecution(task.id)
+    }
+
+    globalForTaskRunner.__papergridTaskRecoveryDone = true
+  })()
+
+  try {
+    await globalForTaskRunner.__papergridTaskRecoveryPromise
+  } finally {
+    globalForTaskRunner.__papergridTaskRecoveryPromise = undefined
+  }
 }
 
 function toPublicTask(task: TaskRecord): PublicTaskRecord {

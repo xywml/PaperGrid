@@ -108,8 +108,13 @@ function parseMarkdownPost(
   const tags = toUniqueList(parsed.fields.tags || [])
   const categories = toUniqueList(parsed.fields.categories || [])
   const normalizedPath = fileName.replace(/\\/g, '/').toLowerCase()
-  const hexoDraftByPath = normalizedPath.includes('/_draft/') || normalizedPath.startsWith('_draft/')
-  const published = parsed.fields.published === true && !(source === 'hexo' && hexoDraftByPath)
+  const hexoDraftByPath =
+    normalizedPath.includes('/_drafts/') ||
+    normalizedPath.startsWith('_drafts/') ||
+    normalizedPath.includes('/_draft/') ||
+    normalizedPath.startsWith('_draft/')
+  const forceDraftByPath = source === 'hexo' && hexoDraftByPath
+  const published = forceDraftByPath ? false : (parsed.fields.published ?? true)
   const body = parsed.body.trim()
 
   if (!body) {
