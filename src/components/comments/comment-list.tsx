@@ -74,8 +74,8 @@ export function CommentList({
             <div className="flex items-start gap-3">
               <div className="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700" />
               <div className="flex-1 space-y-2">
-                <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded" />
-                <div className="h-20 bg-gray-200 dark:bg-gray-700 rounded" />
+                <div className="h-4 w-24 rounded bg-gray-200 dark:bg-gray-700" />
+                <div className="h-20 rounded bg-gray-200 dark:bg-gray-700" />
               </div>
             </div>
           </div>
@@ -87,9 +87,7 @@ export function CommentList({
   if (comments.length === 0) {
     return (
       <Card className="p-8 text-center">
-        <p className="text-gray-500 dark:text-gray-400">
-          还没有评论，快来发表第一条评论吧！
-        </p>
+        <p className="text-gray-500 dark:text-gray-400">还没有评论，快来发表第一条评论吧！</p>
       </Card>
     )
   }
@@ -162,35 +160,30 @@ function CommentItem({
 }) {
   const [showReplyForm, setShowReplyForm] = useState(false)
   const displayName = comment.author?.name || comment.authorName || '匿名用户'
-  const getInitials = (name: string) => {
+  const avatarSrc =
+    comment.author?.image || (comment.author ? defaultAvatarUrl || undefined : undefined)
+  const getInitial = (name: string) => {
     if (!name) return '?'
-    return name
-      .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2)
+    return name.trim().charAt(0).toUpperCase() || '?'
   }
 
   return (
     <div className="space-y-3">
-      <Card id={`comment-${comment.id}`} className="p-4 hover:shadow-md transition-shadow">
+      <Card id={`comment-${comment.id}`} className="p-4 transition-shadow hover:shadow-md">
         <div className="flex items-start gap-3">
           {/* 头像 */}
           <Avatar className="h-10 w-10 shrink-0">
-            <AvatarImage src={comment.author?.image || defaultAvatarUrl || undefined} />
-            <AvatarFallback className="border border-gray-900 dark:border-white bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white font-serif">
-              {getInitials(displayName)}
+            <AvatarImage src={avatarSrc} />
+            <AvatarFallback className="border border-gray-900 bg-gray-50 font-serif text-gray-900 dark:border-white dark:bg-gray-800 dark:text-white">
+              {getInitial(displayName)}
             </AvatarFallback>
           </Avatar>
 
           {/* 评论内容 */}
-          <div className="flex-1 min-w-0">
+          <div className="min-w-0 flex-1">
             {/* 作者名和时间 */}
-            <div className="flex items-center gap-2 mb-2">
-              <span className="font-medium text-gray-900 dark:text-white">
-                {displayName}
-              </span>
+            <div className="mb-2 flex items-center gap-2">
+              <span className="font-medium text-gray-900 dark:text-white">{displayName}</span>
               <span className="text-gray-400">·</span>
               <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
                 <Calendar className="h-3 w-3" />
@@ -204,7 +197,7 @@ function CommentItem({
             </div>
 
             {/* 评论内容 */}
-            <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap break-words">
+            <p className="break-words whitespace-pre-wrap text-gray-700 dark:text-gray-300">
               {comment.content}
             </p>
 

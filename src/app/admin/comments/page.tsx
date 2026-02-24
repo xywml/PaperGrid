@@ -199,7 +199,10 @@ export default function CommentsAdminPage() {
               <Filter className="h-4 w-4 text-gray-500" />
               <span className="text-sm font-medium">筛选:</span>
             </div>
-            <Select value={statusFilter || 'ALL'} onValueChange={(value) => setStatusFilter(value === 'ALL' ? '' : value)}>
+            <Select
+              value={statusFilter || 'ALL'}
+              onValueChange={(value) => setStatusFilter(value === 'ALL' ? '' : value)}
+            >
               <SelectTrigger className="w-full sm:w-[180px]">
                 <SelectValue placeholder="所有状态" />
               </SelectTrigger>
@@ -231,124 +234,131 @@ export default function CommentsAdminPage() {
                   <div className="flex gap-4">
                     <div className="h-12 w-12 rounded-full bg-gray-200 dark:bg-gray-700" />
                     <div className="flex-1 space-y-2">
-                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4" />
-                      <div className="h-16 bg-gray-200 dark:bg-gray-700 rounded" />
+                      <div className="h-4 w-1/4 rounded bg-gray-200 dark:bg-gray-700" />
+                      <div className="h-16 rounded bg-gray-200 dark:bg-gray-700" />
                     </div>
                   </div>
                 </div>
               ))}
             </div>
           ) : comments.length === 0 ? (
-            <div className="text-center py-12">
-              <MessageSquare className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+            <div className="py-12 text-center">
+              <MessageSquare className="mx-auto mb-4 h-12 w-12 text-gray-400" />
               <p className="text-gray-500 dark:text-gray-400">暂无评论</p>
             </div>
           ) : (
             <div className="space-y-4">
-              {comments.map((comment) => (
-                <div
-                  key={comment.id}
-                  className="flex flex-col gap-4 p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors sm:flex-row"
-                >
-                  {/* Avatar */}
-                  <Avatar className="h-12 w-12 shrink-0">
-                    <AvatarImage src={comment.author?.image || defaultAvatarUrl || undefined} />
-                    <AvatarFallback className="border border-gray-900 dark:border-white bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white font-serif">
-                      {(comment.author?.name || comment.authorName || '匿名用户').charAt(0).toUpperCase() || '?'}
-                    </AvatarFallback>
-                  </Avatar>
+              {comments.map((comment) => {
+                const displayName = comment.author?.name || comment.authorName || '匿名用户'
+                const avatarSrc =
+                  comment.author?.image ||
+                  (comment.author ? defaultAvatarUrl || undefined : undefined)
+                const avatarFallback = displayName.trim().charAt(0).toUpperCase() || '?'
+                return (
+                  <div
+                    key={comment.id}
+                    className="flex flex-col gap-4 rounded-lg border p-4 transition-colors hover:bg-gray-50 sm:flex-row dark:hover:bg-gray-800/50"
+                  >
+                    {/* Avatar */}
+                    <Avatar className="h-12 w-12 shrink-0">
+                      <AvatarImage src={avatarSrc} />
+                      <AvatarFallback className="border border-gray-900 bg-gray-50 font-serif text-gray-900 dark:border-white dark:bg-gray-800 dark:text-white">
+                        {avatarFallback}
+                      </AvatarFallback>
+                    </Avatar>
 
-                  {/* Content */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex flex-wrap items-center gap-2 mb-2">
-                          <span className="font-medium text-gray-900 dark:text-white">
-                            {comment.author?.name || comment.authorName || '匿名用户'}
-                          </span>
-                          <span className="text-gray-400">·</span>
-                          <span className="text-sm text-gray-500 dark:text-gray-400 break-all">
-                            {comment.author?.email || comment.authorEmail || ''}
-                          </span>
-                          {getStatusBadge(comment.status)}
-                        </div>
-                        <p className="text-gray-700 dark:text-gray-300 line-clamp-2 mb-2">
-                          {comment.content}
-                        </p>
-                        <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
-                          <div className="flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            <span>
-                              {formatDistanceToNow(new Date(comment.createdAt), {
-                                addSuffix: true,
-                                locale: zhCN,
-                              })}
+                    {/* Content */}
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                        <div className="min-w-0 flex-1">
+                          <div className="mb-2 flex flex-wrap items-center gap-2">
+                            <span className="font-medium text-gray-900 dark:text-white">
+                              {displayName}
                             </span>
+                            <span className="text-gray-400">·</span>
+                            <span className="text-sm break-all text-gray-500 dark:text-gray-400">
+                              {comment.author?.email || comment.authorEmail || ''}
+                            </span>
+                            {getStatusBadge(comment.status)}
                           </div>
-                          <Link
-                            href={`/posts/${comment.post.slug}`}
-                            className="hover:text-blue-600 dark:hover:text-blue-400"
-                          >
-                            文章: {comment.post.title}
-                          </Link>
+                          <p className="mb-2 line-clamp-2 text-gray-700 dark:text-gray-300">
+                            {comment.content}
+                          </p>
+                          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+                            <div className="flex items-center gap-1">
+                              <Clock className="h-3 w-3" />
+                              <span>
+                                {formatDistanceToNow(new Date(comment.createdAt), {
+                                  addSuffix: true,
+                                  locale: zhCN,
+                                })}
+                              </span>
+                            </div>
+                            <Link
+                              href={`/posts/${comment.post.slug}`}
+                              className="hover:text-blue-600 dark:hover:text-blue-400"
+                            >
+                              文章: {comment.post.title}
+                            </Link>
+                          </div>
                         </div>
-                      </div>
 
-                      {/* Actions */}
-                      <div className="flex flex-wrap items-center gap-2 sm:shrink-0">
-                        {comment.status === 'PENDING' && (
-                          <>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="hover:bg-green-50 hover:text-green-700 hover:border-green-700"
-                              onClick={() => updateCommentStatus(comment.id, 'APPROVED')}
-                            >
-                              <Check className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="hover:bg-red-50 hover:text-red-700 hover:border-red-700"
-                              onClick={() => updateCommentStatus(comment.id, 'REJECTED')}
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
-                          </>
-                        )}
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="hover:bg-red-50 hover:text-red-700 hover:border-red-700"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>删除评论</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                确定要删除这条评论吗？此操作不可撤销。
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>取消</AlertDialogCancel>
-                              <AlertDialogAction
-                                onClick={() => deleteComment(comment.id)}
-                                className="bg-red-600 hover:bg-red-700"
+                        {/* Actions */}
+                        <div className="flex flex-wrap items-center gap-2 sm:shrink-0">
+                          {comment.status === 'PENDING' && (
+                            <>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="hover:border-green-700 hover:bg-green-50 hover:text-green-700"
+                                onClick={() => updateCommentStatus(comment.id, 'APPROVED')}
                               >
-                                确定删除
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
+                                <Check className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="hover:border-red-700 hover:bg-red-50 hover:text-red-700"
+                                onClick={() => updateCommentStatus(comment.id, 'REJECTED')}
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </>
+                          )}
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="hover:border-red-700 hover:bg-red-50 hover:text-red-700"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>删除评论</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  确定要删除这条评论吗？此操作不可撤销。
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>取消</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => deleteComment(comment.id)}
+                                  className="bg-red-600 hover:bg-red-700"
+                                >
+                                  确定删除
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           )}
 
