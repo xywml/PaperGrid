@@ -157,6 +157,14 @@ export default function AdminSettingsPage() {
     return s?.value ? Object.values(s.value)[0] : ''
   }
 
+  const getBoolVal = (key: string, defaultValue = false): boolean => {
+    const value = getVal(key)
+    if (typeof value === 'boolean') return value
+    if (value === 'true' || value === '1' || value === true) return true
+    if (value === 'false' || value === '0' || value === false) return false
+    return defaultValue
+  }
+
   const setVal = (key: string, newVal: unknown) => {
     setSettings((prev) =>
       prev.map((it) => {
@@ -870,6 +878,26 @@ export default function AdminSettingsPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  X 地址
+                </label>
+                <Input
+                  className="mt-2"
+                  value={String(getVal('profile.contactX') || '')}
+                  onChange={(e) => setVal('profile.contactX', e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Bilibili 地址
+                </label>
+                <Input
+                  className="mt-2"
+                  value={String(getVal('profile.contactBilibili') || '')}
+                  onChange={(e) => setVal('profile.contactBilibili', e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   QQ 号码
                 </label>
                 <Input
@@ -877,6 +905,80 @@ export default function AdminSettingsPage() {
                   value={String(getVal('profile.contactQQ') || '')}
                   onChange={(e) => setVal('profile.contactQQ', e.target.value)}
                 />
+              </div>
+            </div>
+
+            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  显示 GitHub 链接
+                </label>
+                <select
+                  className="mt-2 w-full rounded border bg-transparent px-3 py-2"
+                  value={getBoolVal('profile.social.github.enabled', true) ? 'true' : 'false'}
+                  onChange={(e) =>
+                    setVal('profile.social.github.enabled', e.target.value === 'true')
+                  }
+                >
+                  <option value="true">显示</option>
+                  <option value="false">隐藏</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  显示 X 链接
+                </label>
+                <select
+                  className="mt-2 w-full rounded border bg-transparent px-3 py-2"
+                  value={getBoolVal('profile.social.x.enabled', true) ? 'true' : 'false'}
+                  onChange={(e) => setVal('profile.social.x.enabled', e.target.value === 'true')}
+                >
+                  <option value="true">显示</option>
+                  <option value="false">隐藏</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  显示 Bilibili 链接
+                </label>
+                <select
+                  className="mt-2 w-full rounded border bg-transparent px-3 py-2"
+                  value={getBoolVal('profile.social.bilibili.enabled', true) ? 'true' : 'false'}
+                  onChange={(e) =>
+                    setVal('profile.social.bilibili.enabled', e.target.value === 'true')
+                  }
+                >
+                  <option value="true">显示</option>
+                  <option value="false">隐藏</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  显示邮箱链接
+                </label>
+                <select
+                  className="mt-2 w-full rounded border bg-transparent px-3 py-2"
+                  value={getBoolVal('profile.social.email.enabled', true) ? 'true' : 'false'}
+                  onChange={(e) =>
+                    setVal('profile.social.email.enabled', e.target.value === 'true')
+                  }
+                >
+                  <option value="true">显示</option>
+                  <option value="false">隐藏</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  显示 QQ 链接
+                </label>
+                <select
+                  className="mt-2 w-full rounded border bg-transparent px-3 py-2"
+                  value={getBoolVal('profile.social.qq.enabled', true) ? 'true' : 'false'}
+                  onChange={(e) => setVal('profile.social.qq.enabled', e.target.value === 'true')}
+                >
+                  <option value="true">显示</option>
+                  <option value="false">隐藏</option>
+                </select>
               </div>
             </div>
           </CardContent>

@@ -2,14 +2,19 @@
 
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { ArrowRight, Sparkles, Github, X, Mail, MapPin } from 'lucide-react'
+import { ArrowRight, Sparkles, Github, X, Tv, Mail, MapPin } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { isValidHref } from '@/lib/utils'
 
 export function HeroSection({ settings }: { settings?: Record<string, unknown> }) {
   const [mounted, setMounted] = useState(false)
   const [text, setText] = useState('')
   const [index, setIndex] = useState(0)
   const s: Record<string, unknown> = settings || {}
+  const getStr = (key: string, fallback = '') =>
+    typeof s[key] === 'string' ? (s[key] as string) : fallback
+  const getBool = (key: string, fallback = false) =>
+    typeof s[key] === 'boolean' ? (s[key] as boolean) : fallback
 
   const defaultTitles = [
     '欢迎来到我的博客',
@@ -17,7 +22,7 @@ export function HeroSection({ settings }: { settings?: Record<string, unknown> }
     '记录成长的点点滴滴',
     '分享代码与生活的美好'
   ]
-  const rawTitles = typeof s['hero.typingTitles'] === 'string' ? s['hero.typingTitles'] : ''
+  const rawTitles = getStr('hero.typingTitles')
   const titles = rawTitles
     ? rawTitles
         .split(/\r?\n/)
@@ -25,11 +30,19 @@ export function HeroSection({ settings }: { settings?: Record<string, unknown> }
         .map((t: string) => t.trim())
         .filter(Boolean)
     : defaultTitles
-  const subtitle = typeof s['hero.subtitle'] === 'string' ? s['hero.subtitle'] : '全栈开发者 / 开源爱好者 / 终身学习者'
-  const location = typeof s['hero.location'] === 'string' ? s['hero.location'] : '中国 · 热爱技术'
-  const avatarUrl = typeof s['site.defaultAvatarUrl'] === 'string' ? s['site.defaultAvatarUrl'] : ''
-  const ownerName = typeof s['site.ownerName'] === 'string' ? s['site.ownerName'] : 'ME'
-  const githubUrl = typeof s['profile.contactGithub'] === 'string' ? s['profile.contactGithub'] : 'https://github.com/xywml/PaperGrid'
+  const subtitle = getStr('hero.subtitle', '全栈开发者 / 开源爱好者 / 终身学习者')
+  const location = getStr('hero.location', '中国 · 热爱技术')
+  const avatarUrl = getStr('site.defaultAvatarUrl')
+  const ownerName = getStr('site.ownerName', 'ME')
+  const githubUrl = getStr('profile.contactGithub', 'https://github.com/xywml/PaperGrid').trim()
+  const xUrl = getStr('profile.contactX').trim()
+  const bilibiliUrl = getStr('profile.contactBilibili').trim()
+  const email = getStr('profile.contactEmail').trim()
+  const showGithub = getBool('profile.social.github.enabled', true) && Boolean(githubUrl) && isValidHref(githubUrl)
+  const showX = getBool('profile.social.x.enabled', true) && Boolean(xUrl) && isValidHref(xUrl)
+  const showBilibili = getBool('profile.social.bilibili.enabled', true) && Boolean(bilibiliUrl) && isValidHref(bilibiliUrl)
+  const showEmail = getBool('profile.social.email.enabled', true) && Boolean(email) && isValidHref(`mailto:${email}`)
+  const hasSocialLinks = showGithub || showX || showBilibili || showEmail
 
   useEffect(() => {
     // 稍微延迟一点点，确保浏览器已经渲染完毕，从而能观察到动画
@@ -183,36 +196,54 @@ export function HeroSection({ settings }: { settings?: Record<string, unknown> }
           </div>
 
           {/* 社交链接 */}
-          <div
-            className={`transition-all duration-1000 delay-700 ease-out ${
-              mounted ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
-            }`}
-          >
-            <div className="flex items-center gap-4">
-              <a
-                href={githubUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-3 rounded-full bg-white dark:bg-gray-800 shadow-md hover:shadow-lg hover:scale-110 transition-all duration-300"
-              >
-                <Github className="h-5 w-5 text-gray-900 dark:text-white" />
-              </a>
-              <a
-                href="https://twitter.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-3 rounded-full bg-white dark:bg-gray-800 shadow-md hover:shadow-lg hover:scale-110 transition-all duration-300"
-              >
-                <X className="h-5 w-5 text-gray-900 dark:text-white" />
-              </a>
-              <a
-                href="mailto:contact@example.com"
-                className="p-3 rounded-full bg-white dark:bg-gray-800 shadow-md hover:shadow-lg hover:scale-110 transition-all duration-300"
-              >
-                <Mail className="h-5 w-5 text-gray-900 dark:text-white" />
-              </a>
+          {hasSocialLinks && (
+            <div
+              className={`transition-all duration-1000 delay-700 ease-out ${
+                mounted ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
+              }`}
+            >
+              <div className="flex items-center gap-4">
+                {showGithub && (
+                  <a
+                    href={githubUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-3 rounded-full bg-white dark:bg-gray-800 shadow-md hover:shadow-lg hover:scale-110 transition-all duration-300"
+                  >
+                    <Github className="h-5 w-5 text-gray-900 dark:text-white" />
+                  </a>
+                )}
+                {showX && (
+                  <a
+                    href={xUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-3 rounded-full bg-white dark:bg-gray-800 shadow-md hover:shadow-lg hover:scale-110 transition-all duration-300"
+                  >
+                    <X className="h-5 w-5 text-gray-900 dark:text-white" />
+                  </a>
+                )}
+                {showBilibili && (
+                  <a
+                    href={bilibiliUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-3 rounded-full bg-white dark:bg-gray-800 shadow-md hover:shadow-lg hover:scale-110 transition-all duration-300"
+                  >
+                    <Tv className="h-5 w-5 text-gray-900 dark:text-white" />
+                  </a>
+                )}
+                {showEmail && (
+                  <a
+                    href={`mailto:${email}`}
+                    className="p-3 rounded-full bg-white dark:bg-gray-800 shadow-md hover:shadow-lg hover:scale-110 transition-all duration-300"
+                  >
+                    <Mail className="h-5 w-5 text-gray-900 dark:text-white" />
+                  </a>
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
 

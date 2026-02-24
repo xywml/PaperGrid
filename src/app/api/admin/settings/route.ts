@@ -32,6 +32,55 @@ const AUTO_CREATE_SETTINGS: Record<string, { value: any; group: string; editable
     secret: false,
     description: '允许收件人通过链接退订回复通知',
   },
+  'profile.contactX': {
+    value: { text: '' },
+    group: 'profile',
+    editable: true,
+    secret: false,
+    description: 'X (Twitter) 地址',
+  },
+  'profile.contactBilibili': {
+    value: { text: '' },
+    group: 'profile',
+    editable: true,
+    secret: false,
+    description: 'Bilibili 地址',
+  },
+  'profile.social.github.enabled': {
+    value: { enabled: true },
+    group: 'profile',
+    editable: true,
+    secret: false,
+    description: '显示 GitHub 社交链接',
+  },
+  'profile.social.x.enabled': {
+    value: { enabled: true },
+    group: 'profile',
+    editable: true,
+    secret: false,
+    description: '显示 X 社交链接',
+  },
+  'profile.social.bilibili.enabled': {
+    value: { enabled: true },
+    group: 'profile',
+    editable: true,
+    secret: false,
+    description: '显示 Bilibili 社交链接',
+  },
+  'profile.social.email.enabled': {
+    value: { enabled: true },
+    group: 'profile',
+    editable: true,
+    secret: false,
+    description: '显示邮箱社交链接',
+  },
+  'profile.social.qq.enabled': {
+    value: { enabled: true },
+    group: 'profile',
+    editable: true,
+    secret: false,
+    description: '显示 QQ 社交链接',
+  },
 }
 
 // GET /api/admin/settings - 返回所有设置

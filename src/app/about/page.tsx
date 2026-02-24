@@ -1,10 +1,11 @@
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Mail, Github, MapPin, Calendar, MessageCircle } from 'lucide-react'
+import { Mail, Github, X, Tv, MapPin, Calendar, MessageSquareHeart } from 'lucide-react'
 import { getSetting } from '@/lib/settings'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { AboutAvatarTrigger } from '@/components/profile/about-avatar-trigger'
 import { SectionHeadingAccent } from '@/components/layout/section-heading-accent'
+import { isValidHref } from '@/lib/utils'
 
 export const revalidate = 60
 
@@ -21,7 +22,14 @@ export default async function AboutPage() {
     contactIntro,
     contactEmail,
     contactGithub,
+    contactX,
+    contactBilibili,
     contactQQ,
+    showSocialGithub,
+    showSocialX,
+    showSocialBilibili,
+    showSocialEmail,
+    showSocialQQ,
   ] = await Promise.all([
     getSetting<string>('site.ownerName', '千叶'),
     getSetting<string>('site.defaultAvatarUrl', ''),
@@ -34,8 +42,22 @@ export default async function AboutPage() {
     getSetting<string>('profile.contactIntro', ''),
     getSetting<string>('profile.contactEmail', ''),
     getSetting<string>('profile.contactGithub', 'https://github.com/xywml/PaperGrid'),
+    getSetting<string>('profile.contactX', ''),
+    getSetting<string>('profile.contactBilibili', ''),
     getSetting<string>('profile.contactQQ', ''),
+    getSetting<boolean>('profile.social.github.enabled', true),
+    getSetting<boolean>('profile.social.x.enabled', true),
+    getSetting<boolean>('profile.social.bilibili.enabled', true),
+    getSetting<boolean>('profile.social.email.enabled', true),
+    getSetting<boolean>('profile.social.qq.enabled', true),
   ])
+
+  const canShowEmail = Boolean(contactEmail) && Boolean(showSocialEmail ?? true) && isValidHref(contactEmail)
+  const canShowGithub = Boolean(contactGithub) && Boolean(showSocialGithub ?? true) && isValidHref(contactGithub)
+  const canShowX = Boolean(contactX) && Boolean(showSocialX ?? true) && isValidHref(contactX)
+  const canShowBilibili = Boolean(contactBilibili) && Boolean(showSocialBilibili ?? true) && isValidHref(contactBilibili)
+  const canShowQQ = Boolean(contactQQ) && Boolean(showSocialQQ ?? true)
+  const hasSocialLinks = canShowEmail || canShowGithub || canShowX || canShowBilibili || canShowQQ
 
   const bioParagraphs = (bio || '').split('\n').map((p) => p.trim()).filter(Boolean)
   const hobbyItems = (hobbies || '').split('\n').map((p) => p.trim()).filter(Boolean)
@@ -132,36 +154,58 @@ export default async function AboutPage() {
                     </div>
 
                     {/* 社交链接 */}
-                    <div className="mt-6 flex gap-3">
-                      {contactEmail && (
-                        <a
-                          href={`mailto:${contactEmail}`}
-                          className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-900 hover:text-white dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white dark:hover:text-gray-900 transition-colors"
-                        >
-                          <Mail className="h-5 w-5" />
-                        </a>
-                      )}
-                      {contactGithub && (
-                        <a
-                          href={contactGithub}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-900 hover:text-white dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white dark:hover:text-gray-900 transition-colors"
-                        >
-                          <Github className="h-5 w-5" />
-                        </a>
-                      )}
-                      {contactQQ && (
-                        <a
-                          href={`https://wpa.qq.com/msgrd?uin=${contactQQ}&site=qq&menu=yes`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-900 hover:text-white dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white dark:hover:text-gray-900 transition-colors"
-                        >
-                          <MessageCircle className="h-5 w-5" />
-                        </a>
-                      )}
-                    </div>
+                    {hasSocialLinks && (
+                      <div className="mt-6 flex gap-3">
+                        {canShowEmail && (
+                          <a
+                            href={`mailto:${contactEmail}`}
+                            className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-900 hover:text-white dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white dark:hover:text-gray-900 transition-colors"
+                          >
+                            <Mail className="h-5 w-5" />
+                          </a>
+                        )}
+                        {canShowGithub && (
+                          <a
+                            href={contactGithub}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-900 hover:text-white dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white dark:hover:text-gray-900 transition-colors"
+                          >
+                            <Github className="h-5 w-5" />
+                          </a>
+                        )}
+                        {canShowX && (
+                          <a
+                            href={contactX}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-900 hover:text-white dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white dark:hover:text-gray-900 transition-colors"
+                          >
+                            <X className="h-5 w-5" />
+                          </a>
+                        )}
+                        {canShowBilibili && (
+                          <a
+                            href={contactBilibili}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-900 hover:text-white dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white dark:hover:text-gray-900 transition-colors"
+                          >
+                            <Tv className="h-5 w-5" />
+                          </a>
+                        )}
+                        {canShowQQ && (
+                          <a
+                            href={`https://wpa.qq.com/msgrd?v=3&uin=${contactQQ}&site=qq&menu=yes`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-900 hover:text-white dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white dark:hover:text-gray-900 transition-colors"
+                          >
+                            <MessageSquareHeart className="h-5 w-5" />
+                          </a>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -243,19 +287,29 @@ export default async function AboutPage() {
                       {contactIntro || '如果你想与我交流技术问题、合作项目,或者只是打个招呼,欢迎通过以下方式联系我:'}
                     </p>
                     <div className="mt-4 space-y-2">
-                      {contactEmail && (
+                      {canShowEmail && (
                         <p className="text-gray-700 dark:text-gray-300">
                           📧 Email: <a href={`mailto:${contactEmail}`} className="text-blue-600 hover:text-blue-700">{contactEmail}</a>
                         </p>
                       )}
-                      {contactGithub && (
+                      {canShowGithub && (
                         <p className="text-gray-700 dark:text-gray-300">
                           💻 GitHub: <a href={contactGithub} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700">{contactGithub}</a>
                         </p>
                       )}
-                      {contactQQ && (
+                      {canShowX && (
                         <p className="text-gray-700 dark:text-gray-300">
-                          💬 QQ: <a href={`https://wpa.qq.com/msgrd?uin=${contactQQ}&site=qq&menu=yes`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700">{contactQQ}</a>
+                          𝕏 X: <a href={contactX} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700">{contactX}</a>
+                        </p>
+                      )}
+                      {canShowBilibili && (
+                        <p className="text-gray-700 dark:text-gray-300">
+                          📺 Bilibili: <a href={contactBilibili} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700">{contactBilibili}</a>
+                        </p>
+                      )}
+                      {canShowQQ && (
+                        <p className="text-gray-700 dark:text-gray-300">
+                          💬 QQ: <a href={`https://wpa.qq.com/msgrd?v=3&uin=${contactQQ}&site=qq&menu=yes`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700">{contactQQ}</a>
                         </p>
                       )}
                     </div>
