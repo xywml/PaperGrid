@@ -723,6 +723,20 @@ export default function AdminSettingsPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  公安备案
+                </label>
+                <Input
+                  className="mt-2"
+                  value={String(getVal('site.footer_mps') || '')}
+                  onChange={(e) => setVal('site.footer_mps', e.target.value)}
+                  placeholder="如：粤公网安备44030502008569号"
+                />
+                <p className="text-muted-foreground mt-1 text-xs">
+                  仅支持“省简称 + 公网安备 + 数字 + 号”格式。
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   版权信息
                 </label>
                 <Input

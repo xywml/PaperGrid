@@ -44,6 +44,7 @@ const PUBLIC_SETTING_KEYS = [
   'profile.social.email.enabled',
   'profile.social.qq.enabled',
   'site.footer_icp',
+  'site.footer_mps',
   'site.footer_copyright',
   'site.footer_powered_by',
 ]

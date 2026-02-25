@@ -81,6 +81,13 @@ const AUTO_CREATE_SETTINGS: Record<string, { value: any; group: string; editable
     secret: false,
     description: '显示 QQ 社交链接',
   },
+  'site.footer_mps': {
+    value: { value: '' },
+    group: 'site',
+    editable: true,
+    secret: false,
+    description: '公安备案信息',
+  },
 }
 
 // GET /api/admin/settings - 返回所有设置

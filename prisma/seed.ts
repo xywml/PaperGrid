@@ -76,6 +76,7 @@ async function main() {
     { key: 'email.reply.unsubscribeList', value: { text: '' }, group: 'email', editable: false },
     // 页脚设置
     { key: 'site.footer_icp', value: { value: '蜀ICP备xxxx' }, group: 'site', editable: true },
+    { key: 'site.footer_mps', value: { value: '' }, group: 'site', editable: true },
     { key: 'site.footer_copyright', value: { value: '千叶' }, group: 'site', editable: true },
     { key: 'site.footer_powered_by', value: { value: 'by xywml' }, group: 'site', editable: true },
     // Gotify 通知默认配置

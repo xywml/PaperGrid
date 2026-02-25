@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
 import { Eye } from 'lucide-react'
 import { HeroSection } from '@/components/home/hero-section'
-import { getPublicSettings } from '@/lib/settings'
+import { getPublicSettings, getSetting } from '@/lib/settings'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { RecentCommentsTimeline } from '@/components/comments/recent-comments-timeline'
 import { PostMeta } from '@/components/posts/post-meta'
@@ -13,8 +13,9 @@ import { PostMeta } from '@/components/posts/post-meta'
 export const revalidate = 60
 
 export default async function HomePage() {
-  const [settings, latestPosts, categories, tags] = await Promise.all([
+  const [settings, commentsEnabledRaw, latestPosts, categories, tags] = await Promise.all([
     getPublicSettings(),
+    getSetting<boolean>('comments.enabled', true),
     prisma.post.findMany({
       where: {
         status: 'PUBLISHED',
@@ -91,6 +92,7 @@ export default async function HomePage() {
       take: 10,
     }),
   ])
+  const commentsEnabled = commentsEnabledRaw ?? true
   const ownerName = typeof settings['site.ownerName'] === 'string' ? settings['site.ownerName'] : '千叶'
   const defaultAvatarUrl = typeof settings['site.defaultAvatarUrl'] === 'string' ? settings['site.defaultAvatarUrl'] : ''
   const ownerRole = typeof settings['profile.role'] === 'string' ? settings['profile.role'] : '全栈开发者'
@@ -272,14 +274,16 @@ export default async function HomePage() {
               </Card>
 
               {/* 最新评论 */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>最新评论</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <RecentCommentsTimeline />
-                </CardContent>
-              </Card>
+              {commentsEnabled && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>最新评论</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <RecentCommentsTimeline />
+                  </CardContent>
+                </Card>
+              )}
             </div>
           </div>
         </div>

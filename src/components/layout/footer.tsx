@@ -1,9 +1,23 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Github, X, Tv, Mail } from 'lucide-react'
 import { isValidHref } from '@/lib/utils'
+
+function parseMpsSetting(rawValue: string): { text: string; href: string } | null {
+  const raw = rawValue.trim()
+  if (!raw) return null
+
+  const normalized = raw.replace(/\s+/g, '')
+  const match = normalized.match(/^[\u4e00-\u9fa5]公网安备(\d{8,})号$/)
+  if (!match) return null
+
+  const code = match[1]
+  const href = `https://beian.mps.gov.cn/#/query/websearch?code=${code}`
+  return { text: normalized, href }
+}
 
 export function Footer({ settings }: { settings?: Record<string, unknown> }) {
   const pathname = usePathname()
@@ -13,6 +27,7 @@ export function Footer({ settings }: { settings?: Record<string, unknown> }) {
   const getBool = (key: string, fallback = false) =>
     typeof s[key] === 'boolean' ? (s[key] as boolean) : fallback
   const icp = getStr('site.footer_icp')
+  const mps = parseMpsSetting(getStr('site.footer_mps'))
   const copyright = getStr('site.footer_copyright')
   const poweredBy = getStr('site.footer_powered_by')
   const ownerName = getStr('site.ownerName', '千叶')
@@ -187,6 +202,25 @@ export function Footer({ settings }: { settings?: Record<string, unknown> }) {
                   className="transition-colors hover:text-gray-900 dark:hover:text-white"
                 >
                   {icp}
+                </a>
+              </p>
+            )}
+            {mps && (
+              <p>
+                <a
+                  href={mps.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 transition-colors hover:text-gray-900 dark:hover:text-white"
+                >
+                  <Image
+                    src="/assets/mps-beian-logo.png"
+                    alt="公安备案"
+                    width={16}
+                    height={16}
+                    className="h-4 w-4"
+                  />
+                  <span>{mps.text}</span>
                 </a>
               </p>
             )}
