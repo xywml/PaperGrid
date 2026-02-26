@@ -92,7 +92,7 @@ async function main() {
     { key: 'ai.embedding.dimensions', value: { value: 1536 }, group: 'ai', editable: true },
     { key: 'ai.rag.topK', value: { value: 8 }, group: 'ai', editable: true },
     { key: 'ai.rag.minScore', value: { value: 0.2 }, group: 'ai', editable: true },
-    { key: 'ai.answer.maxTokens', value: { value: 800 }, group: 'ai', editable: true },
+    { key: 'ai.answer.maxTokens', value: { value: 32768 }, group: 'ai', editable: true },
     // 页脚设置
     { key: 'site.footer_icp', value: { value: '蜀ICP备xxxx' }, group: 'site', editable: true },
     { key: 'site.footer_mps', value: { value: '' }, group: 'site', editable: true },

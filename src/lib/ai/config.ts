@@ -36,7 +36,7 @@ export const AI_DEFAULTS: Omit<AiRuntimeSettings, 'apiKey' | 'hasApiKey'> = {
   embeddingDimensions: 1536,
   ragTopK: 8,
   ragMinScore: 0.2,
-  answerMaxTokens: 131072,
+  answerMaxTokens: 32768,
 }
 
 export type AiSettingDefinition = {

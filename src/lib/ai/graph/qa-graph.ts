@@ -607,15 +607,67 @@ function assertQaSettingsReady(settings: Awaited<ReturnType<typeof getAiRuntimeS
   }
 }
 
-export async function streamQaGraph(
-  input: QaGraphInput,
-  options: QaGraphStreamOptions = {}
+function parseMaxTokensUpperBoundFromMessage(message: string) {
+  if (!message) {
+    return null
+  }
+
+  const patterns = [/expected a value <=\s*(\d+)/i, /maximum value[^0-9]*(\d+)/i]
+  for (const pattern of patterns) {
+    const matched = message.match(pattern)
+    if (!matched?.[1]) {
+      continue
+    }
+
+    const parsed = Number.parseInt(matched[1], 10)
+    if (Number.isFinite(parsed) && parsed > 0) {
+      return parsed
+    }
+  }
+
+  return null
+}
+
+function parseMaxTokensUpperBoundFromError(error: unknown) {
+  const messages: string[] = []
+
+  if (error instanceof Error && typeof error.message === 'string') {
+    messages.push(error.message)
+  }
+
+  if (error && typeof error === 'object') {
+    const record = error as {
+      message?: unknown
+      error?: unknown
+    }
+    if (typeof record.message === 'string') {
+      messages.push(record.message)
+    }
+
+    if (typeof record.error === 'string') {
+      messages.push(record.error)
+    } else if (record.error && typeof record.error === 'object') {
+      const nestedMessage = (record.error as { message?: unknown }).message
+      if (typeof nestedMessage === 'string') {
+        messages.push(nestedMessage)
+      }
+    }
+  }
+
+  for (const message of messages) {
+    const parsed = parseMaxTokensUpperBoundFromMessage(message)
+    if (parsed) {
+      return parsed
+    }
+  }
+
+  return null
+}
+
+async function runQaGraphWithRuntime(
+  runtime: Awaited<ReturnType<typeof createQaAgentRuntime>>,
+  options: QaGraphStreamOptions
 ): Promise<QaGraphOutput> {
-  const settings = await getAiRuntimeSettings()
-  assertQaSettingsReady(settings)
-
-  const runtime = await createQaAgentRuntime(input, settings)
-
   const stream = await runtime.agent.stream(
     { messages: runtime.messages },
     buildQaGraphStreamConfig(options.signal)
@@ -658,5 +710,31 @@ export async function streamQaGraph(
     answer: extractFinalAnswer(latestMessages, streamedText),
     citations: extractToolCitations(latestMessages),
     model: runtime.resolvedModel,
+  }
+}
+
+export async function streamQaGraph(
+  input: QaGraphInput,
+  options: QaGraphStreamOptions = {}
+): Promise<QaGraphOutput> {
+  const settings = await getAiRuntimeSettings()
+  assertQaSettingsReady(settings)
+
+  const runtime = await createQaAgentRuntime(input, settings)
+
+  try {
+    return await runQaGraphWithRuntime(runtime, options)
+  } catch (error) {
+    const maxTokensUpperBound = parseMaxTokensUpperBoundFromError(error)
+    if (!maxTokensUpperBound || maxTokensUpperBound >= settings.answerMaxTokens) {
+      throw error
+    }
+
+    const fallbackSettings = {
+      ...settings,
+      answerMaxTokens: maxTokensUpperBound,
+    }
+    const fallbackRuntime = await createQaAgentRuntime(input, fallbackSettings)
+    return runQaGraphWithRuntime(fallbackRuntime, options)
   }
 }

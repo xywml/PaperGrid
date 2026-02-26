@@ -5,6 +5,7 @@ import { normalizeAndValidateAiBaseUrl } from '@/lib/ai/security'
 type AiChatModelOverrides = {
   model?: string
   temperature?: number
+  maxTokens?: number
 }
 
 const OPENAI_COMPATIBLE_MAX_OUTPUT_TOKENS = 262144
@@ -47,8 +48,12 @@ export async function createAiChatModel(input: {
   }
 
   const temperature = typeof input.overrides?.temperature === 'number' ? input.overrides.temperature : 0.2
+  const configuredMaxTokens =
+    typeof input.overrides?.maxTokens === 'number'
+      ? input.overrides.maxTokens
+      : settings.answerMaxTokens
   const maxOutputTokens = Math.min(
-    Math.max(Math.round(settings.answerMaxTokens), 1),
+    Math.max(Math.round(configuredMaxTokens), 1),
     OPENAI_COMPATIBLE_MAX_OUTPUT_TOKENS
   )
   const modelName =

@@ -69,7 +69,7 @@ const DEFAULT_SETTINGS: AiSettingsPayload = {
   embeddingDimensions: 1536,
   ragTopK: 8,
   ragMinScore: 0.2,
-  answerMaxTokens: 131072,
+  answerMaxTokens: 32768,
   hasApiKey: false,
 }
 
