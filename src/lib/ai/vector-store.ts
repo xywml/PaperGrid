@@ -120,6 +120,9 @@ function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max)
 }
 
+const SQLITE_JOURNAL_MODES = ['DELETE', 'TRUNCATE', 'PERSIST', 'MEMORY', 'WAL', 'OFF'] as const
+type SqliteJournalMode = (typeof SQLITE_JOURNAL_MODES)[number]
+
 function resolveRebuildConcurrency() {
   const raw = Number.parseInt(process.env.AI_INDEX_REBUILD_CONCURRENCY || '', 10)
   if (!Number.isFinite(raw)) {
@@ -145,14 +148,41 @@ function normalizeDatabaseUrl(raw: string) {
   return trimmed
 }
 
+function resolveVectorDatabaseUrl() {
+  const aiVectorDatabaseUrl = normalizeDatabaseUrl(process.env.AI_VECTOR_DATABASE_URL || '')
+  if (aiVectorDatabaseUrl) {
+    return aiVectorDatabaseUrl
+  }
+
+  return normalizeDatabaseUrl(process.env.DATABASE_URL || '')
+}
+
+function resolveSqliteJournalMode(): SqliteJournalMode {
+  const raw = (process.env.SQLITE_JOURNAL_MODE || '').trim().toUpperCase()
+  if (!raw) {
+    return 'DELETE'
+  }
+
+  if ((SQLITE_JOURNAL_MODES as readonly string[]).includes(raw)) {
+    return raw as SqliteJournalMode
+  }
+
+  console.warn(
+    `[ai/vector-store] 无效 SQLITE_JOURNAL_MODE=${process.env.SQLITE_JOURNAL_MODE}，将回退为 DELETE（可选值：${SQLITE_JOURNAL_MODES.join(
+      ', '
+    )}）`
+  )
+  return 'DELETE'
+}
+
 function resolveSqliteDatabasePath() {
-  const rawUrl = normalizeDatabaseUrl(process.env.DATABASE_URL || '')
+  const rawUrl = resolveVectorDatabaseUrl()
   if (!rawUrl) {
     return path.resolve(process.cwd(), 'prisma', 'dev.db')
   }
 
   if (!rawUrl.startsWith('file:')) {
-    throw new Error('当前仅支持 SQLite（DATABASE_URL 需以 file: 开头）')
+    throw new Error('当前仅支持 SQLite（AI_VECTOR_DATABASE_URL 或 DATABASE_URL 需以 file: 开头）')
   }
 
   const withoutProtocol = rawUrl.slice('file:'.length)
@@ -648,9 +678,11 @@ async function openVectorDatabase(options: OpenVectorDatabaseOptions = {}): Prom
   try {
     loadSqliteVecExtension(db)
 
-    // 单机场景启用 WAL，避免后台写索引时阻塞前台读请求。
+    // 稳定性优先：默认使用 DELETE，避免在存储抖动时 WAL 增加额外风险。
+    // 可通过 SQLITE_JOURNAL_MODE 显式覆盖。
+    const journalMode = resolveSqliteJournalMode()
     try {
-      db.exec('PRAGMA journal_mode = WAL')
+      db.exec(`PRAGMA journal_mode = ${journalMode}`)
     } catch {
       // noop
     }

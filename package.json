@@ -1,6 +1,6 @@
 {
   "name": "my-blog",
-  "version": "1.0.17",
+  "version": "1.0.18",
   "private": true,
   "scripts": {
     "postinstall": "pnpm db:prepare",

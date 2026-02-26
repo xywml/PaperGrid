@@ -51,6 +51,10 @@ services:
     environment:
       # 建议持久化到数据卷，避免容器重建丢数据
       DATABASE_URL: "file:/data/db.sqlite"
+      # 可选：为 AI 向量索引单独使用 SQLite 文件（推荐）
+      # AI_VECTOR_DATABASE_URL: "file:/data/ai-index.sqlite"
+      # 可选：AI 向量索引使用的 SQLite 日志模式，默认 DELETE（稳定优先）
+      # SQLITE_JOURNAL_MODE: "DELETE"
       # 反向代理后必须改成你的公网地址（https://your-domain），否则登录会报 UntrustedHost
       NEXTAUTH_URL: "http://localhost:6066"
       # 仅本地开发可开启（生产环境不要设置）
@@ -126,6 +130,10 @@ pnpm dev
 
 ```env
 DATABASE_URL="file:./dev.db"
+# 可选：为 AI 向量索引单独使用 SQLite 文件（推荐生产启用）
+# AI_VECTOR_DATABASE_URL="file:/data/ai-index.sqlite"
+# 可选：AI 向量索引使用的 SQLite 日志模式；默认 DELETE（稳定优先）
+# SQLITE_JOURNAL_MODE="DELETE"
 
 NEXTAUTH_URL="http://localhost:6066"
 NEXTAUTH_SECRET="your-secret-key-change-this-in-production"

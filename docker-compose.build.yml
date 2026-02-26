@@ -9,6 +9,10 @@ services:
       - "127.0.0.1:3000:3000"
     environment:
       DATABASE_URL: "file:/data/db.sqlite"
+      # 可选：为 AI 向量索引单独使用 SQLite 文件（推荐）
+      # AI_VECTOR_DATABASE_URL: "file:/data/ai-index.sqlite"
+      # 可选：AI 向量索引使用的 SQLite 日志模式，默认 DELETE（稳定优先）
+      # SQLITE_JOURNAL_MODE: "DELETE"
       NEXTAUTH_URL: "http://localhost:3000"
       # SMTP_HOST: "smtp.example.com"
       # SMTP_PORT: "465"
