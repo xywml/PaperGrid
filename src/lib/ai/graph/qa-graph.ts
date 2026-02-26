@@ -239,6 +239,7 @@ function buildAgentPrompt(includeProtected: boolean) {
     '针对通用知识或无需站内事实的问题，可直接回答。',
     '当问题涉及站内文章事实、引用、数据或需要可追溯证据时，优先调用工具再回答。',
     '优先使用最小上下文策略：先 query_posts(action=count/list) 获取规模与候选，再 query_posts(action=get) 精读；分类和标签统一用 list_taxonomies；仅在需要语义检索时使用 search_posts。',
+    '工具参数必须严格匹配 schema：仅传允许字段、类型正确、枚举值精确匹配，不要携带额外字段。',
     '调用 query_posts(action=get) 时仅在必要场景才开启 includeContent，并设置较小 contentMaxChars（例如 1200-4000）。',
     '若用户只问数量、分类、标签，不要读取正文内容。',
     includeProtected
@@ -246,6 +247,7 @@ function buildAgentPrompt(includeProtected: boolean) {
       : '当前禁止检索受保护文章，不能尝试绕过权限。',
     '当会话禁止受保护文章时，不得请求或推断受保护文章内容。',
     '若工具返回 error 为“approval_required”，应提示用户先批准该工具调用后再继续。',
+    '若出现工具参数校验/解析错误，必须立即修正参数并重试同一工具；系统会对此类错误自动重试最多 3 次。',
     '若工具返回 error 为“请先执行向量化”，直接回复“请先执行向量化”。',
     '回答要简洁明确；若使用了检索结果，请附上引用来源；若未检索，请明确说明是通用回答。',
   ].join('\n')

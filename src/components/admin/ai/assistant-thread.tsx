@@ -21,7 +21,7 @@ import { code as streamdownCode } from '@streamdown/code'
 import { math as streamdownMath } from '@streamdown/math'
 import { mermaid as streamdownMermaid } from '@streamdown/mermaid'
 import { Bot, BrainCog, ChevronRight, SendHorizonal, Square, Wrench } from 'lucide-react'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { iterateSseStream } from '@/lib/ai/chat/sse'
 import { isValidHref } from '@/lib/utils'
@@ -428,13 +428,14 @@ function ToolGroup({
   )
 }
 
-function UserMessage() {
+function UserMessage({ avatarUrl }: { avatarUrl?: string }) {
   return (
     <MessagePrimitive.Root className="flex items-start justify-end gap-3 py-1.5">
       <div className="max-w-[min(88%,52rem)] rounded-2xl bg-primary px-4 py-3 text-sm text-primary-foreground">
         <MessagePrimitive.Parts components={{ Text: MarkdownTextPart }} />
       </div>
       <Avatar className="h-8 w-8 shrink-0 border bg-primary/10">
+        <AvatarImage src={avatarUrl || undefined} alt="用户头像" />
         <AvatarFallback className="text-xs font-semibold">你</AvatarFallback>
       </Avatar>
     </MessagePrimitive.Root>
@@ -498,7 +499,9 @@ function Composer() {
   )
 }
 
-function AssistantThread() {
+function AssistantThread({ userAvatarUrl }: { userAvatarUrl?: string }) {
+  const UserMessageWithAvatar = () => <UserMessage avatarUrl={userAvatarUrl} />
+
   return (
     <ThreadPrimitive.Root className="mx-auto flex h-full min-h-0 w-full max-w-5xl flex-col overflow-hidden rounded-xl border bg-background">
       <ThreadPrimitive.Viewport className="flex-1 space-y-2 overflow-y-auto bg-muted/20 p-4 md:p-6">
@@ -529,7 +532,7 @@ function AssistantThread() {
         </ThreadPrimitive.Empty>
         <ThreadPrimitive.Messages
           components={{
-            UserMessage,
+            UserMessage: UserMessageWithAvatar,
             AssistantMessage,
           }}
         />
@@ -574,10 +577,35 @@ export function AdminAiAssistantThread({
   const safeThreadId = threadId.trim()
   const initialMessages = useMemo(() => toInitialThreadMessages(initialHistory), [initialHistory])
   const [approvedToolKeys, setApprovedToolKeys] = useState<string[]>([])
+  const [defaultAvatarUrl, setDefaultAvatarUrl] = useState('')
 
   useEffect(() => {
     setApprovedToolKeys([])
   }, [safeThreadId])
+
+  useEffect(() => {
+    let active = true
+
+    void fetch('/api/settings/public', { cache: 'no-store' })
+      .then((res) => res.json().catch(() => ({} as Record<string, unknown>)))
+      .then((data: unknown) => {
+        if (!active || !data || typeof data !== 'object') {
+          return
+        }
+
+        const value = (data as Record<string, unknown>)['site.defaultAvatarUrl']
+        setDefaultAvatarUrl(typeof value === 'string' ? value.trim() : '')
+      })
+      .catch(() => {
+        if (active) {
+          setDefaultAvatarUrl('')
+        }
+      })
+
+    return () => {
+      active = false
+    }
+  }, [])
 
   useEffect(() => {
     const onApprove = (event: Event) => {
@@ -776,7 +804,7 @@ export function AdminAiAssistantThread({
 
   return (
     <AssistantRuntimeProvider runtime={runtime}>
-      <AssistantThread />
+      <AssistantThread userAvatarUrl={defaultAvatarUrl || undefined} />
     </AssistantRuntimeProvider>
   )
 }
