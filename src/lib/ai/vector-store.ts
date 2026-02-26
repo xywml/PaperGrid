@@ -537,29 +537,34 @@ async function openVectorDatabase(options: OpenVectorDatabaseOptions = {}): Prom
   mkdirSync(dbDir, { recursive: true })
 
   const db = new DatabaseSync(dbPath, { allowExtension: true })
-  loadSqliteVecExtension(db)
-
-  // 单机场景启用 WAL，避免后台写索引时阻塞前台读请求。
   try {
-    db.exec('PRAGMA journal_mode = WAL')
-  } catch {
-    // noop
-  }
+    loadSqliteVecExtension(db)
 
-  try {
-    db.exec('PRAGMA synchronous = NORMAL')
-  } catch {
-    // noop
-  }
+    // 单机场景启用 WAL，避免后台写索引时阻塞前台读请求。
+    try {
+      db.exec('PRAGMA journal_mode = WAL')
+    } catch {
+      // noop
+    }
 
-  db.exec('PRAGMA foreign_keys = ON')
-  db.exec('PRAGMA busy_timeout = 5000')
+    try {
+      db.exec('PRAGMA synchronous = NORMAL')
+    } catch {
+      // noop
+    }
 
-  const dimension = ensureVectorSchema(db, options)
+    db.exec('PRAGMA foreign_keys = ON')
+    db.exec('PRAGMA busy_timeout = 5000')
 
-  return {
-    db,
-    dimension,
+    const dimension = ensureVectorSchema(db, options)
+
+    return {
+      db,
+      dimension,
+    }
+  } catch (error) {
+    closeQuietly(db)
+    throw error
   }
 }
 
@@ -613,6 +618,11 @@ function assertAiReady(settings: AiRuntimeSettings) {
   if (!settings.hasApiKey) {
     throw new Error('AI API Key 未配置')
   }
+}
+
+function isIndexDimensionMismatchError(error: unknown) {
+  const message = error instanceof Error ? error.message : ''
+  return message.includes('Embedding 维度与当前索引维度不一致')
 }
 
 async function indexPostRecord(
@@ -895,22 +905,21 @@ export async function rebuildAllPostIndex(): Promise<AiRebuildIndexResult> {
   const settings = await getAiRuntimeSettings()
   assertAiReady(settings)
 
-  const publishedPosts = await prisma.post.findMany({
+  const publishedRows = await prisma.post.findMany({
     where: {
       status: PostStatus.PUBLISHED,
     },
     select: {
       id: true,
-      title: true,
-      excerpt: true,
-      content: true,
-      status: true,
     },
-    orderBy: [{ publishedAt: 'desc' }, { updatedAt: 'desc' }],
+    orderBy: {
+      id: 'asc',
+    },
   })
+  const publishedPostIds = publishedRows.map((row) => row.id)
 
   const indexedPostIds = await listIndexedPostIds()
-  const publishedIdSet = new Set(publishedPosts.map((post) => post.id))
+  const publishedIdSet = new Set(publishedPostIds)
 
   const staleIndexedPostIds = indexedPostIds.filter((indexedPostId) => !publishedIdSet.has(indexedPostId))
   let deleted = await deletePostVectorIndexes(staleIndexedPostIds)
@@ -925,39 +934,81 @@ export async function rebuildAllPostIndex(): Promise<AiRebuildIndexResult> {
 
   await Promise.all(
     Array.from({ length: concurrency }, async () => {
-      while (cursor < publishedPosts.length) {
-        const index = cursor
-        cursor += 1
-        const post = publishedPosts[index]
-        if (!post) {
-          continue
-        }
+      let dbContext = await openVectorDatabase({
+        dimensions: settings.embeddingDimensions,
+        resetOnDimensionMismatch: true,
+      })
 
-        try {
-          const result = await indexPostRecord(post, {
-            settings,
-          })
-
-          if (result.status === 'indexed') {
-            indexed += 1
-          } else if (result.status === 'unchanged') {
-            unchanged += 1
-          } else if (result.status === 'deleted') {
-            deleted += 1
+      try {
+        while (cursor < publishedPostIds.length) {
+          const index = cursor
+          cursor += 1
+          const postId = publishedPostIds[index]
+          if (!postId) {
+            continue
           }
-        } catch (error) {
-          failed += 1
-          errors.push({
-            postId: post.id,
-            error: error instanceof Error ? error.message : '重建索引失败',
+
+          const post = await prisma.post.findUnique({
+            where: { id: postId },
+            select: {
+              id: true,
+              title: true,
+              excerpt: true,
+              content: true,
+              status: true,
+            },
           })
+          if (!post) {
+            const deleteResult = await deletePostVectorIndex(postId)
+            if (deleteResult.deleted) {
+              deleted += 1
+            }
+            continue
+          }
+
+          try {
+            let result: AiPostIndexResult
+            try {
+              result = await indexPostRecord(post, {
+                settings,
+                dbContext,
+              })
+            } catch (error) {
+              if (!isIndexDimensionMismatchError(error)) {
+                throw error
+              }
+
+              result = await indexPostRecord(post, {
+                settings,
+              })
+              const nextDbContext = await openVectorDatabase()
+              closeQuietly(dbContext.db)
+              dbContext = nextDbContext
+            }
+
+            if (result.status === 'indexed') {
+              indexed += 1
+            } else if (result.status === 'unchanged') {
+              unchanged += 1
+            } else if (result.status === 'deleted') {
+              deleted += 1
+            }
+          } catch (error) {
+            failed += 1
+            errors.push({
+              postId: post.id,
+              error: error instanceof Error ? error.message : '重建索引失败',
+            })
+          }
         }
+      } finally {
+        closeQuietly(dbContext.db)
       }
     })
   )
 
   return {
-    totalPublishedPosts: publishedPosts.length,
+    totalPublishedPosts: publishedPostIds.length,
     indexed,
     unchanged,
     deleted,

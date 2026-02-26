@@ -47,10 +47,18 @@ export type QaToolResultPayload = {
 }
 
 type QaGraphStreamOptions = {
+  signal?: AbortSignal
   onToken?: (token: string) => void
   onReasoning?: (payload: { text: string }) => void
   onToolCall?: (payload: QaToolCallPayload) => void
   onToolResult?: (payload: QaToolResultPayload) => void
+}
+
+export function buildQaGraphStreamConfig(signal?: AbortSignal) {
+  return {
+    streamMode: ['messages', 'values'] as Array<'messages' | 'values'>,
+    signal,
+  }
 }
 
 function normalizeHistory(history: QaConversationMessage[]) {
@@ -608,9 +616,7 @@ export async function streamQaGraph(
 
   const stream = await runtime.agent.stream(
     { messages: runtime.messages },
-    {
-      streamMode: ['messages', 'values'],
-    }
+    buildQaGraphStreamConfig(options.signal)
   )
 
   let latestMessages: BaseMessage[] = []
@@ -626,7 +632,7 @@ export async function streamQaGraph(
       continue
     }
 
-    const [mode, payload] = chunk as [unknown, unknown]
+    const [mode, payload] = chunk as unknown as [unknown, unknown]
 
     if (mode === 'messages') {
       const token = extractTokenFromMessagesPayload(payload)

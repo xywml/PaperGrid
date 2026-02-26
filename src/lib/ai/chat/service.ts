@@ -85,6 +85,7 @@ export async function streamAdminAiChat(
       approvedToolKeys: input.approvedToolKeys,
     },
     {
+      signal: options.signal,
       onToken(token) {
         if (!token) return
         assertClientNotAborted(options.signal)

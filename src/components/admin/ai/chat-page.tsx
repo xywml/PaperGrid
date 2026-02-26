@@ -2,9 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import { Loader2, Menu, MessageSquarePlus, Settings2, Trash2, X } from 'lucide-react'
+import { AlertTriangle, Loader2, Menu, MessageSquarePlus, Settings2, Trash2, X } from 'lucide-react'
 import { AdminAiAssistantThread } from '@/components/admin/ai/assistant-thread'
 import { Button } from '@/components/ui/button'
+import { useToast } from '@/hooks/use-toast'
 
 type ThreadSummary = {
   id: string
@@ -34,13 +35,25 @@ function normalizeMessages(thread?: ThreadDetail) {
   return Array.isArray(thread?.messages) ? thread.messages : []
 }
 
+function resolveApiErrorMessage(payload: unknown, fallback: string) {
+  if (payload && typeof payload === 'object') {
+    const error = (payload as { error?: unknown }).error
+    if (typeof error === 'string' && error.trim()) {
+      return error.trim()
+    }
+  }
+  return fallback
+}
+
 export function AdminAiChatPage() {
+  const { toast } = useToast()
   const [threads, setThreads] = useState<ThreadSummary[]>([])
   const [selectedThreadId, setSelectedThreadId] = useState('')
   const [initialHistory, setInitialHistory] = useState<
     Array<{ role: 'user' | 'assistant'; content: string }>
   >([])
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState('')
   const [creating, setCreating] = useState(false)
   const [chatModels, setChatModels] = useState<string[]>([])
   const [selectedModel, setSelectedModel] = useState('gpt-4o-mini')
@@ -52,6 +65,10 @@ export function AdminAiChatPage() {
   const fetchSettingsAndModels = useCallback(async () => {
     const settingsRes = await fetch('/api/admin/ai/settings', { cache: 'no-store' })
     const settingsData = (await settingsRes.json().catch(() => ({} as Partial<AiSettingsPayload>))) as Partial<AiSettingsPayload>
+    if (!settingsRes.ok) {
+      throw new Error(resolveApiErrorMessage(settingsData, '获取 AI 设置失败'))
+    }
+
     const defaultModel =
       typeof settingsData.chatModel === 'string' && settingsData.chatModel.trim()
         ? settingsData.chatModel.trim()
@@ -66,6 +83,10 @@ export function AdminAiChatPage() {
 
     const modelsRes = await fetch('/api/admin/ai/models', { cache: 'no-store' })
     const modelsData = await modelsRes.json().catch(() => ({} as Record<string, unknown>))
+    if (!modelsRes.ok) {
+      throw new Error(resolveApiErrorMessage(modelsData, '获取模型列表失败'))
+    }
+
     const fromApi = Array.isArray(modelsData.chatModels)
       ? modelsData.chatModels.filter((item: unknown): item is string => typeof item === 'string')
       : []
@@ -78,7 +99,11 @@ export function AdminAiChatPage() {
 
   const fetchThreads = useCallback(async () => {
     const res = await fetch('/api/admin/ai/threads', { cache: 'no-store' })
-    const data = await res.json().catch(() => ({ threads: [] as ThreadSummary[] }))
+    const data = await res.json().catch(() => ({} as Record<string, unknown>))
+    if (!res.ok) {
+      throw new Error(resolveApiErrorMessage(data, '获取会话列表失败'))
+    }
+
     const list = Array.isArray(data.threads) ? (data.threads as ThreadSummary[]) : []
     setThreads(list)
     return list
@@ -115,20 +140,36 @@ export function AdminAiChatPage() {
             model: modelHint,
           }),
         })
-        const data = await res.json().catch(() => ({} as { thread?: ThreadDetail }))
-        const created = data.thread
-        if (!created) return
+        const data = await res.json().catch(() => ({} as Record<string, unknown>))
+        if (!res.ok) {
+          throw new Error(resolveApiErrorMessage(data, '创建会话失败'))
+        }
 
-        threadCacheRef.current[created.id] = created
+        const created = data.thread
+        if (!created || typeof created !== 'object') {
+          throw new Error('创建会话失败')
+        }
+
+        const createdThread = created as ThreadDetail
+        threadCacheRef.current[createdThread.id] = createdThread
         await fetchThreads()
-        setSelectedThreadId(created.id)
+        setSelectedThreadId(createdThread.id)
         setInitialHistory([])
         setMobileHistoryOpen(false)
+        return createdThread
+      } catch (error) {
+        const message = error instanceof Error ? error.message : '创建会话失败'
+        toast({
+          title: '创建会话失败',
+          description: message,
+          variant: 'destructive',
+        })
+        return null
       } finally {
         setCreating(false)
       }
     },
-    [fetchThreads]
+    [fetchThreads, toast]
   )
 
   const deleteThread = useCallback(
@@ -136,49 +177,81 @@ export function AdminAiChatPage() {
       const id = threadId.trim()
       if (!id) return
 
-      await fetch(`/api/admin/ai/threads/${encodeURIComponent(id)}`, {
-        method: 'DELETE',
-      })
+      try {
+        const response = await fetch(`/api/admin/ai/threads/${encodeURIComponent(id)}`, {
+          method: 'DELETE',
+        })
+        const payload = await response.json().catch(() => ({} as Record<string, unknown>))
+        if (!response.ok) {
+          throw new Error(resolveApiErrorMessage(payload, '删除会话失败'))
+        }
 
-      delete threadCacheRef.current[id]
+        delete threadCacheRef.current[id]
 
-      const nextThreads = await fetchThreads()
-      if (nextThreads.length === 0) {
-        await createThread(selectedModel)
+        const nextThreads = await fetchThreads()
+        if (nextThreads.length === 0) {
+          const created = await createThread(selectedModel)
+          if (!created) {
+            setSelectedThreadId('')
+            setLoadError('删除后创建新会话失败，请重试')
+          }
+          return
+        }
+
+        if (selectedThreadId === id) {
+          const fallback = nextThreads[0]
+          setSelectedThreadId(fallback.id)
+        }
+      } catch (error) {
+        const message = error instanceof Error ? error.message : '删除会话失败'
+        toast({
+          title: '删除会话失败',
+          description: message,
+          variant: 'destructive',
+        })
+      }
+    },
+    [createThread, fetchThreads, selectedModel, selectedThreadId, toast]
+  )
+
+  const initializePage = useCallback(async () => {
+    setLoading(true)
+    setLoadError('')
+
+    try {
+      const defaultModel = (await fetchSettingsAndModels()) || 'gpt-4o-mini'
+      const list = await fetchThreads()
+      if (list.length > 0) {
+        const first = list[0]
+        setSelectedThreadId(first.id)
         return
       }
 
-      if (selectedThreadId === id) {
-        const fallback = nextThreads[0]
-        setSelectedThreadId(fallback.id)
+      const created = await createThread(defaultModel)
+      if (!created) {
+        throw new Error('初始化会话失败，请稍后重试')
       }
-    },
-    [createThread, fetchThreads, selectedModel, selectedThreadId]
-  )
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '加载 AI 会话失败'
+      setLoadError(message)
+      setSelectedThreadId('')
+      toast({
+        title: '加载失败',
+        description: message,
+        variant: 'destructive',
+      })
+    } finally {
+      setLoading(false)
+    }
+  }, [createThread, fetchSettingsAndModels, fetchThreads, toast])
 
   useEffect(() => {
     if (initializedRef.current) {
       return
     }
     initializedRef.current = true
-
-    void (async () => {
-      setLoading(true)
-      try {
-        const defaultModel = (await fetchSettingsAndModels()) || 'gpt-4o-mini'
-        const list = await fetchThreads()
-        if (list.length > 0) {
-          const first = list[0]
-          setSelectedThreadId(first.id)
-          return
-        }
-
-        await createThread(defaultModel)
-      } finally {
-        setLoading(false)
-      }
-    })()
-  }, [createThread, fetchSettingsAndModels, fetchThreads])
+    void initializePage()
+  }, [initializePage])
 
   useEffect(() => {
     const id = selectedThreadId.trim()
@@ -282,10 +355,35 @@ export function AdminAiChatPage() {
     setMobileHistoryOpen(false)
   }
 
-  if (loading || !selectedThreadId) {
+  if (loading) {
     return (
       <div className="flex h-[calc(100dvh-10rem)] min-h-0 items-center justify-center rounded-xl border bg-background md:min-h-[680px]">
         <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+      </div>
+    )
+  }
+
+  if (!selectedThreadId) {
+    return (
+      <div className="flex h-[calc(100dvh-10rem)] min-h-0 items-center justify-center rounded-xl border bg-background p-4 md:min-h-[680px]">
+        <div className="max-w-md space-y-3 text-center">
+          <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-red-50 text-red-500">
+            <AlertTriangle className="h-5 w-5" />
+          </div>
+          <div className="text-sm font-medium">加载 AI 会话失败</div>
+          <div className="text-xs text-muted-foreground">
+            {loadError || '未能初始化聊天会话，请重试。'}
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              void initializePage()
+            }}
+          >
+            重新加载
+          </Button>
+        </div>
       </div>
     )
   }

@@ -318,6 +318,24 @@ function assertQueueCapacity() {
   }
 }
 
+export async function preparePostUpsertQueue(input: {
+  postId: string
+  removePending: (postId: string) => void
+  assertCapacity: () => void
+  markQueued: (postId: string) => Promise<void>
+}) {
+  const normalizedPostId = input.postId.trim()
+  if (!normalizedPostId) {
+    throw new Error('postId 不能为空')
+  }
+
+  input.removePending(normalizedPostId)
+  input.assertCapacity()
+  await input.markQueued(normalizedPostId)
+
+  return normalizedPostId
+}
+
 async function executeTask(task: AiIndexTaskRecord) {
   switch (task.type) {
     case 'rebuild': {
@@ -449,15 +467,12 @@ export async function enqueuePostUpsertIndexTask(
 ) {
   await ensureTaskStateLoaded()
 
-  const normalizedPostId = postId.trim()
-  if (!normalizedPostId) {
-    throw new Error('postId 不能为空')
-  }
-
-  removePendingPostTasks(normalizedPostId)
-  await markPostIndexQueued(normalizedPostId)
-
-  assertQueueCapacity()
+  const normalizedPostId = await preparePostUpsertQueue({
+    postId,
+    removePending: removePendingPostTasks,
+    assertCapacity: assertQueueCapacity,
+    markQueued: markPostIndexQueued,
+  })
 
   const task = createTaskRecord({
     type: 'post-upsert',
