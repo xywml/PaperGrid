@@ -30,6 +30,16 @@ RUN mkdir -p /app/prisma \
 
 RUN pnpm build
 
+# 固化 sqlite-vec 原生扩展，避免 standalone 裁剪可选依赖后运行时找不到 vec0.so
+RUN set -eu; \
+  ext_path="$(find /app/node_modules/.pnpm -maxdepth 5 -type f -path '*/node_modules/sqlite-vec-*/vec0.so' | head -n 1)"; \
+  if [ -z "$ext_path" ]; then \
+    echo "sqlite-vec 扩展文件 vec0.so 未找到，构建失败" >&2; \
+    exit 1; \
+  fi; \
+  mkdir -p /app/sqlite-vec-extension; \
+  cp "$ext_path" /app/sqlite-vec-extension/vec0.so
+
 FROM base AS prisma-cli
 ARG NPM_REGISTRY=https://registry.npmmirror.com
 COPY package.json ./
@@ -45,6 +55,7 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NEXT_CACHE_DIR=/data/.next-cache
 ENV APP_VERSION=$APP_VERSION
+ENV SQLITE_VEC_EXTENSION_PATH=/app/sqlite-vec-extension/vec0.so
 
 # non-root user + 初始化数据卷目录（用于写 SQLite 与生成 NEXTAUTH_SECRET）
 RUN addgroup -g 1001 -S nodejs \
@@ -56,6 +67,7 @@ RUN addgroup -g 1001 -S nodejs \
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/sqlite-vec-extension ./sqlite-vec-extension
 COPY --from=builder --chown=nextjs:nodejs /app/prisma/template.db ./prisma/template.db
 COPY --from=builder --chown=nextjs:nodejs /app/prisma/schema.prisma ./prisma/schema.prisma
 COPY --from=builder --chown=nextjs:nodejs /app/prisma/migrations ./prisma/migrations
