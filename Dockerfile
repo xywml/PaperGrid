@@ -3,6 +3,9 @@
 FROM node:22-bookworm-slim AS base
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
+RUN apt-get update -y \
+  && apt-get install -y --no-install-recommends openssl ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
 
 FROM base AS deps
 ARG NPM_REGISTRY=https://registry.npmmirror.com
@@ -48,7 +51,7 @@ RUN npm config set registry $NPM_REGISTRY \
   && node -e "const fs=require('fs');const pkg=require('./package.json');const v=(pkg.devDependencies&&pkg.devDependencies.prisma)||(pkg.dependencies&&pkg.dependencies.prisma);if(!v){console.error('prisma version not found');process.exit(1)};fs.writeFileSync('/app/prisma-cli/package.json',JSON.stringify({private:true,dependencies:{prisma:v}},null,2))" \
   && npm install --prefix /app/prisma-cli --omit=dev
 
-FROM node:22-bookworm-slim AS runner
+FROM base AS runner
 ARG APP_VERSION
 WORKDIR /app
 ENV NODE_ENV=production

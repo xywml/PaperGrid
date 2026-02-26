@@ -219,6 +219,26 @@ function resolveLoadExtensionCandidates(extensionPath: string) {
   return Array.from(new Set([withoutSuffix, normalized].filter(Boolean)))
 }
 
+function normalizePathCandidate(candidate: unknown) {
+  if (typeof candidate !== 'string') {
+    return null
+  }
+
+  const trimmed = candidate.trim()
+  if (!trimmed) {
+    return null
+  }
+
+  return trimmed
+}
+
+function appendPathCandidate(candidates: unknown[], candidate: unknown) {
+  const normalized = normalizePathCandidate(candidate)
+  if (normalized) {
+    candidates.push(normalized)
+  }
+}
+
 function resolveSqliteVecExtensionPathFromPackage() {
   const packageName = resolveSqliteVecPackageName()
   if (!packageName) {
@@ -227,19 +247,19 @@ function resolveSqliteVecExtensionPathFromPackage() {
 
   const extensionFileName = `vec0.${resolveSqliteVecExtensionSuffix()}`
   const cwd = process.cwd()
-  const candidates: string[] = []
+  const candidates: unknown[] = []
 
   const envPath = (process.env.SQLITE_VEC_EXTENSION_PATH || '').trim()
   if (envPath) {
     const envResolved = path.isAbsolute(envPath) ? envPath : path.resolve(cwd, envPath)
     const suffix = `.${resolveSqliteVecExtensionSuffix()}`
-    candidates.push(envResolved)
+    appendPathCandidate(candidates, envResolved)
     if (!envResolved.endsWith(suffix)) {
-      candidates.push(`${envResolved}${suffix}`)
+      appendPathCandidate(candidates, `${envResolved}${suffix}`)
     }
   }
 
-  candidates.push(path.join(cwd, 'node_modules', packageName, extensionFileName))
+  appendPathCandidate(candidates, path.join(cwd, 'node_modules', packageName, extensionFileName))
 
   const pnpmDir = path.join(cwd, 'node_modules', '.pnpm')
   if (existsSync(pnpmDir)) {
@@ -247,7 +267,10 @@ function resolveSqliteVecExtensionPathFromPackage() {
       const entries = readdirSync(pnpmDir)
       for (const entry of entries) {
         if (entry.startsWith(`${packageName}@`) || entry.startsWith('sqlite-vec@')) {
-          candidates.push(path.join(pnpmDir, entry, 'node_modules', packageName, extensionFileName))
+          appendPathCandidate(
+            candidates,
+            path.join(pnpmDir, entry, 'node_modules', packageName, extensionFileName)
+          )
         }
       }
     } catch {
@@ -258,15 +281,16 @@ function resolveSqliteVecExtensionPathFromPackage() {
   if (typeof sqliteVec.getLoadablePath === 'function') {
     try {
       const loadablePath = sqliteVec.getLoadablePath()
-      if (typeof loadablePath === 'string' && loadablePath.trim()) {
-        candidates.push(loadablePath)
-      }
+      appendPathCandidate(candidates, loadablePath)
     } catch {
       // ignore
     }
   }
 
   const uniqueCandidates = Array.from(new Set(candidates))
+    .map((item) => normalizePathCandidate(item))
+    .filter((item): item is string => Boolean(item))
+
   for (const extensionPath of uniqueCandidates) {
     if (existsSync(extensionPath)) {
       return extensionPath
@@ -280,39 +304,64 @@ function resolveSqliteVecExtensionPathFromPackage() {
   )
 }
 
+function tryLoadSqliteExtensionByPath(db: VectorDatabase, extensionPath: string) {
+  const loadCandidates = resolveLoadExtensionCandidates(extensionPath)
+  const loadErrors: string[] = []
+
+  for (const loadPath of loadCandidates) {
+    try {
+      db.loadExtension(loadPath)
+      return null
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error)
+      loadErrors.push(`路径 ${loadPath} 加载失败: ${message}`)
+    }
+  }
+
+  return loadErrors
+}
+
 function loadSqliteVecExtension(db: VectorDatabase) {
   const errors: string[] = []
   const packageName = resolveSqliteVecPackageName() || 'sqlite-vec-linux-x64'
 
   try {
     const extensionPath = resolveSqliteVecExtensionPathFromPackage()
-    const loadCandidates = resolveLoadExtensionCandidates(extensionPath)
-    const loadErrors: string[] = []
-
-    for (const loadPath of loadCandidates) {
-      try {
-        db.loadExtension(loadPath)
-        return
-      } catch (error) {
-        const message = error instanceof Error ? error.message : String(error)
-        loadErrors.push(`路径 ${loadPath} 加载失败: ${message}`)
-      }
+    const loadErrors = tryLoadSqliteExtensionByPath(db, extensionPath)
+    if (!loadErrors) {
+      return
     }
-
-    throw new Error(
-      ['已定位扩展文件但仍加载失败。', ...loadErrors.map((item) => `- ${item}`)].join('\n')
+    errors.push(
+      ['按平台包路径加载失败（已定位到扩展文件）。', ...loadErrors.map((item) => `- ${item}`)].join(
+        '\n'
+      )
     )
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
     errors.push(`按平台包路径加载失败: ${message}`)
   }
 
-  try {
-    sqliteVec.load(db)
-    return
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error)
-    errors.push(`按 sqlite-vec 默认路径加载失败: ${message}`)
+  if (typeof sqliteVec.getLoadablePath === 'function') {
+    try {
+      const loadablePath = sqliteVec.getLoadablePath()
+      const normalized = normalizePathCandidate(loadablePath)
+      if (normalized) {
+        const loadErrors = tryLoadSqliteExtensionByPath(db, normalized)
+        if (!loadErrors) {
+          return
+        }
+        errors.push(
+          ['按 sqlite-vec getLoadablePath 加载失败。', ...loadErrors.map((item) => `- ${item}`)].join(
+            '\n'
+          )
+        )
+      } else {
+        errors.push(`按 sqlite-vec getLoadablePath 加载失败: 返回了无效路径类型（${typeof loadablePath}）`)
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error)
+      errors.push(`按 sqlite-vec getLoadablePath 加载失败: ${message}`)
+    }
   }
 
   throw new Error(
