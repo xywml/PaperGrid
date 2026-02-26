@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { Prisma, PrismaClient } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
@@ -30,7 +30,15 @@ async function main() {
   }
 
   // 创建默认系统设置
-  const settings = [
+  type SeedSetting = {
+    key: string
+    value: Prisma.InputJsonValue
+    group: string
+    editable: boolean
+    secret?: boolean
+  }
+
+  const settings: SeedSetting[] = [
     { key: 'site.title', value: { title: '执笔为剑' }, group: 'site', editable: true },
     { key: 'site.description', value: { description: 'A minimalist blog powered by Next.js' }, group: 'site', editable: true },
     { key: 'site.ownerName', value: { name: '千叶' }, group: 'site', editable: true },
@@ -74,6 +82,17 @@ async function main() {
     { key: 'email.reply.requireApproved', value: { enabled: true }, group: 'email', editable: true },
     { key: 'email.reply.unsubscribeEnabled', value: { enabled: true }, group: 'email', editable: true },
     { key: 'email.reply.unsubscribeList', value: { text: '' }, group: 'email', editable: false },
+    // AI 设置（单机 + OpenAI 兼容）
+    { key: 'ai.enabled', value: { value: false }, group: 'ai', editable: true },
+    { key: 'ai.provider', value: { value: 'openai-compatible' }, group: 'ai', editable: true },
+    { key: 'ai.openai.baseUrl', value: { value: '' }, group: 'ai', editable: true },
+    { key: 'ai.openai.apiKey', value: { value: '' }, group: 'ai', editable: false, secret: true },
+    { key: 'ai.chat.model', value: { value: 'gpt-4o-mini' }, group: 'ai', editable: true },
+    { key: 'ai.embedding.model', value: { value: 'text-embedding-3-small' }, group: 'ai', editable: true },
+    { key: 'ai.embedding.dimensions', value: { value: 1536 }, group: 'ai', editable: true },
+    { key: 'ai.rag.topK', value: { value: 8 }, group: 'ai', editable: true },
+    { key: 'ai.rag.minScore', value: { value: 0.2 }, group: 'ai', editable: true },
+    { key: 'ai.answer.maxTokens', value: { value: 800 }, group: 'ai', editable: true },
     // 页脚设置
     { key: 'site.footer_icp', value: { value: '蜀ICP备xxxx' }, group: 'site', editable: true },
     { key: 'site.footer_mps', value: { value: '' }, group: 'site', editable: true },
@@ -95,7 +114,7 @@ async function main() {
       where: { key: s.key },
       // 保留已有配置值，避免重复 seed 时覆盖管理员在后台保存的设置。
       update: { group: s.group, editable: s.editable, secret: s.secret ?? false },
-      create: s as any,
+      create: s,
     })
   }
 }

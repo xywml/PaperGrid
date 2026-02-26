@@ -2,19 +2,53 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useEffect, useRef, useState } from 'react'
-import { LayoutDashboard, FileText, FolderKanban, Tags, MessageSquare, Users, Settings, Key, GalleryVerticalEnd, Palette, Images, ArrowLeftRight } from 'lucide-react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import {
+  LayoutDashboard,
+  FileText,
+  FolderKanban,
+  Tags,
+  MessageSquare,
+  Users,
+  Settings,
+  Key,
+  GalleryVerticalEnd,
+  Palette,
+  Images,
+  ArrowLeftRight,
+  Bot,
+} from 'lucide-react'
 
-const Icons = { LayoutDashboard, FileText, FolderKanban, Tags, MessageSquare, Users, Settings, Key, GalleryVerticalEnd, Palette, Images, ArrowLeftRight }
+const Icons = {
+  LayoutDashboard,
+  FileText,
+  FolderKanban,
+  Tags,
+  MessageSquare,
+  Users,
+  Settings,
+  Key,
+  GalleryVerticalEnd,
+  Palette,
+  Images,
+  ArrowLeftRight,
+  Bot,
+}
 
-export function AdminNav({ items, onLinkClick }: { items: { href: string; iconName: string; label: string }[]; onLinkClick?: () => void }) {
+export function AdminNav({
+  items,
+  onLinkClick,
+}: {
+  items: { href: string; iconName: string; label: string }[]
+  onLinkClick?: () => void
+}) {
   const pathname = usePathname()
   const containerRef = useRef<HTMLDivElement | null>(null)
   const itemRefs = useRef<Record<string, HTMLDivElement | null>>({})
   const [indicatorStyle, setIndicatorStyle] = useState<{ top: number; height: number; opacity: number }>({ top: 0, height: 0, opacity: 0 })
 
   // Determine active href without matching parent '/admin' for all children
-  const getActiveHref = () => {
+  const getActiveHref = useCallback(() => {
     for (const it of items) {
       if (pathname === it.href) return it.href
       if (it.href !== '/admin' && pathname?.startsWith(it.href + '/')) return it.href
@@ -22,9 +56,9 @@ export function AdminNav({ items, onLinkClick }: { items: { href: string; iconNa
     // fallback: exact '/admin'
     if (pathname === '/admin') return '/admin'
     return null
-  }
+  }, [items, pathname])
 
-  const updateIndicator = () => {
+  const updateIndicator = useCallback(() => {
     const activeHref = getActiveHref()
     if (!containerRef.current) return
     if (!activeHref) {
@@ -39,14 +73,17 @@ export function AdminNav({ items, onLinkClick }: { items: { href: string; iconNa
     const containerTop = containerRef.current.getBoundingClientRect().top
     const rect = el.getBoundingClientRect()
     setIndicatorStyle({ top: rect.top - containerTop, height: rect.height, opacity: 1 })
-  }
+  }, [getActiveHref])
 
   useEffect(() => {
-    updateIndicator()
+    const rafId = requestAnimationFrame(updateIndicator)
     const onResize = () => requestAnimationFrame(updateIndicator)
     window.addEventListener('resize', onResize)
-    return () => window.removeEventListener('resize', onResize)
-  }, [pathname, items])
+    return () => {
+      cancelAnimationFrame(rafId)
+      window.removeEventListener('resize', onResize)
+    }
+  }, [updateIndicator])
 
   return (
     <nav ref={containerRef} className="relative flex-1 space-y-1 p-4">
@@ -61,7 +98,7 @@ export function AdminNav({ items, onLinkClick }: { items: { href: string; iconNa
         const Icon = Icons[item.iconName as keyof typeof Icons]
         const active = pathname === item.href || (item.href !== '/admin' && pathname?.startsWith(item.href + '/'))
         return (
-          <Link key={item.href} href={item.href} className="relative block">
+          <Link key={item.href} href={item.href} className="relative block" onClick={onLinkClick}>
             <div
               ref={(el) => { itemRefs.current[item.href] = el }}
               className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${active ? 'bg-gray-100 text-blue-600 dark:bg-gray-700 dark:text-blue-400' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white'}`}

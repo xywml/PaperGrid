@@ -37,6 +37,14 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   output: 'standalone',
+  serverExternalPackages: [
+    'sqlite-vec',
+    'sqlite-vec-linux-x64',
+    'sqlite-vec-linux-arm64',
+    'sqlite-vec-darwin-x64',
+    'sqlite-vec-darwin-arm64',
+    'sqlite-vec-windows-x64',
+  ],
   // Append the default value of mdx in webpack extensions
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
   async headers() {

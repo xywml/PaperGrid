@@ -30,6 +30,7 @@ const navItems = [
   { href: '/admin/comments', iconName: 'MessageSquare', label: '评论管理' },
   { href: '/admin/users', iconName: 'Users', label: '用户管理' },
   { href: '/admin/api-keys', iconName: 'Key', label: '接口密钥' },
+  { href: '/admin/ai', iconName: 'Bot', label: '智能助手' },
   { href: '/admin/import-export', iconName: 'ArrowLeftRight', label: '导入导出' },
   { href: '/admin/styles', iconName: 'Palette', label: '样式管理' },
   { href: '/admin/settings', iconName: 'Settings', label: '系统设置' },

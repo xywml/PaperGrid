@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/lib/auth'
 import { NextResponse } from 'next/server'
-import { PostStatus } from '@prisma/client'
+import { PostStatus, type Prisma } from '@prisma/client'
 import slugify from 'slugify'
 import readingTime from 'reading-time'
 import bcrypt from 'bcryptjs'
@@ -27,7 +27,7 @@ export async function GET(req: Request) {
     const skip = (safePage - 1) * limit
 
     // 构建查询条件
-    const where: any = {}
+    const where: Prisma.PostWhereInput = {}
 
     if (status && status !== 'all') {
       where.status = status as PostStatus
