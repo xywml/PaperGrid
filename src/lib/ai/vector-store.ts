@@ -1,6 +1,5 @@
 import crypto from 'node:crypto'
-import { existsSync, mkdirSync } from 'node:fs'
-import { createRequire } from 'node:module'
+import { existsSync, mkdirSync, readdirSync } from 'node:fs'
 import path from 'node:path'
 import { PostStatus } from '@prisma/client'
 import * as sqliteVec from 'sqlite-vec'
@@ -11,7 +10,6 @@ import { prisma } from '@/lib/prisma'
 const VECTOR_META_KEY = 'embedding_dimensions'
 const MAX_CHUNK_CHARS = 1200
 const CHUNK_OVERLAP_CHARS = 160
-const requireFromHere = createRequire(import.meta.url)
 
 type SqliteRow = Record<string, unknown>
 
@@ -213,31 +211,59 @@ function resolveSqliteVecExtensionPathFromPackage() {
     throw new Error(`当前平台不受 sqlite-vec 支持：${process.platform}-${process.arch}`)
   }
 
-  let sqliteVecEntrypointPath = ''
-  try {
-    sqliteVecEntrypointPath = requireFromHere.resolve('sqlite-vec', {
-      paths: [process.cwd()],
-    })
-  } catch {
-    throw new Error('未找到 sqlite-vec 包，请先安装 sqlite-vec')
+  const extensionFileName = `vec0.${resolveSqliteVecExtensionSuffix()}`
+  const cwd = process.cwd()
+  const candidates: string[] = []
+
+  const envPath = (process.env.SQLITE_VEC_EXTENSION_PATH || '').trim()
+  if (envPath) {
+    candidates.push(path.isAbsolute(envPath) ? envPath : path.resolve(cwd, envPath))
   }
 
-  const sqliteVecPackageDir = path.dirname(sqliteVecEntrypointPath)
-  const extensionPath = path.join(
-    sqliteVecPackageDir,
-    '..',
-    packageName,
-    `vec0.${resolveSqliteVecExtensionSuffix()}`
+  candidates.push(path.join(cwd, 'node_modules', packageName, extensionFileName))
+
+  const pnpmDir = path.join(cwd, 'node_modules', '.pnpm')
+  if (existsSync(pnpmDir)) {
+    try {
+      const entries = readdirSync(pnpmDir)
+      for (const entry of entries) {
+        if (entry.startsWith(`${packageName}@`) || entry.startsWith('sqlite-vec@')) {
+          candidates.push(path.join(pnpmDir, entry, 'node_modules', packageName, extensionFileName))
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }
+
+  if (typeof sqliteVec.getLoadablePath === 'function') {
+    try {
+      const loadablePath = sqliteVec.getLoadablePath()
+      if (typeof loadablePath === 'string' && loadablePath.trim()) {
+        candidates.push(loadablePath)
+      }
+    } catch {
+      // ignore
+    }
+  }
+
+  const uniqueCandidates = Array.from(new Set(candidates))
+  for (const extensionPath of uniqueCandidates) {
+    if (existsSync(extensionPath)) {
+      return extensionPath
+    }
+  }
+
+  throw new Error(
+    `未找到 ${packageName} 的扩展文件（${extensionFileName}）。已检查路径：\n${uniqueCandidates
+      .map((item) => `- ${item}`)
+      .join('\n')}`
   )
-  if (!existsSync(extensionPath)) {
-    throw new Error(`未找到 ${packageName} 的扩展文件：${extensionPath}`)
-  }
-
-  return extensionPath
 }
 
 function loadSqliteVecExtension(db: VectorDatabase) {
   const errors: string[] = []
+  const packageName = resolveSqliteVecPackageName() || 'sqlite-vec-linux-x64'
 
   try {
     const extensionPath = resolveSqliteVecExtensionPathFromPackage()
@@ -261,7 +287,7 @@ function loadSqliteVecExtension(db: VectorDatabase) {
       'sqlite-vec 扩展加载失败。',
       `平台: ${process.platform}-${process.arch}`,
       ...errors.map((item) => `- ${item}`),
-      '建议执行：pnpm add sqlite-vec sqlite-vec-linux-x64',
+      `建议执行：pnpm add sqlite-vec ${packageName}`,
     ].join('\n')
   )
 }

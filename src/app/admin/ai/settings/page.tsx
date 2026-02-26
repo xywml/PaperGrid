@@ -175,6 +175,10 @@ export default function AdminAiSettingsPage() {
   )
 
   useEffect(() => {
+    if (!settings.enabled) {
+      return
+    }
+
     void fetchIndexStatus(true)
     const timer = window.setInterval(() => {
       void fetchIndexStatus(false)
@@ -183,7 +187,7 @@ export default function AdminAiSettingsPage() {
     return () => {
       window.clearInterval(timer)
     }
-  }, [fetchIndexStatus])
+  }, [fetchIndexStatus, settings.enabled])
 
   const saveSettings = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
