@@ -205,6 +205,20 @@ function resolveSqliteVecExtensionSuffix() {
   return 'so'
 }
 
+function resolveLoadExtensionCandidates(extensionPath: string) {
+  const normalized = extensionPath.trim()
+  if (!normalized) {
+    return []
+  }
+
+  const suffix = `.${resolveSqliteVecExtensionSuffix()}`
+  const withoutSuffix = normalized.endsWith(suffix)
+    ? normalized.slice(0, -suffix.length)
+    : normalized
+
+  return Array.from(new Set([withoutSuffix, normalized].filter(Boolean)))
+}
+
 function resolveSqliteVecExtensionPathFromPackage() {
   const packageName = resolveSqliteVecPackageName()
   if (!packageName) {
@@ -217,7 +231,12 @@ function resolveSqliteVecExtensionPathFromPackage() {
 
   const envPath = (process.env.SQLITE_VEC_EXTENSION_PATH || '').trim()
   if (envPath) {
-    candidates.push(path.isAbsolute(envPath) ? envPath : path.resolve(cwd, envPath))
+    const envResolved = path.isAbsolute(envPath) ? envPath : path.resolve(cwd, envPath)
+    const suffix = `.${resolveSqliteVecExtensionSuffix()}`
+    candidates.push(envResolved)
+    if (!envResolved.endsWith(suffix)) {
+      candidates.push(`${envResolved}${suffix}`)
+    }
   }
 
   candidates.push(path.join(cwd, 'node_modules', packageName, extensionFileName))
@@ -267,8 +286,22 @@ function loadSqliteVecExtension(db: VectorDatabase) {
 
   try {
     const extensionPath = resolveSqliteVecExtensionPathFromPackage()
-    db.loadExtension(extensionPath)
-    return
+    const loadCandidates = resolveLoadExtensionCandidates(extensionPath)
+    const loadErrors: string[] = []
+
+    for (const loadPath of loadCandidates) {
+      try {
+        db.loadExtension(loadPath)
+        return
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error)
+        loadErrors.push(`路径 ${loadPath} 加载失败: ${message}`)
+      }
+    }
+
+    throw new Error(
+      ['已定位扩展文件但仍加载失败。', ...loadErrors.map((item) => `- ${item}`)].join('\n')
+    )
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
     errors.push(`按平台包路径加载失败: ${message}`)

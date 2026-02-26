@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM node:22-alpine AS base
+FROM node:22-bookworm-slim AS base
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 
@@ -48,18 +48,18 @@ RUN npm config set registry $NPM_REGISTRY \
   && node -e "const fs=require('fs');const pkg=require('./package.json');const v=(pkg.devDependencies&&pkg.devDependencies.prisma)||(pkg.dependencies&&pkg.dependencies.prisma);if(!v){console.error('prisma version not found');process.exit(1)};fs.writeFileSync('/app/prisma-cli/package.json',JSON.stringify({private:true,dependencies:{prisma:v}},null,2))" \
   && npm install --prefix /app/prisma-cli --omit=dev
 
-FROM node:22-alpine AS runner
+FROM node:22-bookworm-slim AS runner
 ARG APP_VERSION
 WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NEXT_CACHE_DIR=/data/.next-cache
 ENV APP_VERSION=$APP_VERSION
-ENV SQLITE_VEC_EXTENSION_PATH=/app/sqlite-vec-extension/vec0.so
+ENV SQLITE_VEC_EXTENSION_PATH=/app/sqlite-vec-extension/vec0
 
 # non-root user + 初始化数据卷目录（用于写 SQLite 与生成 NEXTAUTH_SECRET）
-RUN addgroup -g 1001 -S nodejs \
-  && adduser -S nextjs -u 1001 -G nodejs \
+RUN groupadd --gid 1001 nodejs \
+  && useradd --uid 1001 --gid 1001 --create-home --shell /usr/sbin/nologin nextjs \
   && mkdir -p /data /data/uploads /app/prisma /data/.next-cache \
   && echo "init" > /data/.keep \
   && chown -R nextjs:nodejs /data /app
