@@ -5,6 +5,7 @@ import { getSetting } from '@/lib/settings'
 import sanitizeHtml from 'sanitize-html'
 import { getClientIp, rateLimit, rateLimitHeaders } from '@/lib/rate-limit'
 import { getPostUnlockTokenFromHeaders, verifyPostUnlockToken } from '@/lib/post-protection'
+import { createRequestLogger } from '@/lib/logger'
 import { sendCommentGotifyNotification, type CommentGotifyNotificationInput } from '@/lib/notifications/gotify-service'
 import {
   sendCommentEmailNotification,
@@ -12,39 +13,41 @@ import {
   type CommentEmailNotificationInput,
   type CommentReplyEmailNotificationInput,
 } from '@/lib/notifications/email-service'
+import type { Logger } from 'pino'
 
-function sendCommentGotifyNotificationAsync(comment: CommentGotifyNotificationInput) {
+function sendCommentGotifyNotificationAsync(comment: CommentGotifyNotificationInput, logger: Logger) {
   after(async () => {
     try {
       await sendCommentGotifyNotification(comment)
     } catch (notifyError) {
-      console.error('Gotify 通知发送失败:', notifyError)
+      logger.error({ err: notifyError }, 'Gotify 通知发送失败')
     }
   })
 }
 
-function sendCommentEmailNotificationAsync(comment: CommentEmailNotificationInput) {
+function sendCommentEmailNotificationAsync(comment: CommentEmailNotificationInput, logger: Logger) {
   after(async () => {
     try {
       await sendCommentEmailNotification(comment)
     } catch (notifyError) {
-      console.error('邮件通知发送失败:', notifyError)
+      logger.error({ err: notifyError }, '邮件通知发送失败')
     }
   })
 }
 
-function sendCommentReplyEmailNotificationAsync(input: CommentReplyEmailNotificationInput) {
+function sendCommentReplyEmailNotificationAsync(input: CommentReplyEmailNotificationInput, logger: Logger) {
   after(async () => {
     try {
       await sendCommentReplyEmailNotification(input)
     } catch (notifyError) {
-      console.error('邮件回复通知发送失败:', notifyError)
+      logger.error({ err: notifyError }, '邮件回复通知发送失败')
     }
   })
 }
 
 // GET /api/comments?slug=xxx - 获取文章的所有评论
 export async function GET(request: NextRequest) {
+  const logger = createRequestLogger(request, { module: 'comments', action: 'list' })
   try {
     const { searchParams } = new URL(request.url)
     const slug = searchParams.get('slug')
@@ -107,13 +110,14 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ comments })
   } catch (error) {
-    console.error('获取评论失败:', error)
+    logger.error({ err: error }, '获取评论失败')
     return NextResponse.json({ error: '获取评论失败' }, { status: 500 })
   }
 }
 
 // POST /api/comments?slug=xxx - 创建新评论
 export async function POST(request: NextRequest) {
+  let logger = createRequestLogger(request, { module: 'comments', action: 'create' })
   try {
     const limit = rateLimit(`comments:${getClientIp(request)}`, {
       windowMs: 5 * 60 * 1000,
@@ -127,6 +131,9 @@ export async function POST(request: NextRequest) {
     }
 
     const session = await auth()
+    if (session?.user?.id) {
+      logger = logger.child({ userId: session.user.id })
+    }
     const sessionUser = session?.user
       ? await prisma.user.findUnique({
         where: { id: session.user.id },
@@ -307,13 +314,22 @@ export async function POST(request: NextRequest) {
         },
       },
     })
-    sendCommentGotifyNotificationAsync(comment)
-    sendCommentEmailNotificationAsync(comment)
+    sendCommentGotifyNotificationAsync(
+      comment,
+      logger.child({ commentId: comment.id, notification: 'gotify' })
+    )
+    sendCommentEmailNotificationAsync(
+      comment,
+      logger.child({ commentId: comment.id, notification: 'email' })
+    )
     if (parentCommentForNotification) {
-      sendCommentReplyEmailNotificationAsync({
-        ...comment,
-        parent: parentCommentForNotification,
-      })
+      sendCommentReplyEmailNotificationAsync(
+        {
+          ...comment,
+          parent: parentCommentForNotification,
+        },
+        logger.child({ commentId: comment.id, notification: 'email-reply' })
+      )
     }
 
     const responseComment = {
@@ -327,7 +343,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ comment: responseComment }, { status: 201 })
   } catch (error) {
-    console.error('创建评论失败:', error)
+    logger.error({ err: error }, '创建评论失败')
     return NextResponse.json({ error: '创建评论失败' }, { status: 500 })
   }
 }

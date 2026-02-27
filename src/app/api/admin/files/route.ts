@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
+import { createRequestLogger } from '@/lib/logger'
 import { prisma } from '@/lib/prisma'
 import { getClientIp, rateLimit, rateLimitHeaders } from '@/lib/rate-limit'
 import {
@@ -124,6 +125,7 @@ function toFilePayload(file: {
 }
 
 export async function GET(request: Request) {
+  const logger = createRequestLogger(request, { module: 'admin-files', action: 'list' })
   try {
     const session = await auth()
     if (!session?.user || session.user.role !== 'ADMIN') {
@@ -185,17 +187,19 @@ export async function GET(request: Request) {
       },
     })
   } catch (error) {
-    console.error('获取文件列表失败:', error)
+    logger.error({ err: error }, '获取文件列表失败')
     return NextResponse.json({ error: '获取文件列表失败' }, { status: 500 })
   }
 }
 
 export async function POST(request: Request) {
+  let logger = createRequestLogger(request, { module: 'admin-files', action: 'upload' })
   try {
     const session = await auth()
     if (!session?.user || session.user.role !== 'ADMIN') {
       return NextResponse.json({ error: '未授权' }, { status: 401 })
     }
+    logger = logger.child({ userId: session.user.id })
 
     const clientIp = getClientIp(request)
     const limiter = rateLimit(`upload:${session.user.id}:${clientIp}`, {
@@ -282,7 +286,7 @@ export async function POST(request: Request) {
       } catch (cleanupError) {
         const nodeError = cleanupError as NodeJS.ErrnoException
         if (nodeError.code !== 'ENOENT') {
-          console.error('回滚上传文件失败:', cleanupError)
+          logger.error({ err: cleanupError }, '回滚上传文件失败')
         }
       }
 
@@ -291,7 +295,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ file: toFilePayload(record) }, { status: 201 })
   } catch (error) {
-    console.error('上传文件失败:', error)
+    logger.error({ err: error }, '上传文件失败')
 
     if (error instanceof UploadValidationError) {
       return NextResponse.json({ error: error.message }, { status: error.status })

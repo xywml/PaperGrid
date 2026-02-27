@@ -3,6 +3,7 @@ import path from 'node:path'
 import { mkdir, readFile, readdir, rm, unlink, writeFile } from 'node:fs/promises'
 import { exportBackupData, importBackupData, parseBooleanFlag } from './backup'
 import { exportMigrationMarkdownZip, importMigrationMarkdown, type MigrationSource } from './migration'
+import { logger } from '@/lib/logger'
 
 export type ImportExportTaskType =
   | 'backup_export'
@@ -84,6 +85,8 @@ const taskQueue =
   globalForTaskRunner.__papergridTaskQueue ||
   (globalForTaskRunner.__papergridTaskQueue = [])
 
+const taskLogger = logger.child({ module: 'import-export-tasks' })
+
 function isTaskType(value: string): value is ImportExportTaskType {
   return TASK_TYPES.has(value as ImportExportTaskType)
 }
@@ -141,7 +144,7 @@ async function cleanupExpiredTasks() {
   } catch (error) {
     const nodeError = error as NodeJS.ErrnoException
     if (nodeError.code !== 'ENOENT') {
-      console.error('清理历史任务失败:', error)
+      taskLogger.error({ err: error }, '清理历史任务失败')
     }
     return
   }
@@ -197,7 +200,7 @@ async function cleanupExpiredTasks() {
         })
       }
     } catch (error) {
-      console.error('清理历史任务失败:', error)
+      taskLogger.error({ err: error }, '清理历史任务失败')
     }
   }
 }
@@ -207,7 +210,7 @@ async function ensureTaskDirs() {
   await mkdir(TASK_FILE_DIR, { recursive: true, mode: TASK_DIR_MODE })
   await recoverUnfinishedTasks()
   void cleanupExpiredTasks().catch((error) => {
-    console.error('调度历史任务清理失败:', error)
+    taskLogger.error({ err: error }, '调度历史任务清理失败')
   })
 }
 
@@ -241,7 +244,7 @@ async function recoverUnfinishedTasks() {
     } catch (error) {
       const nodeError = error as NodeJS.ErrnoException
       if (nodeError.code !== 'ENOENT') {
-        console.error('恢复未完成任务失败:', error)
+        taskLogger.error({ err: error }, '恢复未完成任务失败')
       }
       globalForTaskRunner.__papergridTaskRecoveryDone = true
       return
@@ -261,7 +264,7 @@ async function recoverUnfinishedTasks() {
         if (task.status !== 'pending' && task.status !== 'running') continue
         resumableTasks.push(task)
       } catch (error) {
-        console.error('恢复任务读取失败:', error)
+        taskLogger.error({ err: error }, '恢复任务读取失败')
       }
     }
 
@@ -339,7 +342,7 @@ async function stripInputArtifact(task: TaskRecord): Promise<TaskRecord> {
   try {
     await safeUnlink(task.inputFilePath)
   } catch (error) {
-    console.error('清理导入文件失败:', error)
+    taskLogger.error({ err: error, taskId: task.id }, '清理导入文件失败')
     return task
   }
 
@@ -585,7 +588,7 @@ export async function getTaskDownload(taskId: string) {
       outputFilePath: null,
     }))
   } catch (error) {
-    console.error('清理导出文件失败:', error)
+    taskLogger.error({ err: error, taskId }, '清理导出文件失败')
   }
 
   return {

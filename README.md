@@ -174,6 +174,8 @@ GOTIFY_TOKEN=""
 
 NEXT_PUBLIC_APP_URL="http://localhost:6066"
 NEXT_PUBLIC_DEFAULT_LOCALE="zh"
+# 可选：日志级别（fatal/error/warn/info/debug/trace/silent）
+# LOG_LEVEL="info"
 ```
 
 OAuth 回调填写（GitHub/Google）：

@@ -8,6 +8,7 @@ import {
 import { normalizeChatRequestBody } from '@/lib/ai/chat/validation'
 import { AiBaseUrlValidationError } from '@/lib/ai/security'
 import { getClientIp, rateLimit, rateLimitHeaders } from '@/lib/rate-limit'
+import { createRequestLogger } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -41,11 +42,14 @@ function encodeSseEvent(event: ChatStreamEvent['event'] | 'error', payload: unkn
 }
 
 export async function POST(request: NextRequest) {
+  const logger = createRequestLogger(request, { module: 'admin-ai-chat-stream' })
+  let userId: string | null = null
   try {
     const session = await auth()
     if (!session?.user || session.user.role !== 'ADMIN') {
       return NextResponse.json({ error: '未授权' }, { status: 401 })
     }
+    userId = session.user.id
 
     const limitResult = rateLimit(
       `admin-ai-chat-stream:${session.user.id}:${getClientIp(request)}`,
@@ -96,7 +100,7 @@ export async function POST(request: NextRequest) {
             }
 
             const message = toClientSafeErrorMessage(error)
-            console.error('后台 AI 流式对话失败:', error)
+            logger.error({ err: error, userId }, '后台 AI 流式对话失败')
             sendEvent('error', { error: message })
             close()
           }
@@ -127,7 +131,7 @@ export async function POST(request: NextRequest) {
           ? 503
           : 500
     if (status >= 500) {
-      console.error('后台 AI 流式对话失败:', error)
+      logger.error({ err: error, userId }, '后台 AI 流式对话失败')
     }
     return NextResponse.json({ error: message }, { status })
   }

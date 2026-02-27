@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
+import { createRequestLogger } from '@/lib/logger'
 import { prisma } from '@/lib/prisma'
 import { mediaUrlById, resolveMediaPath } from '@/lib/media'
 import { removeCachedMediaResolvedFile } from '@/lib/media-file-cache'
@@ -81,13 +82,16 @@ async function getReferenceSummary(mediaId: string) {
 }
 
 export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  let logger = createRequestLogger(request, { module: 'admin-files', action: 'delete' })
   try {
     const session = await auth()
     if (!session?.user || session.user.role !== 'ADMIN') {
       return NextResponse.json({ error: '未授权' }, { status: 401 })
     }
+    logger = logger.child({ userId: session.user.id })
 
     const { id } = await params
+    logger = logger.child({ mediaId: id })
     const media = await prisma.mediaFile.findUnique({
       where: { id },
     })
@@ -122,7 +126,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
       const nodeError = error as NodeJS.ErrnoException
 
       if (nodeError.code !== 'ENOENT') {
-        console.error('删除本地文件失败，准备回滚数据库记录:', nodeError)
+        logger.error({ err: nodeError }, '删除本地文件失败，准备回滚数据库记录')
 
         try {
           await prisma.mediaFile.create({
@@ -142,7 +146,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
             },
           })
         } catch (rollbackError) {
-          console.error('回滚媒体记录失败:', rollbackError)
+          logger.error({ err: rollbackError }, '回滚媒体记录失败')
         }
 
         return NextResponse.json({ error: '删除文件失败，请重试' }, { status: 500 })
@@ -151,7 +155,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
 
     return NextResponse.json({ message: '删除成功' })
   } catch (error) {
-    console.error('删除文件失败:', error)
+    logger.error({ err: error }, '删除文件失败')
     return NextResponse.json({ error: '删除文件失败' }, { status: 500 })
   }
 }
