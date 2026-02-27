@@ -113,7 +113,7 @@ export function MDXContent({ content }: MDXContentProps) {
         rehypePlugins={[
           rehypeRaw,
           [rehypeSanitize, sanitizeSchema],
-          rehypeKatex,
+          [rehypeKatex, { strict: 'ignore' }],
           [rehypePrismPlus, { ignoreMissing: true }],
         ]}
         components={{
