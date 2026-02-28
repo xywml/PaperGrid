@@ -45,14 +45,18 @@ body[data-public-style-preset='valley-ledger'] {
   --pg-floating-main-shadow: 6px 6px 0 rgba(47, 27, 13, 0.88);
   --pg-paper-fold-size: 0px;
   --pg-progress-track-bg: #e5c98f;
-  --pg-progress-border-width: 3px;
-  --pg-progress-border-color: #6b3710;
+  --pg-progress-border-width: 0px;
+  --pg-progress-border-color: transparent;
   --pg-progress-fill-gradient: repeating-linear-gradient(
     90deg,
     #ffd921 0 14px,
     #f7b500 14px 28px,
     #b52121 28px 42px
   );
+  --pg-site-loading-track-bg: #ebd6ad;
+  --pg-site-loading-border-width: 1px;
+  --pg-site-loading-border-color: #6b3710;
+  --pg-site-loading-fill-gradient: linear-gradient(90deg, #ffd921 0%, #b52121 52%, #ffd921 100%);
   --pg-archive-panel-bg: #f8edd5;
   --pg-archive-panel-border-color: #6b3710;
   --pg-archive-rail-color: rgba(107, 55, 16, 0.36);
@@ -151,14 +155,18 @@ body[data-public-style-preset='valley-ledger'] {
   --pg-floating-main-fg: #2a180b;
   --pg-floating-main-shadow: 6px 6px 0 rgba(0, 0, 0, 0.8);
   --pg-progress-track-bg: #4a3624;
-  --pg-progress-border-width: 3px;
-  --pg-progress-border-color: #c79752;
+  --pg-progress-border-width: 0px;
+  --pg-progress-border-color: transparent;
   --pg-progress-fill-gradient: repeating-linear-gradient(
     90deg,
     #ffd45a 0 14px,
     #b52121 14px 28px,
     #a36d2a 28px 42px
   );
+  --pg-site-loading-track-bg: #4a3624;
+  --pg-site-loading-border-width: 1px;
+  --pg-site-loading-border-color: #c79752;
+  --pg-site-loading-fill-gradient: linear-gradient(90deg, #ffd45a 0%, #b52121 52%, #ffd45a 100%);
   --pg-archive-panel-bg: #342517;
   --pg-archive-panel-border-color: #c79752;
   --pg-archive-rail-color: rgba(199, 151, 82, 0.48);

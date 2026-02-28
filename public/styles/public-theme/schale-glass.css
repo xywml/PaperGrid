@@ -48,6 +48,10 @@ body[data-public-style-preset='schale-glass'] {
   --pg-progress-border-width: 0px;
   --pg-progress-border-color: transparent;
   --pg-progress-fill-gradient: linear-gradient(90deg, #a9d1ea 0%, #4d8fdc 55%, #fdb7c2 100%);
+  --pg-site-loading-track-bg: rgba(198, 225, 242, 0.72);
+  --pg-site-loading-border-width: 0px;
+  --pg-site-loading-border-color: transparent;
+  --pg-site-loading-fill-gradient: linear-gradient(90deg, #a9d1ea 0%, #4d8fdc 55%, #fdb7c2 100%);
   --pg-archive-panel-bg: rgba(255, 255, 255, 0.74);
   --pg-archive-panel-border-color: rgba(255, 255, 255, 0.74);
   --pg-archive-rail-color: rgba(63, 120, 215, 0.36);
@@ -150,6 +154,10 @@ body[data-public-style-preset='schale-glass'] {
   --pg-progress-border-width: 0px;
   --pg-progress-border-color: transparent;
   --pg-progress-fill-gradient: linear-gradient(90deg, #8cc4ff 0%, #5f9df2 55%, #c7a7ff 100%);
+  --pg-site-loading-track-bg: rgba(63, 120, 215, 0.36);
+  --pg-site-loading-border-width: 0px;
+  --pg-site-loading-border-color: transparent;
+  --pg-site-loading-fill-gradient: linear-gradient(90deg, #8cc4ff 0%, #5f9df2 55%, #c7a7ff 100%);
   --pg-archive-panel-bg: rgba(12, 24, 42, 0.78);
   --pg-archive-panel-border-color: rgba(148, 176, 220, 0.5);
   --pg-archive-rail-color: rgba(140, 196, 255, 0.42);

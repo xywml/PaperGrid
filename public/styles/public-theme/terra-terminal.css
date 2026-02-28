@@ -71,13 +71,17 @@ body[data-public-style-preset='terra-terminal'] {
   --pg-floating-main-shadow: 6px 6px 0 rgba(15, 23, 42, 0.82);
   --pg-paper-fold-size: 0px;
   --pg-progress-track-bg: rgba(11, 17, 25, 0.46);
-  --pg-progress-border-width: 2px;
-  --pg-progress-border-color: #4d657f;
+  --pg-progress-border-width: 0px;
+  --pg-progress-border-color: transparent;
   --pg-progress-fill-gradient: repeating-linear-gradient(
     90deg,
     #ccff00 0 14px,
     #0b1119 14px 28px
   );
+  --pg-site-loading-track-bg: rgba(11, 17, 25, 0.62);
+  --pg-site-loading-border-width: 1px;
+  --pg-site-loading-border-color: #587391;
+  --pg-site-loading-fill-gradient: linear-gradient(90deg, #ccff00 0%, #8fd5ff 52%, #ccff00 100%);
   --pg-archive-panel-bg: #121d2c;
   --pg-archive-panel-border-color: #8fa7c1;
   --pg-archive-rail-color: rgba(148, 163, 184, 0.5);
@@ -202,13 +206,17 @@ body[data-public-style-preset='terra-terminal'] {
   --pg-floating-main-fg: #0b1206;
   --pg-floating-main-shadow: 6px 6px 0 rgba(204, 255, 0, 0.34);
   --pg-progress-track-bg: rgba(11, 17, 25, 0.62);
-  --pg-progress-border-width: 2px;
-  --pg-progress-border-color: #8fa7c1;
+  --pg-progress-border-width: 0px;
+  --pg-progress-border-color: transparent;
   --pg-progress-fill-gradient: repeating-linear-gradient(
     90deg,
     #d7ff50 0 14px,
     #081018 14px 28px
   );
+  --pg-site-loading-track-bg: rgba(8, 16, 24, 0.82);
+  --pg-site-loading-border-width: 1px;
+  --pg-site-loading-border-color: #8fa7c1;
+  --pg-site-loading-fill-gradient: linear-gradient(90deg, #d7ff50 0%, #8cedff 55%, #d7ff50 100%);
   --pg-archive-panel-bg: #121d2c;
   --pg-archive-panel-border-color: #8fa7c1;
   --pg-archive-rail-color: rgba(148, 163, 184, 0.5);
@@ -401,6 +409,20 @@ html:not(.dark) body[data-public-style-preset='terra-terminal'] .pg-post-updated
 
 html:not(.dark) body[data-public-style-preset='terra-terminal'] .pg-post-updated-meta svg {
   color: inherit !important;
+}
+
+/* Light mode: taxonomy pages (category/tag) readability */
+html:not(.dark) body[data-public-style-preset='terra-terminal'] .pg-taxonomy-back-link {
+  color: #dff0ff !important;
+}
+
+html:not(.dark) body[data-public-style-preset='terra-terminal'] .pg-taxonomy-back-link:hover {
+  color: #f5fbff !important;
+  background: rgba(34, 211, 238, 0.14) !important;
+}
+
+html:not(.dark) body[data-public-style-preset='terra-terminal'] .pg-taxonomy-post-count {
+  color: #f3faff !important;
 }
 
 /* Light mode: right drawer TOC title ("目录") */

@@ -49,6 +49,10 @@
   --pg-progress-border-width: 0px;
   --pg-progress-border-color: transparent;
   --pg-progress-fill-gradient: linear-gradient(90deg, #6b7280 0%, #f3f4f6 50%, #6b7280 100%);
+  --pg-site-loading-track-bg: var(--pg-progress-track-bg);
+  --pg-site-loading-border-width: var(--pg-progress-border-width);
+  --pg-site-loading-border-color: var(--pg-progress-border-color);
+  --pg-site-loading-fill-gradient: var(--pg-progress-fill-gradient);
   --pg-archive-panel-bg: var(--pg-card-bg);
   --pg-archive-panel-border-color: var(--pg-card-border-color);
   --pg-archive-rail-color: color-mix(in oklab, var(--pg-nav-link-color) 36%, transparent);
@@ -150,6 +154,10 @@
   --pg-progress-border-width: 0px;
   --pg-progress-border-color: transparent;
   --pg-progress-fill-gradient: linear-gradient(90deg, #cbd5e1 0%, #0f172a 50%, #cbd5e1 100%);
+  --pg-site-loading-track-bg: var(--pg-progress-track-bg);
+  --pg-site-loading-border-width: var(--pg-progress-border-width);
+  --pg-site-loading-border-color: var(--pg-progress-border-color);
+  --pg-site-loading-fill-gradient: var(--pg-progress-fill-gradient);
   --pg-archive-panel-bg: var(--pg-card-bg);
   --pg-archive-panel-border-color: var(--pg-card-border-color);
   --pg-archive-rail-color: color-mix(in oklab, var(--pg-nav-link-color) 40%, transparent);
@@ -582,6 +590,16 @@
 
 .pg-scroll-progress-fill {
   background: var(--pg-progress-fill-gradient);
+  background-size: 200% 100%;
+}
+
+.pg-site-loading-track {
+  background: var(--pg-site-loading-track-bg) !important;
+  border: var(--pg-site-loading-border-width) solid var(--pg-site-loading-border-color);
+}
+
+.pg-site-loading-fill {
+  background: var(--pg-site-loading-fill-gradient) !important;
   background-size: 200% 100%;
 }
 

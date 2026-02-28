@@ -116,7 +116,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3 mb-6">
             <Link href="/posts">
-              <Button variant="ghost" size="sm">
+              <Button className="pg-taxonomy-back-link" variant="ghost" size="sm">
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 返回文章列表
               </Button>
@@ -131,7 +131,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
               <p className="mt-2 text-lg text-gray-600 dark:text-gray-400">
                 {category.description || (
                   <>
-                    共 <span className="pg-public-stat-emphasis font-semibold">{totalPosts}</span> 篇文章
+                    共 <span className="pg-public-stat-emphasis pg-taxonomy-post-count font-semibold">{totalPosts}</span> 篇文章
                   </>
                 )}
               </p>
@@ -146,7 +146,11 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
           {/* 文章数量 */}
           <div className="mb-6">
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              共找到 <span className="pg-public-stat-emphasis font-semibold text-gray-900 dark:text-white">{totalPosts}</span> 篇文章
+              共找到{' '}
+              <span className="pg-public-stat-emphasis pg-taxonomy-post-count font-semibold text-gray-900 dark:text-white">
+                {totalPosts}
+              </span>{' '}
+              篇文章
               {totalPosts > pageSize && ` · 第 ${page} / ${totalPages} 页`}
             </p>
           </div>
@@ -273,7 +277,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
                         query: { page: (page - 1).toString() },
                       }}
                     >
-                      <Button variant="outline" size="sm">
+                      <Button variant="outline" size="sm" className="pg-public-outline-btn">
                         上一页
                       </Button>
                     </Link>
@@ -319,7 +323,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
                         query: { page: (page + 1).toString() },
                       }}
                     >
-                      <Button variant="outline" size="sm">
+                      <Button variant="outline" size="sm" className="pg-public-outline-btn">
                         下一页
                       </Button>
                     </Link>

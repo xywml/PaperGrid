@@ -57,8 +57,8 @@ export function SiteLoading() {
 
   return (
     <div className="pointer-events-none fixed top-4 left-1/2 z-[70] -translate-x-1/2">
-      <div className="relative h-1 w-28 overflow-hidden rounded-full bg-gray-200/70 dark:bg-gray-700/60">
-        <div className="site-loading-bar h-full w-1/2 rounded-full bg-gradient-to-r from-gray-900/80 to-gray-500/40 dark:from-white/80 dark:to-gray-400/40" />
+      <div className="pg-site-loading-track relative h-1 w-28 overflow-hidden rounded-full">
+        <div className="pg-site-loading-fill site-loading-bar h-full w-1/2 rounded-full" />
       </div>
     </div>
   )

@@ -303,7 +303,7 @@ export default async function PostsPage({ searchParams }: PostsPageProps) {
                         },
                       }}
                     >
-                      <Button variant="outline" size="sm">
+                      <Button variant="outline" size="sm" className="pg-public-outline-btn">
                         上一页
                       </Button>
                     </Link>
@@ -357,7 +357,7 @@ export default async function PostsPage({ searchParams }: PostsPageProps) {
                         },
                       }}
                     >
-                      <Button variant="outline" size="sm">
+                      <Button variant="outline" size="sm" className="pg-public-outline-btn">
                         下一页
                       </Button>
                     </Link>
