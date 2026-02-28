@@ -160,7 +160,7 @@ export default async function AboutPage() {
                           <a
                             href={`mailto:${contactEmail}`}
                             data-slot="button"
-                            className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-900 hover:text-white dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white dark:hover:text-gray-900 transition-colors"
+                            className="pg-hero-social-btn flex h-10 w-10 items-center justify-center rounded-full transition-colors"
                           >
                             <Mail className="h-5 w-5" />
                           </a>
@@ -171,7 +171,7 @@ export default async function AboutPage() {
                             target="_blank"
                             rel="noopener noreferrer"
                             data-slot="button"
-                            className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-900 hover:text-white dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white dark:hover:text-gray-900 transition-colors"
+                            className="pg-hero-social-btn flex h-10 w-10 items-center justify-center rounded-full transition-colors"
                           >
                             <Github className="h-5 w-5" />
                           </a>
@@ -182,7 +182,7 @@ export default async function AboutPage() {
                             target="_blank"
                             rel="noopener noreferrer"
                             data-slot="button"
-                            className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-900 hover:text-white dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white dark:hover:text-gray-900 transition-colors"
+                            className="pg-hero-social-btn flex h-10 w-10 items-center justify-center rounded-full transition-colors"
                           >
                             <X className="h-5 w-5" />
                           </a>
@@ -193,7 +193,7 @@ export default async function AboutPage() {
                             target="_blank"
                             rel="noopener noreferrer"
                             data-slot="button"
-                            className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-900 hover:text-white dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white dark:hover:text-gray-900 transition-colors"
+                            className="pg-hero-social-btn flex h-10 w-10 items-center justify-center rounded-full transition-colors"
                           >
                             <Tv className="h-5 w-5" />
                           </a>
@@ -204,7 +204,7 @@ export default async function AboutPage() {
                             target="_blank"
                             rel="noopener noreferrer"
                             data-slot="button"
-                            className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-900 hover:text-white dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white dark:hover:text-gray-900 transition-colors"
+                            className="pg-hero-social-btn flex h-10 w-10 items-center justify-center rounded-full transition-colors"
                           >
                             <MessageSquareHeart className="h-5 w-5" />
                           </a>
@@ -251,7 +251,11 @@ export default async function AboutPage() {
                         </h4>
                         <div className="flex flex-wrap gap-2">
                           {section.items.map((item, itemIdx) => (
-                            <Badge key={`${section.title}-${itemIdx}`} variant="secondary">
+                            <Badge
+                              key={`${section.title}-${itemIdx}`}
+                              variant="secondary"
+                              className="pg-public-badge-secondary"
+                            >
                               {item}
                             </Badge>
                           ))}
@@ -294,27 +298,27 @@ export default async function AboutPage() {
                     <div className="mt-4 space-y-2">
                       {canShowEmail && (
                         <p className="text-gray-700 dark:text-gray-300">
-                          📧 Email: <a href={`mailto:${contactEmail}`} className="text-blue-600 hover:text-blue-700">{contactEmail}</a>
+                          📧 Email: <a href={`mailto:${contactEmail}`} className="pg-about-contact-link">{contactEmail}</a>
                         </p>
                       )}
                       {canShowGithub && (
                         <p className="text-gray-700 dark:text-gray-300">
-                          💻 GitHub: <a href={contactGithub} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700">{contactGithub}</a>
+                          💻 GitHub: <a href={contactGithub} target="_blank" rel="noopener noreferrer" className="pg-about-contact-link">{contactGithub}</a>
                         </p>
                       )}
                       {canShowX && (
                         <p className="text-gray-700 dark:text-gray-300">
-                          𝕏 X: <a href={contactX} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700">{contactX}</a>
+                          𝕏 X: <a href={contactX} target="_blank" rel="noopener noreferrer" className="pg-about-contact-link">{contactX}</a>
                         </p>
                       )}
                       {canShowBilibili && (
                         <p className="text-gray-700 dark:text-gray-300">
-                          📺 Bilibili: <a href={contactBilibili} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700">{contactBilibili}</a>
+                          📺 Bilibili: <a href={contactBilibili} target="_blank" rel="noopener noreferrer" className="pg-about-contact-link">{contactBilibili}</a>
                         </p>
                       )}
                       {canShowQQ && (
                         <p className="text-gray-700 dark:text-gray-300">
-                          💬 QQ: <a href={`https://wpa.qq.com/msgrd?v=3&uin=${contactQQ}&site=qq&menu=yes`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700">{contactQQ}</a>
+                          💬 QQ: <a href={`https://wpa.qq.com/msgrd?v=3&uin=${contactQQ}&site=qq&menu=yes`} target="_blank" rel="noopener noreferrer" className="pg-about-contact-link">{contactQQ}</a>
                         </p>
                       )}
                     </div>

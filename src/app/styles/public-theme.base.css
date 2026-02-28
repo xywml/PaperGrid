@@ -56,6 +56,54 @@
   --pg-archive-accent: var(--pg-link-accent);
   --pg-archive-link-hover-bg: var(--pg-drawer-link-hover-bg);
   --pg-archive-link-hover-border-color: var(--pg-archive-panel-border-color);
+  --pg-search-trigger-bg: color-mix(in oklab, var(--pg-card-bg) 90%, #ffffff 10%);
+  --pg-search-trigger-border-color: var(--pg-card-border-color);
+  --pg-search-trigger-text: var(--pg-nav-link-color);
+  --pg-search-trigger-hover-bg: color-mix(in oklab, var(--pg-link-accent) 14%, var(--pg-search-trigger-bg));
+  --pg-search-trigger-hover-text: var(--pg-nav-link-active-color);
+  --pg-search-kbd-bg: color-mix(in oklab, var(--pg-search-trigger-bg) 88%, #ffffff 12%);
+  --pg-search-kbd-border-color: var(--pg-search-trigger-border-color);
+  --pg-search-kbd-text: var(--pg-nav-link-color);
+  --pg-hero-primary-bg: var(--pg-link-accent);
+  --pg-hero-primary-fg: #ffffff;
+  --pg-hero-primary-border-color: color-mix(in oklab, var(--pg-link-accent) 85%, #111827 15%);
+  --pg-hero-primary-hover-bg: color-mix(in oklab, var(--pg-link-accent) 82%, #000000 18%);
+  --pg-hero-secondary-bg: color-mix(in oklab, var(--pg-card-bg) 95%, transparent);
+  --pg-hero-secondary-fg: var(--pg-nav-link-active-color);
+  --pg-hero-secondary-border-color: var(--pg-card-border-color);
+  --pg-hero-secondary-hover-bg: color-mix(in oklab, var(--pg-link-accent) 12%, var(--pg-hero-secondary-bg));
+  --pg-hero-secondary-hover-fg: var(--pg-nav-link-active-color);
+  --pg-social-btn-bg: color-mix(in oklab, var(--pg-card-bg) 92%, #ffffff 8%);
+  --pg-social-btn-fg: var(--pg-nav-link-active-color);
+  --pg-social-btn-border-color: var(--pg-card-border-color);
+  --pg-social-btn-hover-bg: color-mix(in oklab, var(--pg-link-accent) 18%, var(--pg-social-btn-bg));
+  --pg-social-btn-hover-fg: var(--pg-nav-link-active-color);
+  --pg-badge-secondary-bg: color-mix(in oklab, var(--pg-card-bg) 80%, #e2e8f0 20%);
+  --pg-badge-secondary-fg: var(--pg-nav-link-active-color);
+  --pg-badge-secondary-border-color: color-mix(in oklab, var(--pg-card-border-color) 88%, transparent);
+  --pg-badge-secondary-hover-bg: color-mix(in oklab, var(--pg-link-accent) 20%, var(--pg-badge-secondary-bg));
+  --pg-badge-secondary-hover-fg: var(--pg-nav-link-active-color);
+  --pg-badge-outline-bg: color-mix(in oklab, var(--pg-card-bg) 94%, transparent);
+  --pg-badge-outline-fg: var(--pg-nav-link-color);
+  --pg-badge-outline-border-color: var(--pg-card-border-color);
+  --pg-badge-outline-hover-bg: color-mix(in oklab, var(--pg-link-accent) 14%, var(--pg-badge-outline-bg));
+  --pg-badge-outline-hover-fg: var(--pg-nav-link-active-color);
+  --pg-outline-btn-bg: color-mix(in oklab, var(--pg-card-bg) 92%, transparent);
+  --pg-outline-btn-fg: var(--pg-nav-link-active-color);
+  --pg-outline-btn-border-color: var(--pg-card-border-color);
+  --pg-outline-btn-hover-bg: color-mix(in oklab, var(--pg-link-accent) 14%, var(--pg-outline-btn-bg));
+  --pg-outline-btn-hover-fg: var(--pg-nav-link-active-color);
+  --pg-stat-emphasis-color: var(--pg-nav-link-active-color);
+  --pg-contact-link-color: var(--pg-link-accent);
+  --pg-contact-link-hover-color: color-mix(in oklab, var(--pg-link-accent) 84%, #000000 16%);
+  --pg-divider-line-color: color-mix(in oklab, var(--pg-nav-link-color) 36%, transparent);
+  --pg-divider-icon-color: color-mix(in oklab, var(--pg-nav-link-color) 68%, transparent);
+  --pg-divider-icon-bg: var(--background);
+  --pg-lock-color: var(--pg-link-accent);
+  --pg-lock-bg: color-mix(in oklab, var(--pg-link-accent) 12%, transparent);
+  --pg-lock-border-color: color-mix(in oklab, var(--pg-link-accent) 38%, transparent);
+  --pg-lock-circle-bg: color-mix(in oklab, var(--pg-link-accent) 14%, var(--pg-card-bg));
+  --pg-lock-circle-color: var(--pg-link-accent);
   --pg-link-accent: #1d4ed8;
   --pg-heading-tracking: -0.02em;
   --pg-heading-weight: 700;
@@ -109,6 +157,54 @@
   --pg-archive-accent: var(--pg-link-accent);
   --pg-archive-link-hover-bg: var(--pg-drawer-link-hover-bg);
   --pg-archive-link-hover-border-color: var(--pg-archive-panel-border-color);
+  --pg-search-trigger-bg: color-mix(in oklab, var(--pg-card-bg) 90%, #0f172a 10%);
+  --pg-search-trigger-border-color: var(--pg-card-border-color);
+  --pg-search-trigger-text: var(--pg-nav-link-color);
+  --pg-search-trigger-hover-bg: color-mix(in oklab, var(--pg-link-accent) 18%, var(--pg-search-trigger-bg));
+  --pg-search-trigger-hover-text: var(--pg-nav-link-active-color);
+  --pg-search-kbd-bg: color-mix(in oklab, var(--pg-search-trigger-bg) 88%, #0f172a 12%);
+  --pg-search-kbd-border-color: var(--pg-search-trigger-border-color);
+  --pg-search-kbd-text: var(--pg-nav-link-color);
+  --pg-hero-primary-bg: var(--pg-link-accent);
+  --pg-hero-primary-fg: #0f172a;
+  --pg-hero-primary-border-color: color-mix(in oklab, var(--pg-link-accent) 55%, #f8fafc 45%);
+  --pg-hero-primary-hover-bg: color-mix(in oklab, var(--pg-link-accent) 82%, #ffffff 18%);
+  --pg-hero-secondary-bg: color-mix(in oklab, var(--pg-card-bg) 86%, #0f172a 14%);
+  --pg-hero-secondary-fg: var(--pg-nav-link-active-color);
+  --pg-hero-secondary-border-color: var(--pg-card-border-color);
+  --pg-hero-secondary-hover-bg: color-mix(in oklab, var(--pg-link-accent) 16%, var(--pg-hero-secondary-bg));
+  --pg-hero-secondary-hover-fg: var(--pg-nav-link-active-color);
+  --pg-social-btn-bg: color-mix(in oklab, var(--pg-card-bg) 88%, #0f172a 12%);
+  --pg-social-btn-fg: var(--pg-nav-link-active-color);
+  --pg-social-btn-border-color: var(--pg-card-border-color);
+  --pg-social-btn-hover-bg: color-mix(in oklab, var(--pg-link-accent) 20%, var(--pg-social-btn-bg));
+  --pg-social-btn-hover-fg: var(--pg-nav-link-active-color);
+  --pg-badge-secondary-bg: color-mix(in oklab, var(--pg-card-bg) 78%, #334155 22%);
+  --pg-badge-secondary-fg: var(--pg-nav-link-active-color);
+  --pg-badge-secondary-border-color: color-mix(in oklab, var(--pg-card-border-color) 92%, transparent);
+  --pg-badge-secondary-hover-bg: color-mix(in oklab, var(--pg-link-accent) 24%, var(--pg-badge-secondary-bg));
+  --pg-badge-secondary-hover-fg: var(--pg-nav-link-active-color);
+  --pg-badge-outline-bg: color-mix(in oklab, var(--pg-card-bg) 90%, #0f172a 10%);
+  --pg-badge-outline-fg: var(--pg-nav-link-color);
+  --pg-badge-outline-border-color: var(--pg-card-border-color);
+  --pg-badge-outline-hover-bg: color-mix(in oklab, var(--pg-link-accent) 18%, var(--pg-badge-outline-bg));
+  --pg-badge-outline-hover-fg: var(--pg-nav-link-active-color);
+  --pg-outline-btn-bg: color-mix(in oklab, var(--pg-card-bg) 90%, #0f172a 10%);
+  --pg-outline-btn-fg: var(--pg-nav-link-active-color);
+  --pg-outline-btn-border-color: var(--pg-card-border-color);
+  --pg-outline-btn-hover-bg: color-mix(in oklab, var(--pg-link-accent) 18%, var(--pg-outline-btn-bg));
+  --pg-outline-btn-hover-fg: var(--pg-nav-link-active-color);
+  --pg-stat-emphasis-color: var(--pg-nav-link-active-color);
+  --pg-contact-link-color: var(--pg-link-accent);
+  --pg-contact-link-hover-color: color-mix(in oklab, var(--pg-link-accent) 82%, #ffffff 18%);
+  --pg-divider-line-color: color-mix(in oklab, var(--pg-nav-link-color) 42%, transparent);
+  --pg-divider-icon-color: color-mix(in oklab, var(--pg-nav-link-color) 72%, transparent);
+  --pg-divider-icon-bg: var(--background);
+  --pg-lock-color: var(--pg-link-accent);
+  --pg-lock-bg: color-mix(in oklab, var(--pg-link-accent) 20%, transparent);
+  --pg-lock-border-color: color-mix(in oklab, var(--pg-link-accent) 44%, transparent);
+  --pg-lock-circle-bg: color-mix(in oklab, var(--pg-link-accent) 22%, var(--pg-card-bg));
+  --pg-lock-circle-color: var(--pg-link-accent);
   --pg-link-accent: #93c5fd;
 }
 
@@ -176,6 +272,157 @@
 
 .pg-public-scope [data-slot='badge'] {
   border-radius: var(--pg-badge-radius);
+}
+
+.pg-public-search-trigger {
+  border-color: var(--pg-search-trigger-border-color) !important;
+  background: var(--pg-search-trigger-bg) !important;
+  color: var(--pg-search-trigger-text) !important;
+}
+
+.pg-public-search-trigger:hover {
+  background: var(--pg-search-trigger-hover-bg) !important;
+  color: var(--pg-search-trigger-hover-text) !important;
+}
+
+.pg-public-search-trigger svg {
+  color: inherit !important;
+}
+
+.pg-public-search-trigger .pg-public-search-kbd {
+  border-color: var(--pg-search-kbd-border-color) !important;
+  background: var(--pg-search-kbd-bg) !important;
+  color: var(--pg-search-kbd-text) !important;
+}
+
+.pg-hero-btn-primary {
+  border: var(--pg-card-border-width) solid var(--pg-hero-primary-border-color) !important;
+  background: var(--pg-hero-primary-bg) !important;
+  color: var(--pg-hero-primary-fg) !important;
+}
+
+.pg-hero-btn-primary:hover {
+  background: var(--pg-hero-primary-hover-bg) !important;
+  color: var(--pg-hero-primary-fg) !important;
+}
+
+.pg-hero-btn-secondary {
+  border-color: var(--pg-hero-secondary-border-color) !important;
+  background: var(--pg-hero-secondary-bg) !important;
+  color: var(--pg-hero-secondary-fg) !important;
+}
+
+.pg-hero-btn-secondary:hover {
+  background: var(--pg-hero-secondary-hover-bg) !important;
+  color: var(--pg-hero-secondary-hover-fg) !important;
+}
+
+.pg-hero-social-btn {
+  border: var(--pg-card-border-width) solid var(--pg-social-btn-border-color) !important;
+  background: var(--pg-social-btn-bg) !important;
+  color: var(--pg-social-btn-fg) !important;
+}
+
+.pg-hero-social-btn:hover {
+  background: var(--pg-social-btn-hover-bg) !important;
+  color: var(--pg-social-btn-hover-fg) !important;
+}
+
+.pg-hero-social-btn svg {
+  color: inherit !important;
+}
+
+.pg-public-badge-secondary {
+  border-color: var(--pg-badge-secondary-border-color) !important;
+  background: var(--pg-badge-secondary-bg) !important;
+  color: var(--pg-badge-secondary-fg) !important;
+}
+
+.pg-public-badge-secondary:hover {
+  background: var(--pg-badge-secondary-hover-bg) !important;
+  color: var(--pg-badge-secondary-hover-fg) !important;
+}
+
+.pg-public-badge-outline {
+  border-color: var(--pg-badge-outline-border-color) !important;
+  background: var(--pg-badge-outline-bg) !important;
+  color: var(--pg-badge-outline-fg) !important;
+}
+
+.pg-public-badge-outline:hover {
+  background: var(--pg-badge-outline-hover-bg) !important;
+  color: var(--pg-badge-outline-hover-fg) !important;
+}
+
+.pg-public-outline-btn {
+  border-color: var(--pg-outline-btn-border-color) !important;
+  background: var(--pg-outline-btn-bg) !important;
+  color: var(--pg-outline-btn-fg) !important;
+}
+
+.pg-public-outline-btn:hover {
+  background: var(--pg-outline-btn-hover-bg) !important;
+  color: var(--pg-outline-btn-hover-fg) !important;
+}
+
+.pg-public-stat-emphasis {
+  color: var(--pg-stat-emphasis-color) !important;
+}
+
+.pg-about-contact-link {
+  color: var(--pg-contact-link-color) !important;
+}
+
+.pg-about-contact-link:hover {
+  color: var(--pg-contact-link-hover-color) !important;
+}
+
+.pg-post-divider-line {
+  border-top-color: var(--pg-divider-line-color) !important;
+  border-top-style: dashed;
+}
+
+.pg-post-divider-icon {
+  background: var(--pg-divider-icon-bg) !important;
+  color: var(--pg-divider-icon-color) !important;
+}
+
+.pg-post-divider-icon svg {
+  color: inherit !important;
+}
+
+.pg-lock-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border: 1px solid var(--pg-lock-border-color);
+  border-radius: var(--pg-control-radius);
+  background: var(--pg-lock-bg);
+  color: var(--pg-lock-color) !important;
+  padding: 0.125rem 0.5rem;
+  line-height: 1.2;
+}
+
+.pg-lock-indicator svg {
+  color: inherit !important;
+}
+
+.pg-lock-inline {
+  color: var(--pg-lock-color) !important;
+}
+
+.pg-lock-inline svg {
+  color: inherit !important;
+}
+
+.pg-lock-circle {
+  border: var(--pg-card-border-width) solid var(--pg-lock-border-color) !important;
+  background: var(--pg-lock-circle-bg) !important;
+  color: var(--pg-lock-circle-color) !important;
+}
+
+.pg-lock-circle svg {
+  color: inherit !important;
 }
 
 .pg-public-scope h1,
@@ -333,6 +580,17 @@
 .pg-archive-timeline .pg-archive-year-link,
 .pg-archive-timeline .pg-archive-post-link {
   color: var(--pg-nav-link-color) !important;
+}
+
+.pg-archive-timeline .pg-archive-count-badge {
+  border-color: var(--pg-badge-secondary-border-color) !important;
+  background: var(--pg-badge-secondary-bg) !important;
+  color: var(--pg-badge-secondary-fg) !important;
+}
+
+.pg-archive-timeline .pg-archive-count-badge:hover {
+  background: var(--pg-badge-secondary-hover-bg) !important;
+  color: var(--pg-badge-secondary-hover-fg) !important;
 }
 
 .pg-archive-timeline .pg-archive-year-title,

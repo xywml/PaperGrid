@@ -52,10 +52,10 @@ export function PostMeta({
     items.push({
       key: 'protected',
       content: (
-        <>
+        <span className="pg-lock-inline inline-flex items-center gap-1">
           <Lock className="h-3 w-3 sm:h-4 sm:w-4" />
           <span>加密</span>
-        </>
+        </span>
       ),
     })
   }

@@ -218,7 +218,7 @@ export function ProtectedPostPage({
                 </span>
               </div>
             )}
-            <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+            <div className="pg-lock-indicator text-xs">
               <Lock className="h-3 w-3" />
               加密文章
             </div>
@@ -228,14 +228,14 @@ export function ProtectedPostPage({
           <div className="flex flex-wrap items-center gap-2 mt-4">
             {post.category && (
               <Link href={`/posts?category=${post.category.slug}`}>
-                <Badge variant="secondary" className="cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900">
+                <Badge variant="secondary" className="pg-public-badge-secondary cursor-pointer">
                   {post.category.name}
                 </Badge>
               </Link>
             )}
             {post.postTags.map((pt) => (
               <Link key={pt.tag.id} href={`/posts?tag=${pt.tag.slug}`}>
-                <Badge variant="outline" className="cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900">
+                <Badge variant="outline" className="pg-public-badge-outline cursor-pointer">
                   #{pt.tag.name}
                 </Badge>
               </Link>
@@ -248,10 +248,10 @@ export function ProtectedPostPage({
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 mb-6">
         <div className="relative">
           <div className="absolute inset-0 flex items-center" aria-hidden="true">
-            <div className="w-full border-t border-dashed border-gray-300 dark:border-gray-700"></div>
+            <div className="pg-post-divider-line w-full border-t border-dashed border-gray-300 dark:border-gray-700"></div>
           </div>
           <div className="relative flex justify-start">
-            <span className="bg-white dark:bg-gray-950 pr-3 text-gray-400 dark:text-gray-600">
+            <span className="pg-post-divider-icon pr-3 text-gray-400 dark:text-gray-600">
               <Scissors className="h-5 w-5" />
             </span>
           </div>
@@ -426,8 +426,10 @@ export function ProtectedPostPage({
                                 {related.isProtected && (
                                   <>
                                     <span>•</span>
-                                    <Lock className="inline h-3 w-3" />
-                                    <span>加密</span>
+                                    <span className="pg-lock-inline inline-flex items-center gap-1">
+                                      <Lock className="inline h-3 w-3" />
+                                      <span>加密</span>
+                                    </span>
                                   </>
                                 )}
                               </div>

@@ -280,7 +280,9 @@ export function ArchiveTimeline({ years }: ArchiveTimelineProps) {
                       {year.year} 年
                     </span>
                   </span>
-                  <Badge variant="secondary">{year.postCount} 篇</Badge>
+                  <Badge variant="secondary" className="pg-archive-count-badge">
+                    {year.postCount} 篇
+                  </Badge>
                 </button>
 
                 {isYearOpen && (
@@ -312,7 +314,9 @@ export function ArchiveTimeline({ years }: ArchiveTimelineProps) {
                               <CalendarDays className="h-4 w-4" />
                               {month.month} 月
                             </span>
-                            <Badge variant="outline">{month.postCount}</Badge>
+                            <Badge variant="outline" className="pg-archive-count-badge">
+                              {month.postCount}
+                            </Badge>
                           </button>
 
                           {isMonthOpen && (

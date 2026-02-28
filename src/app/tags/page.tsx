@@ -59,8 +59,8 @@ export default async function TagsPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              共 <span className="font-semibold text-gray-900 dark:text-white">{tags.length}</span> 个标签,
-              <span className="font-semibold text-gray-900 dark:text-white">{totalPosts}</span> 篇文章
+              共 <span className="pg-public-stat-emphasis font-semibold text-gray-900 dark:text-white">{tags.length}</span> 个标签,
+              <span className="pg-public-stat-emphasis font-semibold text-gray-900 dark:text-white">{totalPosts}</span> 篇文章
             </p>
           </div>
 
@@ -81,7 +81,7 @@ export default async function TagsPage() {
                     <Link key={tag.id} href={`/tags/${tag.slug}`}>
                       <Badge
                         variant="secondary"
-                        className="cursor-pointer px-4 py-2 text-sm hover:bg-blue-100 dark:hover:bg-blue-900 transition-colors"
+                        className="pg-public-badge-secondary cursor-pointer px-4 py-2 text-sm transition-colors"
                       >
                         #{tag.name}
                         <span className="ml-2 text-xs opacity-60">

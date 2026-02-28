@@ -139,12 +139,12 @@ export default async function TagPage({ params, searchParams }: TagPageProps) {
                 <h1 className="text-3xl font-serif font-bold tracking-tight text-gray-900 dark:text-white sm:text-5xl">
                   #{tag.name}
                 </h1>
-                <Badge variant="secondary" className="text-lg">
+                <Badge variant="secondary" className="pg-public-badge-secondary text-lg">
                   {totalPosts} 篇文章
                 </Badge>
               </div>
               <p className="mt-2 text-lg text-gray-600 dark:text-gray-400">
-                标记为 "{tag.name}" 的所有文章
+                标记为「{tag.name}」的所有文章
               </p>
             </div>
           </div>
@@ -157,7 +157,7 @@ export default async function TagPage({ params, searchParams }: TagPageProps) {
           {/* 文章数量 */}
           <div className="mb-6">
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              共找到 <span className="font-semibold text-gray-900 dark:text-white">{totalPosts}</span> 篇文章
+              共找到 <span className="pg-public-stat-emphasis font-semibold text-gray-900 dark:text-white">{totalPosts}</span> 篇文章
               {totalPosts > pageSize && ` · 第 ${page} / ${totalPages} 页`}
             </p>
           </div>
@@ -227,7 +227,7 @@ export default async function TagPage({ params, searchParams }: TagPageProps) {
                           {post.isProtected && (
                             <>
                               <span>•</span>
-                              <div className="flex items-center gap-1">
+                              <div className="pg-lock-inline flex items-center gap-1">
                                 <Lock className="h-3 w-3" />
                                 <span>加密</span>
                               </div>
@@ -248,7 +248,7 @@ export default async function TagPage({ params, searchParams }: TagPageProps) {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2 flex-wrap">
                           {post.category && (
-                            <Badge variant="secondary" className="text-xs">
+                            <Badge variant="secondary" className="pg-public-badge-secondary text-xs">
                               {post.category.name}
                             </Badge>
                           )}
@@ -259,7 +259,7 @@ export default async function TagPage({ params, searchParams }: TagPageProps) {
                               <Badge
                                 key={pt.tag.id}
                                 variant="outline"
-                                className="text-xs"
+                                className="pg-public-badge-outline text-xs"
                               >
                                 {pt.tag.name}
                               </Badge>
@@ -273,7 +273,7 @@ export default async function TagPage({ params, searchParams }: TagPageProps) {
                     </CardContent>
                     <CardFooter className="pt-0">
                       <Link href={`/posts/${post.slug}`} className="w-full">
-                        <Button variant="outline" className="w-full" size="sm">
+                        <Button variant="outline" className="pg-public-outline-btn w-full" size="sm">
                           阅读全文
                         </Button>
                       </Link>

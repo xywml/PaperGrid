@@ -129,7 +129,11 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
                 {category.name}
               </h1>
               <p className="mt-2 text-lg text-gray-600 dark:text-gray-400">
-                {category.description || `共 ${totalPosts} 篇文章`}
+                {category.description || (
+                  <>
+                    共 <span className="pg-public-stat-emphasis font-semibold">{totalPosts}</span> 篇文章
+                  </>
+                )}
               </p>
             </div>
           </div>
@@ -142,7 +146,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
           {/* 文章数量 */}
           <div className="mb-6">
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              共找到 <span className="font-semibold text-gray-900 dark:text-white">{totalPosts}</span> 篇文章
+              共找到 <span className="pg-public-stat-emphasis font-semibold text-gray-900 dark:text-white">{totalPosts}</span> 篇文章
               {totalPosts > pageSize && ` · 第 ${page} / ${totalPages} 页`}
             </p>
           </div>
@@ -212,7 +216,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
                           {post.isProtected && (
                             <>
                               <span>•</span>
-                              <div className="flex items-center gap-1">
+                              <div className="pg-lock-inline flex items-center gap-1">
                                 <Lock className="h-3 w-3" />
                                 <span>加密</span>
                               </div>
@@ -236,7 +240,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
                             <Badge
                               key={pt.tag.id}
                               variant="outline"
-                              className="text-xs"
+                              className="pg-public-badge-outline text-xs"
                             >
                               {pt.tag.name}
                             </Badge>
@@ -250,7 +254,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
                     </CardContent>
                     <CardFooter className="pt-0">
                       <Link href={`/posts/${post.slug}`} className="w-full">
-                        <Button variant="outline" className="w-full" size="sm">
+                        <Button variant="outline" className="pg-public-outline-btn w-full" size="sm">
                           阅读全文
                         </Button>
                       </Link>

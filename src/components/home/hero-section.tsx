@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { ArrowRight, Sparkles, Github, X, Tv, Mail, MapPin } from 'lucide-react'
+import { ArrowRight, Github, X, Tv, Mail, MapPin } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { isValidHref } from '@/lib/utils'
 
@@ -168,7 +168,7 @@ export function HeroSection({ settings }: { settings?: Record<string, unknown> }
             <Link href="/posts">
               <Button
                 size="lg"
-                className="group bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 shadow-md hover:shadow-lg transition-all duration-300"
+                className="pg-hero-btn-primary group shadow-md transition-all duration-300 hover:shadow-lg"
               >
                 浏览文章
                 <ArrowRight className="ml-2 h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
@@ -178,7 +178,7 @@ export function HeroSection({ settings }: { settings?: Record<string, unknown> }
               <Button
                 size="lg"
                 variant="outline"
-                className="border-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-300"
+                className="pg-hero-btn-secondary border-2 transition-all duration-300"
               >
                 关于我
               </Button>
@@ -198,9 +198,10 @@ export function HeroSection({ settings }: { settings?: Record<string, unknown> }
                     href={githubUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-3 rounded-full bg-white dark:bg-gray-800 shadow-md hover:shadow-lg hover:scale-110 transition-all duration-300"
+                    data-slot="button"
+                    className="pg-hero-social-btn rounded-full p-3 shadow-md transition-all duration-300 hover:scale-110 hover:shadow-lg"
                   >
-                    <Github className="h-5 w-5 text-gray-900 dark:text-white" />
+                    <Github className="h-5 w-5" />
                   </a>
                 )}
                 {showX && (
@@ -208,9 +209,10 @@ export function HeroSection({ settings }: { settings?: Record<string, unknown> }
                     href={xUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-3 rounded-full bg-white dark:bg-gray-800 shadow-md hover:shadow-lg hover:scale-110 transition-all duration-300"
+                    data-slot="button"
+                    className="pg-hero-social-btn rounded-full p-3 shadow-md transition-all duration-300 hover:scale-110 hover:shadow-lg"
                   >
-                    <X className="h-5 w-5 text-gray-900 dark:text-white" />
+                    <X className="h-5 w-5" />
                   </a>
                 )}
                 {showBilibili && (
@@ -218,17 +220,19 @@ export function HeroSection({ settings }: { settings?: Record<string, unknown> }
                     href={bilibiliUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-3 rounded-full bg-white dark:bg-gray-800 shadow-md hover:shadow-lg hover:scale-110 transition-all duration-300"
+                    data-slot="button"
+                    className="pg-hero-social-btn rounded-full p-3 shadow-md transition-all duration-300 hover:scale-110 hover:shadow-lg"
                   >
-                    <Tv className="h-5 w-5 text-gray-900 dark:text-white" />
+                    <Tv className="h-5 w-5" />
                   </a>
                 )}
                 {showEmail && (
                   <a
                     href={`mailto:${email}`}
-                    className="p-3 rounded-full bg-white dark:bg-gray-800 shadow-md hover:shadow-lg hover:scale-110 transition-all duration-300"
+                    data-slot="button"
+                    className="pg-hero-social-btn rounded-full p-3 shadow-md transition-all duration-300 hover:scale-110 hover:shadow-lg"
                   >
-                    <Mail className="h-5 w-5 text-gray-900 dark:text-white" />
+                    <Mail className="h-5 w-5" />
                   </a>
                 )}
               </div>

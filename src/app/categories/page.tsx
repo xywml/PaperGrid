@@ -54,8 +54,8 @@ export default async function CategoriesPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              共 <span className="font-semibold text-gray-900 dark:text-white">{categories.length}</span> 个分类,
-              <span className="font-semibold text-gray-900 dark:text-white">{totalPosts}</span> 篇文章
+              共 <span className="pg-public-stat-emphasis font-semibold text-gray-900 dark:text-white">{categories.length}</span> 个分类,
+              <span className="pg-public-stat-emphasis font-semibold text-gray-900 dark:text-white">{totalPosts}</span> 篇文章
             </p>
           </div>
 
@@ -85,7 +85,7 @@ export default async function CategoriesPage() {
                             </p>
                           )}
                         </div>
-                        <Badge variant="secondary" className="ml-2">
+                        <Badge variant="secondary" className="pg-public-badge-secondary ml-2">
                           {category._count.posts}
                         </Badge>
                       </div>

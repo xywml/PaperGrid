@@ -114,7 +114,7 @@ export default async function HomePage() {
                   最新文章
                 </h2>
                 <Link href="/posts">
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" className="pg-public-outline-btn">
                     查看全部
                   </Button>
                 </Link>
@@ -162,7 +162,7 @@ export default async function HomePage() {
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             {post.category && (
-                              <Badge variant="secondary">
+                              <Badge variant="secondary" className="pg-public-badge-secondary">
                                 {post.category.name}
                               </Badge>
                             )}
@@ -170,7 +170,7 @@ export default async function HomePage() {
                               <Badge
                                 key={pt.tag.id}
                                 variant="outline"
-                                className="text-xs"
+                                className="pg-public-badge-outline text-xs"
                               >
                                 {pt.tag.name}
                               </Badge>
@@ -260,7 +260,7 @@ export default async function HomePage() {
                       >
                         <Badge
                           variant="secondary"
-                          className="hover:bg-blue-100 dark:hover:bg-blue-900"
+                          className="pg-public-badge-secondary"
                         >
                           {tag.name}
                           <span className="ml-1 text-xs opacity-60">

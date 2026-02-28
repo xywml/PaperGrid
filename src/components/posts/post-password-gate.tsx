@@ -57,7 +57,7 @@ export function PostPasswordGate({ slug, title, excerpt, onUnlock }: PostPasswor
     <div className="mx-auto max-w-xl px-4 py-12 sm:px-6 lg:px-8">
       <Card className="p-6 sm:p-8">
         <div className="flex flex-col items-center text-center">
-          <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-200">
+          <div className="pg-lock-circle mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-200">
             <Lock className="h-6 w-6" />
           </div>
           <h1 className="text-xl font-semibold text-gray-900 dark:text-white">

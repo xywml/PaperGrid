@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma'
+import type { Prisma } from '@prisma/client'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -35,7 +36,7 @@ export default async function PostsPage({ searchParams }: PostsPageProps) {
   const tagSlug = params.tag || ''
 
   // 构建查询条件
-  const where: any = {
+  const where: Prisma.PostWhereInput = {
     status: 'PUBLISHED',
   }
 
@@ -256,7 +257,7 @@ export default async function PostsPage({ searchParams }: PostsPageProps) {
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2 flex-wrap">
                             {post.category && (
-                              <Badge variant="secondary" className="text-xs">
+                              <Badge variant="secondary" className="pg-public-badge-secondary text-xs">
                                 {post.category.name}
                               </Badge>
                             )}
@@ -264,7 +265,7 @@ export default async function PostsPage({ searchParams }: PostsPageProps) {
                               <Badge
                                 key={pt.tag.id}
                                 variant="outline"
-                                className="text-xs"
+                                className="pg-public-badge-outline text-xs"
                               >
                                 {pt.tag.name}
                               </Badge>
@@ -278,7 +279,7 @@ export default async function PostsPage({ searchParams }: PostsPageProps) {
                       </CardContent>
                       <CardFooter className="pt-0">
                         <Link href={`/posts/${post.slug}`} className="w-full">
-                          <Button variant="outline" className="w-full">
+                          <Button variant="outline" className="pg-public-outline-btn w-full">
                             阅读全文
                           </Button>
                         </Link>
@@ -388,7 +389,7 @@ export default async function PostsPage({ searchParams }: PostsPageProps) {
                               {post.title}
                             </p>
                             {post.isProtected && (
-                              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                              <p className="pg-lock-inline mt-1 text-xs text-gray-500 dark:text-gray-400">
                                 <Lock className="mr-1 inline h-3 w-3" />
                                 加密文章
                               </p>
@@ -443,7 +444,7 @@ export default async function PostsPage({ searchParams }: PostsPageProps) {
                       >
                         <Badge
                           variant="secondary"
-                          className="hover:bg-blue-100 dark:hover:bg-blue-900"
+                          className="pg-public-badge-secondary"
                         >
                           {tag.name}
                           <span className="ml-1 text-xs opacity-60">
