@@ -51,6 +51,14 @@ body[data-public-style-preset='paper-grid'] {
     #d1d5db 75%,
     #9ca3af 100%
   );
+  --pg-site-loading-track-bg: rgba(229, 231, 235, 0.7);
+  --pg-site-loading-border-width: 0px;
+  --pg-site-loading-border-color: transparent;
+  --pg-site-loading-fill-gradient: linear-gradient(
+    90deg,
+    rgba(17, 24, 39, 0.8) 0%,
+    rgba(107, 114, 128, 0.4) 100%
+  );
   --pg-archive-panel-bg: color-mix(in oklab, var(--pg-card-bg) 92%, #ffffff 8%);
   --pg-archive-panel-border-color: rgba(100, 116, 139, 0.4);
   --pg-archive-rail-color: rgba(100, 116, 139, 0.32);
@@ -141,6 +149,14 @@ body[data-public-style-preset='paper-grid'] {
     #f9fafb 50%,
     #d1d5db 75%,
     #9ca3af 100%
+  );
+  --pg-site-loading-track-bg: rgba(55, 65, 81, 0.6);
+  --pg-site-loading-border-width: 0px;
+  --pg-site-loading-border-color: transparent;
+  --pg-site-loading-fill-gradient: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.8) 0%,
+    rgba(156, 163, 175, 0.4) 100%
   );
   --pg-archive-panel-bg: color-mix(in oklab, var(--pg-card-bg) 90%, #0f172a 10%);
   --pg-archive-panel-border-color: rgba(148, 163, 184, 0.34);
