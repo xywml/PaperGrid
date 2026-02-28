@@ -138,7 +138,7 @@ export function MobileNav({
   const SidebarContent = (
     <div
       ref={containerRef}
-      className={`fixed inset-0 z-[100] flex ${isTopDrawer ? 'items-start' : ''} ${open ? 'pointer-events-auto' : 'pointer-events-none'}`}
+      className={`fixed inset-0 z-[100] flex overflow-hidden ${isTopDrawer ? 'items-start' : ''} ${open ? 'pointer-events-auto' : 'pointer-events-none'}`}
       aria-hidden={!open && !isFocusInside}
       inert={!open && !isFocusInside ? true : undefined}
     >
@@ -150,7 +150,8 @@ export function MobileNav({
 
       {/* panel (left slide-in) */}
       <div
-        className={`cubic-bezier(0.16, 1, 0.3, 1) relative z-10 transform bg-white p-6 shadow-2xl transition-transform duration-300 dark:bg-gray-900 ${isTopDrawer ? 'max-h-[85vh] w-full overflow-auto' : 'h-full w-72'} ${open ? (isTopDrawer ? 'translate-y-0' : 'translate-x-0') : (isTopDrawer ? '-translate-y-full' : '-translate-x-full')}`}
+        data-drawer-side={isTopDrawer ? 'top' : 'left'}
+        className={`pg-public-drawer-panel relative z-10 transform bg-white p-6 shadow-2xl transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform dark:bg-gray-900 ${isTopDrawer ? 'max-h-[85vh] w-full overflow-auto' : 'h-full w-72'} ${open ? (isTopDrawer ? 'translate-y-0 opacity-100' : 'translate-x-0 opacity-100') : (isTopDrawer ? '-translate-y-[calc(100%+16px)] opacity-0' : '-translate-x-[calc(100%+24px)] opacity-0')}`}
       >
         <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -204,7 +205,7 @@ export function MobileNav({
                 key={link.href}
                 href={link.href}
                 onClick={() => setOpen(false)}
-                className={`flex items-center rounded-md px-4 py-3 text-base font-medium transition-all ${active ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'}`}
+                className={`pg-public-drawer-link flex items-center rounded-md px-4 py-3 text-base font-medium transition-all ${active ? 'pg-public-drawer-link-active bg-primary/10 text-primary shadow-sm' : 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'}`}
               >
                 {link.label}
               </Link>

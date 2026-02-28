@@ -1,10 +1,27 @@
 import { cache } from 'react'
 import { prisma } from './prisma'
 
-function unwrapSettingValue(value: unknown): unknown {
-  if (!value || typeof value !== 'object') return undefined
-  const values = Object.values(value as Record<string, unknown>)
-  return values.length > 0 ? values[0] : undefined
+const SETTING_VALUE_FIELD_BY_KEY: Record<string, string> = {
+  'ui.publicStylePreset': 'preset',
+  'ui.mobileReadingBackground': 'style',
+}
+
+const COMMON_SETTING_FIELDS = ['value', 'text', 'enabled', 'style', 'preset'] as const
+
+function unwrapSettingValue(key: string, value: unknown): unknown {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return undefined
+  const record = value as Record<string, unknown>
+  const preferredField = SETTING_VALUE_FIELD_BY_KEY[key]
+  if (preferredField && preferredField in record) {
+    return record[preferredField]
+  }
+  for (const field of COMMON_SETTING_FIELDS) {
+    if (field in record) {
+      return record[field]
+    }
+  }
+  const entries = Object.entries(record)
+  return entries.length === 1 ? entries[0][1] : undefined
 }
 
 const getSettingRecord = cache(async (key: string) => {
@@ -21,6 +38,7 @@ const PUBLIC_SETTING_KEYS = [
   'site.faviconUrl',
   'site.defaultAvatarUrl',
   'ui.hideAdminEntry',
+  'ui.publicStylePreset',
   'hero.typingTitles',
   'hero.subtitle',
   'hero.location',
@@ -58,7 +76,7 @@ const getPublicSettingsCached = cache(async () => {
 
   const result: Record<string, unknown> = {}
   for (const s of settings) {
-    result[s.key] = unwrapSettingValue(s.value)
+    result[s.key] = unwrapSettingValue(s.key, s.value)
   }
 
   return result
@@ -71,7 +89,7 @@ export async function getSetting<T = unknown>(key: string, defaultValue?: T): Pr
     return defaultValue
   }
 
-  const value = unwrapSettingValue(setting.value)
+  const value = unwrapSettingValue(key, setting.value)
   return (value ?? defaultValue) as T
 }
 

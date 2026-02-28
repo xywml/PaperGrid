@@ -138,7 +138,7 @@ export function MobileToc({ isOpen, onOpenChange }: { isOpen?: boolean; onOpenCh
 
   const SidebarContent = (
     <div
-      className={`fixed inset-0 z-[100] flex md:hidden ${open ? 'pointer-events-auto' : 'pointer-events-none'}`}
+      className={`fixed inset-0 z-[100] flex overflow-hidden md:hidden ${open ? 'pointer-events-auto' : 'pointer-events-none'}`}
       aria-hidden={!open}
       inert={!open ? true : undefined}
     >
@@ -150,7 +150,8 @@ export function MobileToc({ isOpen, onOpenChange }: { isOpen?: boolean; onOpenCh
 
       {/* panel (right slide-in) */}
       <div
-        className={`relative z-10 ml-auto h-full w-72 transform bg-white p-6 shadow-2xl transition-transform duration-300 cubic-bezier(0.16, 1, 0.3, 1) dark:bg-gray-900 flex flex-col ${open ? 'translate-x-0' : 'translate-x-full'}`}
+        data-drawer-side="right"
+        className={`pg-public-drawer-panel relative z-10 ml-auto flex h-full w-72 transform flex-col bg-white p-6 shadow-2xl transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform dark:bg-gray-900 ${open ? 'translate-x-0 opacity-100' : 'translate-x-[calc(100%+24px)] opacity-0'}`}
       >
         <div className="mb-6 flex items-center justify-between">
           <span className="text-lg font-bold tracking-tight">目录</span>
@@ -167,7 +168,7 @@ export function MobileToc({ isOpen, onOpenChange }: { isOpen?: boolean; onOpenCh
               <button
                 key={heading.id}
                 onClick={() => handleClick(heading.id)}
-                className={`block w-full text-left text-sm transition-all duration-200 ${activeId === heading.id ? 'text-blue-600 dark:text-blue-400 font-medium translate-x-1' : 'text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400'} ${heading.level === 1 ? 'pl-0' : heading.level === 2 ? 'pl-4' : 'pl-8'}`}
+                className={`pg-public-drawer-link block w-full text-left text-sm transition-all duration-200 ${activeId === heading.id ? 'pg-public-drawer-link-active text-blue-600 dark:text-blue-400 font-medium translate-x-1' : 'text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400'} ${heading.level === 1 ? 'pl-0' : heading.level === 2 ? 'pl-4' : 'pl-8'}`}
               >
                 {heading.text}
               </button>

@@ -1,0 +1,377 @@
+:root {
+  --pg-page-bg-color: transparent;
+  --pg-page-bg-image:
+    linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+  --pg-page-bg-size: 24px 24px;
+  --pg-page-bg-position: left top;
+  --pg-shell-radius: 0.9rem;
+  --pg-control-radius: 0.6rem;
+  --pg-badge-radius: 9999px;
+  --pg-card-border-width: 1px;
+  --pg-card-border-color: rgba(148, 163, 184, 0.55);
+  --pg-card-bg: color-mix(in oklab, var(--card) 92%, #f6f8fb 8%);
+  --pg-card-shadow: 0 10px 30px -24px rgba(15, 23, 42, 0.42);
+  --pg-card-hover-shadow: 0 18px 38px -28px rgba(15, 23, 42, 0.52);
+  --pg-reading-card-shadow: var(--pg-card-shadow);
+  --pg-reading-card-hover-shadow: var(--pg-card-hover-shadow);
+  --pg-nav-bg: color-mix(in oklab, var(--background) 86%, #f6f8fc 14%);
+  --pg-nav-border-color: rgba(100, 116, 139, 0.38);
+  --pg-nav-border-width: 1px;
+  --pg-nav-shadow: 0 8px 24px -24px rgba(15, 23, 42, 0.45);
+  --pg-nav-link-color: #4b5563;
+  --pg-nav-link-hover-color: #111827;
+  --pg-nav-link-active-color: #111827;
+  --pg-nav-indicator-color: var(--pg-link-accent);
+  --pg-footer-bg: color-mix(in oklab, var(--card) 90%, #f8fafc 10%);
+  --pg-footer-border-color: rgba(100, 116, 139, 0.34);
+  --pg-footer-border-width: 1px;
+  --pg-drawer-bg: color-mix(in oklab, var(--card) 94%, #f8fafc 6%);
+  --pg-drawer-border-color: rgba(100, 116, 139, 0.34);
+  --pg-drawer-border-width: 1px;
+  --pg-drawer-shadow: 0 18px 36px -26px rgba(15, 23, 42, 0.52);
+  --pg-drawer-link-color: #4b5563;
+  --pg-drawer-link-hover-color: #111827;
+  --pg-drawer-link-hover-bg: rgba(148, 163, 184, 0.14);
+  --pg-drawer-link-active-bg: rgba(59, 130, 246, 0.15);
+  --pg-drawer-link-active-color: var(--pg-link-accent);
+  --pg-floating-bg: color-mix(in oklab, var(--card) 90%, #f8fafc 10%);
+  --pg-floating-icon: #374151;
+  --pg-floating-shadow: 0 10px 20px -16px rgba(15, 23, 42, 0.52);
+  --pg-floating-border-color: var(--pg-drawer-border-color);
+  --pg-floating-main-bg: var(--primary);
+  --pg-floating-main-fg: var(--primary-foreground);
+  --pg-floating-main-shadow: 0 16px 30px -22px rgba(15, 23, 42, 0.62);
+  --pg-paper-fold-size: 0px;
+  --pg-paper-fold-bg: transparent;
+  --pg-paper-fold-border: transparent;
+  --pg-progress-track-bg: color-mix(in oklab, var(--background) 70%, #cbd5e1 30%);
+  --pg-progress-border-width: 0px;
+  --pg-progress-border-color: transparent;
+  --pg-progress-fill-gradient: linear-gradient(90deg, #6b7280 0%, #f3f4f6 50%, #6b7280 100%);
+  --pg-archive-panel-bg: var(--pg-card-bg);
+  --pg-archive-panel-border-color: var(--pg-card-border-color);
+  --pg-archive-rail-color: color-mix(in oklab, var(--pg-nav-link-color) 36%, transparent);
+  --pg-archive-dot-color: color-mix(in oklab, var(--pg-link-accent) 85%, var(--pg-nav-link-color) 15%);
+  --pg-archive-accent: var(--pg-link-accent);
+  --pg-archive-link-hover-bg: var(--pg-drawer-link-hover-bg);
+  --pg-archive-link-hover-border-color: var(--pg-archive-panel-border-color);
+  --pg-link-accent: #1d4ed8;
+  --pg-heading-tracking: -0.02em;
+  --pg-heading-weight: 700;
+}
+
+.dark {
+  --pg-page-bg-color: transparent;
+  --pg-page-bg-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  --pg-page-bg-size: 24px 24px;
+  --pg-page-bg-position: left top;
+  --pg-card-border-color: rgba(148, 163, 184, 0.28);
+  --pg-card-bg: color-mix(in oklab, var(--card) 90%, #111827 10%);
+  --pg-card-shadow: 0 12px 28px -24px rgba(2, 6, 23, 0.75);
+  --pg-card-hover-shadow: 0 22px 40px -30px rgba(2, 6, 23, 0.88);
+  --pg-reading-card-shadow: var(--pg-card-shadow);
+  --pg-reading-card-hover-shadow: var(--pg-card-hover-shadow);
+  --pg-nav-bg: color-mix(in oklab, var(--background) 82%, #111827 18%);
+  --pg-nav-border-color: rgba(148, 163, 184, 0.28);
+  --pg-nav-shadow: 0 8px 24px -24px rgba(2, 6, 23, 0.9);
+  --pg-nav-link-color: #9ca3af;
+  --pg-nav-link-hover-color: #f3f4f6;
+  --pg-nav-link-active-color: #f9fafb;
+  --pg-nav-indicator-color: var(--pg-link-accent);
+  --pg-footer-bg: color-mix(in oklab, var(--card) 88%, #0f172a 12%);
+  --pg-footer-border-color: rgba(148, 163, 184, 0.26);
+  --pg-drawer-bg: color-mix(in oklab, var(--card) 86%, #0f172a 14%);
+  --pg-drawer-border-color: rgba(148, 163, 184, 0.26);
+  --pg-drawer-shadow: 0 22px 40px -24px rgba(2, 6, 23, 0.85);
+  --pg-drawer-link-color: #9ca3af;
+  --pg-drawer-link-hover-color: #f3f4f6;
+  --pg-drawer-link-hover-bg: rgba(148, 163, 184, 0.2);
+  --pg-drawer-link-active-bg: rgba(96, 165, 250, 0.28);
+  --pg-drawer-link-active-color: var(--pg-link-accent);
+  --pg-floating-bg: color-mix(in oklab, var(--card) 86%, #0f172a 14%);
+  --pg-floating-icon: #e5e7eb;
+  --pg-floating-shadow: 0 14px 28px -20px rgba(2, 6, 23, 0.86);
+  --pg-floating-border-color: var(--pg-drawer-border-color);
+  --pg-floating-main-bg: var(--primary);
+  --pg-floating-main-fg: var(--primary-foreground);
+  --pg-floating-main-shadow: 0 18px 34px -22px rgba(2, 6, 23, 0.92);
+  --pg-progress-track-bg: color-mix(in oklab, var(--background) 72%, #334155 28%);
+  --pg-progress-border-width: 0px;
+  --pg-progress-border-color: transparent;
+  --pg-progress-fill-gradient: linear-gradient(90deg, #cbd5e1 0%, #0f172a 50%, #cbd5e1 100%);
+  --pg-archive-panel-bg: var(--pg-card-bg);
+  --pg-archive-panel-border-color: var(--pg-card-border-color);
+  --pg-archive-rail-color: color-mix(in oklab, var(--pg-nav-link-color) 40%, transparent);
+  --pg-archive-dot-color: color-mix(in oklab, var(--pg-link-accent) 86%, var(--pg-nav-link-color) 14%);
+  --pg-archive-accent: var(--pg-link-accent);
+  --pg-archive-link-hover-bg: var(--pg-drawer-link-hover-bg);
+  --pg-archive-link-hover-border-color: var(--pg-archive-panel-border-color);
+  --pg-link-accent: #93c5fd;
+}
+
+.pg-public-scope,
+.pg-public-nav,
+.pg-public-footer,
+.pg-public-drawer-panel,
+.pg-public-fab-btn,
+.pg-public-fab-main {
+  --radius: var(--pg-shell-radius);
+}
+
+.pg-public-scope [data-slot='card'] {
+  border-width: var(--pg-card-border-width);
+  border-style: solid;
+  border-color: var(--pg-card-border-color);
+  border-radius: var(--pg-shell-radius);
+  background: var(--pg-card-bg);
+  box-shadow: var(--pg-card-shadow);
+  transition:
+    transform 220ms ease,
+    box-shadow 220ms ease,
+    border-color 220ms ease;
+}
+
+.pg-public-scope [data-slot='card']:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--pg-card-hover-shadow);
+}
+
+.pg-public-scope [data-slot='card'].pg-reading-mobile-card {
+  box-shadow: var(--pg-reading-card-shadow);
+}
+
+.pg-public-scope [data-slot='card'].pg-reading-mobile-card:hover {
+  box-shadow: var(--pg-reading-card-hover-shadow);
+}
+
+.pg-public-scope [data-slot='card'].pg-reading-no-bg {
+  border-width: 0;
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+
+@media (min-width: 640px) {
+  .pg-public-scope [data-slot='card'].pg-reading-mobile-card-on-desktop {
+    border-width: var(--pg-card-border-width);
+    border-style: solid;
+    border-color: var(--pg-card-border-color);
+    border-radius: var(--pg-shell-radius);
+    background: var(--pg-card-bg);
+    box-shadow: var(--pg-reading-card-shadow);
+  }
+
+  .pg-public-scope [data-slot='card'].pg-reading-mobile-card-on-desktop:hover {
+    box-shadow: var(--pg-reading-card-hover-shadow);
+  }
+}
+
+.pg-public-scope [data-slot='button'],
+.pg-public-scope [data-slot='input'] {
+  border-radius: var(--pg-control-radius);
+}
+
+.pg-public-scope [data-slot='badge'] {
+  border-radius: var(--pg-badge-radius);
+}
+
+.pg-public-scope h1,
+.pg-public-scope h2,
+.pg-public-scope h3,
+.pg-public-scope h4 {
+  letter-spacing: var(--pg-heading-tracking);
+  font-weight: var(--pg-heading-weight);
+}
+
+.pg-public-scope a:hover:not([data-slot='button']) {
+  color: var(--pg-link-accent);
+}
+
+.pg-public-nav {
+  border-bottom-width: var(--pg-nav-border-width) !important;
+  border-bottom-color: var(--pg-nav-border-color) !important;
+  background: var(--pg-nav-bg) !important;
+  box-shadow: var(--pg-nav-shadow);
+}
+
+.pg-public-nav .pg-public-nav-link {
+  color: var(--pg-nav-link-color);
+}
+
+.pg-public-nav .pg-public-nav-link:hover {
+  color: var(--pg-nav-link-hover-color) !important;
+}
+
+.pg-public-nav .pg-public-nav-link-active {
+  color: var(--pg-nav-link-active-color) !important;
+}
+
+.pg-public-nav .pg-public-nav-indicator {
+  background: var(--pg-nav-indicator-color) !important;
+}
+
+.pg-public-nav .pg-public-nav-title {
+  letter-spacing: var(--pg-heading-tracking);
+}
+
+.pg-public-footer {
+  border-top-width: var(--pg-footer-border-width) !important;
+  border-top-color: var(--pg-footer-border-color) !important;
+  background: var(--pg-footer-bg) !important;
+}
+
+.pg-public-footer a:hover {
+  color: var(--pg-link-accent) !important;
+}
+
+.pg-public-drawer-panel {
+  background: var(--pg-drawer-bg) !important;
+  border-style: solid;
+  border-color: var(--pg-drawer-border-color) !important;
+  border-width: var(--pg-drawer-border-width);
+  box-shadow: var(--pg-drawer-shadow);
+}
+
+.pg-public-drawer-panel[data-drawer-side='left'] {
+  border-top: 0;
+  border-right-width: var(--pg-drawer-border-width);
+  border-bottom: 0;
+  border-left: 0;
+  border-radius: 0;
+}
+
+.pg-public-drawer-panel[data-drawer-side='right'] {
+  border-top: 0;
+  border-right: 0;
+  border-bottom: 0;
+  border-left-width: var(--pg-drawer-border-width);
+  border-radius: 0;
+}
+
+.pg-public-drawer-panel[data-drawer-side='top'] {
+  border-top: 0;
+  border-right-width: var(--pg-drawer-border-width);
+  border-bottom-width: var(--pg-drawer-border-width);
+  border-left-width: var(--pg-drawer-border-width);
+  border-radius: 0 0 var(--pg-shell-radius) var(--pg-shell-radius);
+}
+
+.pg-public-drawer-link {
+  border-radius: var(--pg-control-radius) !important;
+  color: var(--pg-drawer-link-color) !important;
+}
+
+.pg-public-drawer-link:hover {
+  color: var(--pg-drawer-link-hover-color) !important;
+  background: var(--pg-drawer-link-hover-bg) !important;
+}
+
+.pg-public-drawer-link-active {
+  background: var(--pg-drawer-link-active-bg) !important;
+  color: var(--pg-drawer-link-active-color) !important;
+}
+
+.pg-public-fab-btn {
+  border: var(--pg-drawer-border-width) solid var(--pg-floating-border-color) !important;
+  background: var(--pg-floating-bg) !important;
+  color: var(--pg-floating-icon) !important;
+  box-shadow: var(--pg-floating-shadow);
+}
+
+.pg-public-fab-btn svg {
+  color: inherit !important;
+}
+
+.pg-public-fab-main {
+  border: var(--pg-drawer-border-width) solid var(--pg-floating-border-color) !important;
+  border-radius: var(--pg-control-radius) !important;
+  background: var(--pg-floating-main-bg) !important;
+  color: var(--pg-floating-main-fg) !important;
+  box-shadow: var(--pg-floating-main-shadow);
+}
+
+.pg-scroll-progress-track {
+  background: var(--pg-progress-track-bg) !important;
+  border-bottom: var(--pg-progress-border-width) solid var(--pg-progress-border-color);
+}
+
+.pg-scroll-progress-fill {
+  background: var(--pg-progress-fill-gradient);
+  background-size: 200% 100%;
+}
+
+.pg-archive-page .pg-archive-title {
+  letter-spacing: var(--pg-heading-tracking);
+  font-weight: var(--pg-heading-weight);
+}
+
+.pg-archive-page .pg-archive-subtitle,
+.pg-archive-page .pg-archive-stats {
+  color: var(--pg-nav-link-color) !important;
+}
+
+.pg-archive-page .pg-archive-emphasis {
+  color: var(--pg-nav-link-active-color) !important;
+}
+
+.pg-archive-page .pg-archive-divider {
+  background: var(--pg-nav-link-color) !important;
+  opacity: 0.55;
+}
+
+.pg-archive-timeline .pg-archive-nav-panel,
+.pg-archive-timeline .pg-archive-toggle-panel,
+.pg-archive-timeline .pg-archive-year-btn,
+.pg-archive-timeline .pg-archive-month-btn {
+  border-color: var(--pg-archive-panel-border-color) !important;
+  background: var(--pg-archive-panel-bg) !important;
+}
+
+.pg-archive-timeline .pg-archive-year-link,
+.pg-archive-timeline .pg-archive-post-link {
+  color: var(--pg-nav-link-color) !important;
+}
+
+.pg-archive-timeline .pg-archive-year-title,
+.pg-archive-timeline .pg-archive-month-label,
+.pg-archive-timeline .pg-archive-post-title {
+  color: var(--pg-nav-link-active-color) !important;
+}
+
+.pg-archive-timeline .pg-archive-rail {
+  background: var(--pg-archive-rail-color) !important;
+}
+
+.pg-archive-timeline .pg-archive-year-dot {
+  border-color: var(--pg-archive-dot-color) !important;
+  background: var(--pg-archive-panel-bg) !important;
+}
+
+.pg-archive-timeline .pg-archive-month-dot,
+.pg-archive-timeline .pg-archive-post-dot {
+  background: var(--pg-archive-dot-color) !important;
+}
+
+.pg-archive-timeline .pg-archive-toggle-indicator {
+  background: var(--pg-archive-accent) !important;
+}
+
+.pg-archive-timeline .pg-archive-year-link:hover,
+.pg-archive-timeline .pg-archive-post-link:hover,
+.pg-archive-timeline .pg-archive-year-btn:hover,
+.pg-archive-timeline .pg-archive-month-btn:hover {
+  background: var(--pg-archive-link-hover-bg) !important;
+  border-color: var(--pg-archive-link-hover-border-color) !important;
+}
+
+.pg-archive-timeline .pg-archive-post-link:hover .pg-archive-post-title,
+.pg-archive-timeline .pg-archive-year-link:hover {
+  color: var(--pg-archive-accent) !important;
+}
+
+.pg-archive-timeline .pg-archive-toggle-btn[aria-pressed='false']:hover {
+  color: var(--pg-archive-accent) !important;
+}

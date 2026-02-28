@@ -189,16 +189,16 @@ export function ArchiveTimeline({ years }: ArchiveTimelineProps) {
   }
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[220px_minmax(0,1fr)]">
+    <div className="pg-archive-timeline grid gap-8 lg:grid-cols-[220px_minmax(0,1fr)]">
       <aside className="space-y-4 lg:sticky lg:top-24 lg:h-fit">
-        <div className="rounded-lg border border-gray-200 bg-white/80 p-4 dark:border-gray-700 dark:bg-gray-900/60">
+        <div className="pg-archive-nav-panel rounded-lg border border-gray-200 bg-white/80 p-4 dark:border-gray-700 dark:bg-gray-900/60">
           <p className="text-sm font-semibold text-gray-900 dark:text-white">年份导航</p>
           <div className="mt-3 flex max-h-64 flex-wrap gap-2 overflow-y-auto lg:block lg:gap-0 lg:space-y-1">
             {years.map((year) => (
               <a
                 key={year.year}
                 href={`#archive-year-${year.year}`}
-                className="inline-flex items-center rounded-md px-2 py-1 text-sm text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white"
+                className="pg-archive-year-link inline-flex items-center rounded-md px-2 py-1 text-sm text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white"
               >
                 {year.year} 年
               </a>
@@ -206,10 +206,10 @@ export function ArchiveTimeline({ years }: ArchiveTimelineProps) {
           </div>
         </div>
 
-        <div className="relative overflow-hidden rounded-lg border border-gray-200 bg-gray-100/80 p-1 dark:border-gray-700 dark:bg-gray-800/70">
+        <div className="pg-archive-toggle-panel relative overflow-hidden rounded-lg border border-gray-200 bg-gray-100/80 p-1 dark:border-gray-700 dark:bg-gray-800/70">
           <span
             className={cn(
-              'pointer-events-none absolute top-1 left-1 h-[calc(100%-0.5rem)] w-[calc(50%-0.25rem)] rounded-md bg-primary shadow-sm transition-transform duration-200',
+              'pg-archive-toggle-indicator pointer-events-none absolute top-1 left-1 h-[calc(100%-0.5rem)] w-[calc(50%-0.25rem)] rounded-md bg-primary shadow-sm transition-transform duration-200',
               isCollapsedAll ? 'translate-x-full' : 'translate-x-0'
             )}
             aria-hidden
@@ -223,7 +223,7 @@ export function ArchiveTimeline({ years }: ArchiveTimelineProps) {
                 setExpandedYears(new Set(allYearKeys))
               }}
               className={cn(
-                'relative z-10 rounded-md px-3 py-1.5 text-xs font-semibold transition-colors',
+                'pg-archive-toggle-btn relative z-10 rounded-md px-3 py-1.5 text-xs font-semibold transition-colors',
                 !isCollapsedAll
                   ? 'text-primary-foreground'
                   : 'text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white'
@@ -239,7 +239,7 @@ export function ArchiveTimeline({ years }: ArchiveTimelineProps) {
                 setExpandedMonths(new Set())
               }}
               className={cn(
-                'relative z-10 rounded-md px-3 py-1.5 text-xs font-semibold transition-colors',
+                'pg-archive-toggle-btn relative z-10 rounded-md px-3 py-1.5 text-xs font-semibold transition-colors',
                 isCollapsedAll
                   ? 'text-primary-foreground'
                   : 'text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white'
@@ -252,7 +252,7 @@ export function ArchiveTimeline({ years }: ArchiveTimelineProps) {
       </aside>
 
       <div className="relative pl-5 sm:pl-7">
-        <div className="absolute top-0 left-1.5 h-full w-px bg-gray-200 dark:bg-gray-700" />
+        <div className="pg-archive-rail absolute top-0 left-1.5 h-full w-px bg-gray-200 dark:bg-gray-700" />
 
         <div className="space-y-8">
           {years.map((year) => {
@@ -263,12 +263,12 @@ export function ArchiveTimeline({ years }: ArchiveTimelineProps) {
                 id={`archive-year-${year.year}`}
                 className="relative scroll-mt-24"
               >
-                <span className="border-primary absolute top-3 -left-5 h-3 w-3 rounded-full border-2 bg-white dark:bg-gray-900" />
+                <span className="pg-archive-year-dot border-primary absolute top-3 -left-5 h-3 w-3 rounded-full border-2 bg-white dark:bg-gray-900" />
 
                 <button
                   type="button"
                   onClick={() => toggleYear(year.year)}
-                  className="flex w-full items-center justify-between rounded-lg border border-gray-200 bg-white/70 px-4 py-3 text-left transition-colors hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900/60 dark:hover:bg-gray-800"
+                  className="pg-archive-year-btn flex w-full items-center justify-between rounded-lg border border-gray-200 bg-white/70 px-4 py-3 text-left transition-colors hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900/60 dark:hover:bg-gray-800"
                 >
                   <span className="flex items-center gap-2">
                     {isYearOpen ? (
@@ -276,7 +276,7 @@ export function ArchiveTimeline({ years }: ArchiveTimelineProps) {
                     ) : (
                       <ChevronRight className="h-4 w-4" />
                     )}
-                    <span className="text-lg font-bold text-gray-900 dark:text-white">
+                    <span className="pg-archive-year-title text-lg font-bold text-gray-900 dark:text-white">
                       {year.year} 年
                     </span>
                   </span>
@@ -296,14 +296,14 @@ export function ArchiveTimeline({ years }: ArchiveTimelineProps) {
                           id={`archive-${monthKey}`}
                           className="relative scroll-mt-24"
                         >
-                          <span className="bg-primary/70 absolute top-3 -left-4 h-2.5 w-2.5 rounded-full" />
+                          <span className="pg-archive-month-dot bg-primary/70 absolute top-3 -left-4 h-2.5 w-2.5 rounded-full" />
 
                           <button
                             type="button"
                             onClick={() => toggleMonth(year.year, month.month)}
-                            className="flex w-full items-center justify-between rounded-md border border-gray-200 bg-white px-3 py-2 text-left transition-colors hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:hover:bg-gray-800"
+                            className="pg-archive-month-btn flex w-full items-center justify-between rounded-md border border-gray-200 bg-white px-3 py-2 text-left transition-colors hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:hover:bg-gray-800"
                           >
-                            <span className="flex items-center gap-2 text-sm font-semibold text-gray-800 dark:text-gray-100">
+                            <span className="pg-archive-month-label flex items-center gap-2 text-sm font-semibold text-gray-800 dark:text-gray-100">
                               {isMonthOpen ? (
                                 <ChevronDown className="h-4 w-4" />
                               ) : (
@@ -345,15 +345,15 @@ export function ArchiveTimeline({ years }: ArchiveTimelineProps) {
                                 <ul className="space-y-2">
                                   {monthState.posts.map((post) => (
                                     <li key={post.id} className="relative">
-                                      <span className="absolute top-2 -left-4 h-2 w-2 rounded-full bg-gray-400 dark:bg-gray-500" />
+                                      <span className="pg-archive-post-dot absolute top-2 -left-4 h-2 w-2 rounded-full bg-gray-400 dark:bg-gray-500" />
                                       <Link
                                         href={`/posts/${post.slug}`}
                                         className={cn(
-                                          'block rounded-md border border-transparent px-2 py-2 transition-colors',
+                                          'pg-archive-post-link block rounded-md border border-transparent px-2 py-2 transition-colors',
                                           'hover:border-gray-200 hover:bg-gray-50 dark:hover:border-gray-700 dark:hover:bg-gray-800'
                                         )}
                                       >
-                                        <p className="text-sm font-medium text-gray-800 dark:text-gray-100">
+                                        <p className="pg-archive-post-title text-sm font-medium text-gray-800 dark:text-gray-100">
                                           {post.title}
                                         </p>
                                       </Link>

@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "./styles/public-theme.css";
 @source "../../node_modules/streamdown/dist/*.js";
 
 @custom-variant dark (&:is(.dark *));
@@ -123,18 +124,14 @@
   }
   body {
     @apply bg-background text-foreground;
-    /* 笔记本方格背景 */
-    background-image:
-      linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
-    background-size: 24px 24px;
   }
 
-  .dark body {
-    background-image:
-      linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-    background-size: 24px 24px;
+  body:has(.pg-public-scope),
+  body[data-page-scope='public'] {
+    background-color: var(--pg-page-bg-color);
+    background-image: var(--pg-page-bg-image);
+    background-size: var(--pg-page-bg-size);
+    background-position: var(--pg-page-bg-position);
   }
 
   /* 隐藏滚动条但保留滚动功能 */

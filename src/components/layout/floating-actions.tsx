@@ -64,7 +64,7 @@ export function FloatingActions({ visible = true }: { visible?: boolean }) {
             variant="ghost"
             onClick={() => setNavOpen(true)}
             aria-label="打开菜单"
-            className="bg-white/90 dark:bg-gray-800/90 shadow-md"
+            className="pg-public-fab-btn bg-white/90 shadow-md dark:bg-gray-800/90"
           >
             <Menu className="h-5 w-5 text-gray-700 dark:text-gray-200" />
           </Button>
@@ -76,7 +76,7 @@ export function FloatingActions({ visible = true }: { visible?: boolean }) {
               variant="ghost"
               onClick={() => setTocOpen(true)}
               aria-label="打开目录"
-              className="bg-white/90 dark:bg-gray-800/90 shadow-md md:hidden"
+              className="pg-public-fab-btn bg-white/90 shadow-md dark:bg-gray-800/90 md:hidden"
             >
               <BookOpen className="h-5 w-5 text-gray-700 dark:text-gray-200" />
             </Button>
@@ -88,7 +88,7 @@ export function FloatingActions({ visible = true }: { visible?: boolean }) {
             variant="ghost"
             onClick={handleGoHome}
             aria-label="回到首页"
-            className="bg-white/90 dark:bg-gray-800/90 shadow-md"
+            className="pg-public-fab-btn bg-white/90 shadow-md dark:bg-gray-800/90"
           >
             <Home className="h-5 w-5 text-gray-700 dark:text-gray-200" />
           </Button>
@@ -99,7 +99,7 @@ export function FloatingActions({ visible = true }: { visible?: boolean }) {
             variant="ghost"
             onClick={handleScrollTop}
             aria-label="回到顶部"
-            className="bg-white/90 dark:bg-gray-800/90 shadow-md"
+            className="pg-public-fab-btn bg-white/90 shadow-md dark:bg-gray-800/90"
           >
             <ArrowUp className="h-5 w-5 text-gray-700 dark:text-gray-200" />
           </Button>
@@ -110,7 +110,7 @@ export function FloatingActions({ visible = true }: { visible?: boolean }) {
             variant="ghost"
             onClick={() => setOpen(false)}
             aria-label="收起"
-            className="bg-white/90 dark:bg-gray-800/90 shadow-md"
+            className="pg-public-fab-btn bg-white/90 shadow-md dark:bg-gray-800/90"
           >
             <X className="h-5 w-5 text-gray-700 dark:text-gray-200" />
           </Button>
@@ -121,7 +121,7 @@ export function FloatingActions({ visible = true }: { visible?: boolean }) {
           size="icon"
           onClick={() => setOpen((s) => !s)}
           aria-label="更多操作"
-          className="bg-primary text-primary-foreground shadow-lg"
+          className="pg-public-fab-main bg-primary text-primary-foreground shadow-lg"
         >
           {open ? <X className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
         </Button>

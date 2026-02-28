@@ -159,6 +159,7 @@ export default async function AboutPage() {
                         {canShowEmail && (
                           <a
                             href={`mailto:${contactEmail}`}
+                            data-slot="button"
                             className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-900 hover:text-white dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white dark:hover:text-gray-900 transition-colors"
                           >
                             <Mail className="h-5 w-5" />
@@ -169,6 +170,7 @@ export default async function AboutPage() {
                             href={contactGithub}
                             target="_blank"
                             rel="noopener noreferrer"
+                            data-slot="button"
                             className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-900 hover:text-white dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white dark:hover:text-gray-900 transition-colors"
                           >
                             <Github className="h-5 w-5" />
@@ -179,6 +181,7 @@ export default async function AboutPage() {
                             href={contactX}
                             target="_blank"
                             rel="noopener noreferrer"
+                            data-slot="button"
                             className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-900 hover:text-white dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white dark:hover:text-gray-900 transition-colors"
                           >
                             <X className="h-5 w-5" />
@@ -189,6 +192,7 @@ export default async function AboutPage() {
                             href={contactBilibili}
                             target="_blank"
                             rel="noopener noreferrer"
+                            data-slot="button"
                             className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-900 hover:text-white dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white dark:hover:text-gray-900 transition-colors"
                           >
                             <Tv className="h-5 w-5" />
@@ -199,6 +203,7 @@ export default async function AboutPage() {
                             href={`https://wpa.qq.com/msgrd?v=3&uin=${contactQQ}&site=qq&menu=yes`}
                             target="_blank"
                             rel="noopener noreferrer"
+                            data-slot="button"
                             className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-900 hover:text-white dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white dark:hover:text-gray-900 transition-colors"
                           >
                             <MessageSquareHeart className="h-5 w-5" />

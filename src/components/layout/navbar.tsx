@@ -88,7 +88,7 @@ export function Navbar({ settings }: { settings?: Record<string, unknown> }) {
   if (pathname?.startsWith('/admin')) return null
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-gray-200 bg-white/80 backdrop-blur-lg dark:border-gray-800 dark:bg-gray-900/80">
+    <nav className="pg-public-nav sticky top-0 z-50 border-b border-gray-200 bg-white/80 backdrop-blur-lg dark:border-gray-800 dark:bg-gray-900/80">
       <div className="relative flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* 左侧菜单 */}
         <div
@@ -123,11 +123,11 @@ export function Navbar({ settings }: { settings?: Record<string, unknown> }) {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`relative px-2 py-1 text-sm font-medium transition-colors ${active ? 'text-gray-900 dark:text-white' : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'}`}
+                  className={`pg-public-nav-link relative px-2 py-1 text-sm font-medium transition-colors ${active ? 'pg-public-nav-link-active text-gray-900 dark:text-white' : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'}`}
                 >
                   {item.label}
                   <span
-                    className={`absolute bottom-0 left-1/2 h-0.5 transform rounded bg-gray-900 transition-all dark:bg-white ${active ? 'w-6 -translate-x-1/2 opacity-100' : 'w-0 opacity-0'}`}
+                    className={`pg-public-nav-indicator absolute bottom-0 left-1/2 h-0.5 transform rounded bg-gray-900 transition-all dark:bg-white ${active ? 'w-6 -translate-x-1/2 opacity-100' : 'w-0 opacity-0'}`}
                   />
                 </Link>
               )
@@ -139,7 +139,7 @@ export function Navbar({ settings }: { settings?: Record<string, unknown> }) {
         <div
           className={`pointer-events-none absolute inset-0 flex items-center justify-center px-12 transition-all duration-500 ${showProgressUI ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}
         >
-          <span className="max-w-2xl truncate text-center text-sm font-bold text-gray-900 md:text-base dark:text-white">
+          <span className="pg-public-nav-title max-w-2xl truncate text-center text-sm font-bold text-gray-900 md:text-base dark:text-white">
             {postTitle}
           </span>
         </div>

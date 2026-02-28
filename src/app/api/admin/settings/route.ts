@@ -1,15 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { Prisma } from '@prisma/client'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { isDefaultAdmin } from '@/lib/admin-default'
+import {
+  DEFAULT_PUBLIC_STYLE_PRESET,
+  normalizePublicStylePreset,
+} from '@/lib/public-style-preset'
+import { normalizeMobileReadingBackground } from '@/lib/reading-style'
 
-const AUTO_CREATE_SETTINGS: Record<string, { value: any; group: string; editable: boolean; secret: boolean; description: string }> = {
+type AutoCreateSettingConfig = {
+  value: Prisma.JsonValue
+  group: string
+  editable: boolean
+  secret: boolean
+  description: string
+}
+
+const AUTO_CREATE_SETTINGS: Record<string, AutoCreateSettingConfig> = {
   'ui.mobileReadingBackground': {
     value: { style: 'grid' },
     group: 'ui',
     editable: true,
     secret: false,
     description: '移动端阅读背景样式',
+  },
+  'ui.publicStylePreset': {
+    value: { preset: DEFAULT_PUBLIC_STYLE_PRESET },
+    group: 'ui',
+    editable: true,
+    secret: false,
+    description: '前台风格预设',
   },
   'email.reply.enabled': {
     value: { enabled: true },
@@ -90,6 +111,38 @@ const AUTO_CREATE_SETTINGS: Record<string, { value: any; group: string; editable
   },
 }
 
+function normalizeSettingUpdateValue(key: string, value: Prisma.InputJsonValue): Prisma.InputJsonValue {
+  const readStringValue = (preferredFields: readonly string[]): string | null => {
+    if (typeof value === 'string') return value
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return null
+
+    const record = value as Record<string, unknown>
+    for (const field of preferredFields) {
+      const raw = record[field]
+      if (typeof raw === 'string') return raw
+    }
+
+    const entries = Object.entries(record)
+    if (entries.length === 1 && typeof entries[0][1] === 'string') {
+      return entries[0][1]
+    }
+
+    return null
+  }
+
+  if (key === 'ui.publicStylePreset') {
+    const rawPreset = readStringValue(['preset', 'value', 'text', 'style'])
+    return { preset: normalizePublicStylePreset(rawPreset) }
+  }
+
+  if (key === 'ui.mobileReadingBackground') {
+    const rawStyle = readStringValue(['style', 'value', 'text'])
+    return { style: normalizeMobileReadingBackground(rawStyle) }
+  }
+
+  return value
+}
+
 // GET /api/admin/settings - 返回所有设置
 export async function GET() {
   try {
@@ -157,7 +210,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     const body = await request.json()
-    const updates: Array<{ key: string; value: any }> = body.updates || []
+    const updates: Array<{ key: string; value: Prisma.InputJsonValue }> = body.updates || []
 
     if (!Array.isArray(updates) || updates.length === 0) {
       return NextResponse.json({ error: '无更新内容' }, { status: 400 })
@@ -166,6 +219,7 @@ export async function PATCH(request: NextRequest) {
     const results: Array<{ key: string; updated: boolean; reason?: string }> = []
 
     for (const u of updates) {
+      const normalizedValue = normalizeSettingUpdateValue(u.key, u.value)
       const s = await prisma.setting.findUnique({ where: { key: u.key } })
       if (!s) {
         const createConfig = AUTO_CREATE_SETTINGS[u.key]
@@ -173,7 +227,7 @@ export async function PATCH(request: NextRequest) {
           await prisma.setting.create({
             data: {
               key: u.key,
-              value: u.value,
+              value: normalizedValue,
               group: createConfig.group,
               editable: createConfig.editable,
               secret: createConfig.secret,
@@ -191,7 +245,7 @@ export async function PATCH(request: NextRequest) {
         continue
       }
 
-      await prisma.setting.update({ where: { key: u.key }, data: { value: u.value } })
+      await prisma.setting.update({ where: { key: u.key }, data: { value: normalizedValue } })
       results.push({ key: u.key, updated: true })
     }
 

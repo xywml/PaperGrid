@@ -45,7 +45,7 @@ export function Footer({ settings }: { settings?: Record<string, unknown> }) {
   if (pathname?.startsWith('/admin')) return null
 
   return (
-    <footer className="border-t border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
+    <footer className="pg-public-footer border-t border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
           {/* 关于 */}

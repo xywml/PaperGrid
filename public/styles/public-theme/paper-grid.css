@@ -1,0 +1,148 @@
+body[data-public-style-preset='paper-grid'] {
+  --pg-page-bg-color: transparent;
+  --pg-page-bg-image:
+    linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+  --pg-page-bg-size: 24px 24px;
+  --pg-page-bg-position: left top;
+  --pg-shell-radius: 0.15rem;
+  --pg-control-radius: 0.12rem;
+  --pg-badge-radius: 0.14rem;
+  --pg-card-border-width: 1px;
+  --pg-card-border-color: rgba(100, 116, 139, 0.48);
+  --pg-card-bg: color-mix(in oklab, var(--card) 95%, #f6f8fc 5%);
+  --pg-card-shadow: 0 8px 24px -22px rgba(15, 23, 42, 0.34);
+  --pg-card-hover-shadow: 0 12px 28px -24px rgba(15, 23, 42, 0.42);
+  --pg-reading-card-shadow: 0 6px 16px -18px rgba(15, 23, 42, 0.28);
+  --pg-reading-card-hover-shadow: 0 8px 18px -18px rgba(15, 23, 42, 0.34);
+  --pg-nav-bg: rgb(255 255 255 / 0.8);
+  --pg-nav-border-color: #e5e7eb;
+  --pg-nav-border-width: 1px;
+  --pg-nav-shadow: none;
+  --pg-nav-indicator-color: #111827;
+  --pg-footer-bg: color-mix(in oklab, var(--card) 92%, #f6f8fc 8%);
+  --pg-footer-border-color: rgba(100, 116, 139, 0.4);
+  --pg-footer-border-width: 1px;
+  --pg-drawer-bg: color-mix(in oklab, var(--card) 92%, #f6f8fc 8%);
+  --pg-drawer-border-color: rgba(100, 116, 139, 0.4);
+  --pg-drawer-border-width: 1px;
+  --pg-drawer-shadow: 0 14px 28px -24px rgba(15, 23, 42, 0.46);
+  --pg-drawer-link-hover-bg: rgba(148, 163, 184, 0.18);
+  --pg-drawer-link-active-bg: rgba(17, 24, 39, 0.1);
+  --pg-drawer-link-active-color: #111827;
+  --pg-floating-bg: #ffffff;
+  --pg-floating-icon: #111827;
+  --pg-floating-shadow: 0 10px 20px -18px rgba(15, 23, 42, 0.42);
+  --pg-floating-border-color: #111827;
+  --pg-floating-main-bg: #111827;
+  --pg-floating-main-fg: #ffffff;
+  --pg-floating-main-shadow: 0 16px 28px -20px rgba(17, 24, 39, 0.55);
+  --pg-paper-fold-size: 0px;
+  --pg-paper-fold-bg: transparent;
+  --pg-paper-fold-border: transparent;
+  --pg-progress-track-bg: rgba(229, 231, 235, 0.5);
+  --pg-progress-border-width: 0px;
+  --pg-progress-border-color: transparent;
+  --pg-progress-fill-gradient: linear-gradient(
+    90deg,
+    #9ca3af 0%,
+    #d1d5db 25%,
+    #f9fafb 50%,
+    #d1d5db 75%,
+    #9ca3af 100%
+  );
+  --pg-archive-panel-bg: color-mix(in oklab, var(--pg-card-bg) 92%, #ffffff 8%);
+  --pg-archive-panel-border-color: rgba(100, 116, 139, 0.4);
+  --pg-archive-rail-color: rgba(100, 116, 139, 0.32);
+  --pg-archive-dot-color: rgba(71, 85, 105, 0.78);
+  --pg-archive-accent: #111827;
+  --pg-archive-link-hover-bg: rgba(148, 163, 184, 0.15);
+  --pg-archive-link-hover-border-color: rgba(100, 116, 139, 0.46);
+  --pg-link-accent: #111827;
+  --pg-heading-tracking: -0.02em;
+  --pg-heading-weight: 700;
+}
+
+.dark body[data-public-style-preset='paper-grid'] {
+  --pg-page-bg-color: transparent;
+  --pg-page-bg-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  --pg-page-bg-size: 24px 24px;
+  --pg-page-bg-position: left top;
+  --pg-card-border-color: rgba(148, 163, 184, 0.32);
+  --pg-card-bg: color-mix(in oklab, var(--card) 92%, #111827 8%);
+  --pg-card-shadow: 0 10px 24px -22px rgba(2, 6, 23, 0.72);
+  --pg-card-hover-shadow: 0 14px 30px -24px rgba(2, 6, 23, 0.82);
+  --pg-reading-card-shadow: 0 8px 18px -20px rgba(2, 6, 23, 0.7);
+  --pg-reading-card-hover-shadow: 0 10px 22px -20px rgba(2, 6, 23, 0.78);
+  --pg-nav-bg: rgb(17 24 39 / 0.8);
+  --pg-nav-border-color: #1f2937;
+  --pg-nav-shadow: none;
+  --pg-nav-indicator-color: #f8fafc;
+  --pg-footer-bg: color-mix(in oklab, var(--card) 88%, #0f172a 12%);
+  --pg-footer-border-color: rgba(148, 163, 184, 0.34);
+  --pg-drawer-bg: color-mix(in oklab, var(--card) 86%, #0f172a 14%);
+  --pg-drawer-border-color: rgba(148, 163, 184, 0.34);
+  --pg-drawer-link-hover-bg: rgba(148, 163, 184, 0.24);
+  --pg-drawer-link-active-bg: rgba(248, 250, 252, 0.18);
+  --pg-drawer-link-active-color: #f8fafc;
+  --pg-floating-bg: #111827;
+  --pg-floating-icon: #f3f4f6;
+  --pg-floating-border-color: #f3f4f6;
+  --pg-floating-main-bg: #f3f4f6;
+  --pg-floating-main-fg: #111827;
+  --pg-floating-main-shadow: 0 18px 30px -20px rgba(241, 245, 249, 0.45);
+  --pg-paper-fold-bg: color-mix(in oklab, var(--pg-card-bg) 70%, #dbeafe 30%);
+  --pg-paper-fold-border: rgba(148, 163, 184, 0.45);
+  --pg-progress-track-bg: rgba(31, 41, 55, 0.5);
+  --pg-progress-border-width: 0px;
+  --pg-progress-border-color: transparent;
+  --pg-progress-fill-gradient: linear-gradient(
+    90deg,
+    #9ca3af 0%,
+    #d1d5db 25%,
+    #f9fafb 50%,
+    #d1d5db 75%,
+    #9ca3af 100%
+  );
+  --pg-archive-panel-bg: color-mix(in oklab, var(--pg-card-bg) 90%, #0f172a 10%);
+  --pg-archive-panel-border-color: rgba(148, 163, 184, 0.34);
+  --pg-archive-rail-color: rgba(148, 163, 184, 0.32);
+  --pg-archive-dot-color: rgba(148, 163, 184, 0.82);
+  --pg-archive-accent: #f8fafc;
+  --pg-archive-link-hover-bg: rgba(148, 163, 184, 0.2);
+  --pg-archive-link-hover-border-color: rgba(148, 163, 184, 0.42);
+  --pg-link-accent: #f8fafc;
+}
+
+body[data-public-style-preset='paper-grid'] .pg-public-scope [data-slot='card'],
+body[data-public-style-preset='paper-grid'] .pg-public-drawer-panel {
+  position: relative;
+}
+
+body[data-public-style-preset='paper-grid'] .pg-public-scope [data-slot='card']::after,
+body[data-public-style-preset='paper-grid'] .pg-public-drawer-panel::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: var(--pg-paper-fold-size);
+  height: var(--pg-paper-fold-size);
+  background: linear-gradient(
+    135deg,
+    color-mix(in oklab, var(--pg-paper-fold-bg) 72%, transparent) 0%,
+    var(--pg-paper-fold-bg) 100%
+  );
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+  border-left: 1px solid var(--pg-paper-fold-border);
+  border-bottom: 1px solid var(--pg-paper-fold-border);
+  pointer-events: none;
+  z-index: 2;
+}
+
+body[data-public-style-preset='paper-grid']
+  .pg-public-scope
+  [data-slot='card'].pg-reading-no-bg::after {
+  display: none;
+}

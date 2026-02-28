@@ -9,13 +9,13 @@ export function normalizeMobileReadingBackground(raw?: string | null): MobileRea
 export function getReadingContentClasses(style: MobileReadingBackground) {
   if (style === 'card') {
     return {
-      cardClassName: 'bg-card shadow-sm -mx-3 sm:mx-0',
+      cardClassName: 'pg-reading-mobile-card -mx-3 sm:mx-0',
       contentClassName: 'p-3 sm:p-8',
     }
   }
 
   return {
-    cardClassName: 'bg-transparent shadow-none border-none sm:bg-card sm:shadow-sm sm:border',
+    cardClassName: 'pg-reading-no-bg pg-reading-mobile-card-on-desktop',
     contentClassName: 'p-0 sm:p-8',
   }
 }

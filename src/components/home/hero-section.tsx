@@ -93,16 +93,6 @@ export function HeroSection({ settings }: { settings?: Record<string, unknown> }
 
   return (
     <section className="relative overflow-hidden bg-transparent min-h-screen flex items-center">
-      {/* 装饰线条 */}
-      <div className="absolute inset-0 overflow-hidden opacity-5 pointer-events-none">
-        <div className="absolute top-1/4 left-0 w-full h-px bg-gray-900 dark:bg-white" />
-        <div className="absolute top-2/4 left-0 w-full h-px bg-gray-900 dark:bg-white" />
-        <div className="absolute top-3/4 left-0 w-full h-px bg-gray-900 dark:bg-white" />
-        <div className="absolute left-1/4 top-0 h-full w-px bg-gray-900 dark:bg-white" />
-        <div className="absolute left-2/4 top-0 h-full w-px bg-gray-900 dark:bg-white" />
-        <div className="absolute left-3/4 top-0 h-full w-px bg-gray-900 dark:bg-white" />
-      </div>
-
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
         <div className="flex flex-col items-center gap-8">
           {/* 头像 */}

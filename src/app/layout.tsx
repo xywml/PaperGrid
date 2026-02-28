@@ -14,6 +14,11 @@ import { PageTransition } from '@/components/layout/page-transition'
 import { getPublicSettings, getSetting } from '@/lib/settings'
 import { Toaster } from '@/components/ui/toaster'
 import { SiteLoading } from '@/components/layout/site-loading'
+import {
+  DEFAULT_PUBLIC_STYLE_PRESET,
+  getPublicStylePresetStylesheet,
+  normalizePublicStylePreset,
+} from '@/lib/public-style-preset'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -52,12 +57,22 @@ export default async function RootLayout({
     getSetting<string>('site.defaultTheme', 'system'),
     getPublicSettings(),
   ])
+  const publicStylePresetRaw =
+    typeof publicSettings['ui.publicStylePreset'] === 'string'
+      ? publicSettings['ui.publicStylePreset']
+      : DEFAULT_PUBLIC_STYLE_PRESET
+  const publicStylePreset = normalizePublicStylePreset(publicStylePresetRaw)
+  const publicPresetStylesheet = getPublicStylePresetStylesheet(publicStylePreset)
   const footerSettings = { ...publicSettings, 'site.currentYear': currentYear }
 
   return (
     <html lang="zh" suppressHydrationWarning>
+      <head>
+        <link rel="stylesheet" href={publicPresetStylesheet} />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${notoSerif.variable} antialiased font-serif`}
+        data-public-style-preset={publicStylePreset}
       >
         <SessionProvider>
           <ThemeProvider
