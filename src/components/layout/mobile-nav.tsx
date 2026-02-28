@@ -191,11 +191,15 @@ export function MobileNav({
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 overflow-hidden">
-              <p className="truncate font-bold text-gray-900 dark:text-white">{displayName}</p>
-              <p className="truncate text-xs text-gray-500 dark:text-gray-400">{tagline}</p>
+              <p className="pg-public-drawer-user-name truncate font-bold text-gray-900 dark:text-white">
+                {displayName}
+              </p>
+              <p className="pg-public-drawer-user-meta truncate text-xs text-gray-500 dark:text-gray-400">
+                {tagline}
+              </p>
             </div>
           </div>
-          <p className="text-sm leading-relaxed text-gray-600 italic dark:text-gray-400">
+          <p className="pg-public-drawer-user-meta text-sm leading-relaxed text-gray-600 italic dark:text-gray-400">
             {signature}
           </p>
         </div>

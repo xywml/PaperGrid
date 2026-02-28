@@ -217,7 +217,7 @@ body[data-public-style-preset='valley-ledger'] {
   --pg-lock-circle-color: #ffd45a;
 }
 
-body[data-public-style-preset='valley-ledger'] .pg-public-scope [data-slot='card'],
+body[data-public-style-preset='valley-ledger'] .pg-public-scope [data-slot='card']:not(.pg-reading-no-bg),
 body[data-public-style-preset='valley-ledger'] .pg-public-drawer-panel {
   border-style: solid;
   box-shadow:
@@ -234,12 +234,12 @@ body[data-public-style-preset='valley-ledger'] .pg-public-fab-main {
   box-shadow: 2px 2px 0 rgba(43, 24, 12, 0.72);
 }
 
-body[data-public-style-preset='valley-ledger'] .pg-public-scope [data-slot='card'] {
+body[data-public-style-preset='valley-ledger'] .pg-public-scope [data-slot='card']:not(.pg-reading-no-bg) {
   position: relative;
   overflow: hidden;
 }
 
-body[data-public-style-preset='valley-ledger'] .pg-public-scope [data-slot='card']::before {
+body[data-public-style-preset='valley-ledger'] .pg-public-scope [data-slot='card']:not(.pg-reading-no-bg)::before {
   content: '';
   position: absolute;
   inset: 0;

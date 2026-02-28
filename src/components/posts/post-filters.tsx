@@ -40,7 +40,7 @@ export function PostFilters({ categories, tags }: PostFiltersProps) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="pg-post-filters space-y-4">
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
           <Input
@@ -53,13 +53,13 @@ export function PostFilters({ categories, tags }: PostFiltersProps) {
         </div>
 
         <Select value={category} onValueChange={setCategory}>
-          <SelectTrigger className="w-full sm:w-[180px]">
+          <SelectTrigger className="pg-post-filter-select-trigger w-full sm:w-[180px]">
             <SelectValue placeholder="选择分类" />
           </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">全部分类</SelectItem>
+          <SelectContent className="pg-post-filter-select-content">
+            <SelectItem className="pg-post-filter-select-item" value="all">全部分类</SelectItem>
             {categories.map((cat) => (
-              <SelectItem key={cat.slug} value={cat.slug}>
+              <SelectItem className="pg-post-filter-select-item" key={cat.slug} value={cat.slug}>
                 {cat.name} ({cat._count.posts})
               </SelectItem>
             ))}
@@ -67,13 +67,13 @@ export function PostFilters({ categories, tags }: PostFiltersProps) {
         </Select>
 
         <Select value={tag} onValueChange={setTag}>
-          <SelectTrigger className="w-full sm:w-[180px]">
+          <SelectTrigger className="pg-post-filter-select-trigger w-full sm:w-[180px]">
             <SelectValue placeholder="选择标签" />
           </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">全部标签</SelectItem>
+          <SelectContent className="pg-post-filter-select-content">
+            <SelectItem className="pg-post-filter-select-item" value="all">全部标签</SelectItem>
             {tags.map((tag) => (
-              <SelectItem key={tag.slug} value={tag.slug}>
+              <SelectItem className="pg-post-filter-select-item" key={tag.slug} value={tag.slug}>
                 {tag.name} ({tag._count.posts})
               </SelectItem>
             ))}

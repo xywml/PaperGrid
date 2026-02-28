@@ -1,10 +1,36 @@
 body[data-public-style-preset='terra-terminal'] {
-  --pg-page-bg-color: #eef2f6;
+  --pg-page-bg-color: #070b12;
   --pg-page-bg-image:
-    linear-gradient(90deg, rgba(31, 41, 51, 0.06) 1px, transparent 1px),
-    linear-gradient(0deg, rgba(31, 41, 51, 0.06) 1px, transparent 1px),
-    linear-gradient(135deg, rgba(204, 255, 0, 0.06) 0%, transparent 48%);
-  --pg-page-bg-size: 28px 28px, 28px 28px, 100% 100%;
+    repeating-linear-gradient(
+      90deg,
+      rgba(34, 211, 238, 0) 0 38px,
+      rgba(34, 211, 238, 0.2) 38px 39px,
+      rgba(34, 211, 238, 0) 39px 76px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(34, 211, 238, 0) 0 38px,
+      rgba(34, 211, 238, 0.2) 38px 39px,
+      rgba(34, 211, 238, 0) 39px 76px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(15, 23, 42, 0) 0 18px,
+      rgba(15, 23, 42, 0.13) 18px 24px,
+      rgba(15, 23, 42, 0) 24px 76px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(15, 23, 42, 0) 0 18px,
+      rgba(15, 23, 42, 0.13) 18px 24px,
+      rgba(15, 23, 42, 0) 24px 76px
+    ),
+    radial-gradient(circle at 38px 38px, rgba(34, 211, 238, 0.4) 0 1.3px, transparent 2.2px),
+    radial-gradient(circle at 0 38px, rgba(34, 211, 238, 0.28) 0 1.1px, transparent 2px),
+    radial-gradient(circle at 38px 0, rgba(34, 211, 238, 0.28) 0 1.1px, transparent 2px),
+    linear-gradient(140deg, rgba(34, 211, 238, 0.07) 0%, rgba(15, 23, 42, 0.24) 48%, transparent 78%);
+  --pg-page-bg-size: 76px 76px, 76px 76px, 76px 76px, 76px 76px, 76px 76px, 76px 76px, 76px 76px, 100%
+    100%;
   --pg-page-bg-position: left top;
   --pg-shell-radius: 0.2rem;
   --pg-control-radius: 0.14rem;
@@ -44,22 +70,21 @@ body[data-public-style-preset='terra-terminal'] {
   --pg-floating-main-fg: #0b1206;
   --pg-floating-main-shadow: 6px 6px 0 rgba(15, 23, 42, 0.82);
   --pg-paper-fold-size: 0px;
-  --pg-progress-track-bg: rgba(18, 26, 36, 0.22);
+  --pg-progress-track-bg: rgba(11, 17, 25, 0.46);
   --pg-progress-border-width: 2px;
   --pg-progress-border-color: #4d657f;
   --pg-progress-fill-gradient: repeating-linear-gradient(
     90deg,
-    #ccff00 0 12px,
-    #7ce6ff 12px 24px,
-    #8ea5bd 24px 36px
+    #ccff00 0 14px,
+    #0b1119 14px 28px
   );
-  --pg-archive-panel-bg: #f3f8fe;
-  --pg-archive-panel-border-color: #4d657f;
-  --pg-archive-rail-color: rgba(31, 41, 51, 0.42);
-  --pg-archive-dot-color: #1f5dff;
-  --pg-archive-accent: #1f5dff;
-  --pg-archive-link-hover-bg: rgba(31, 93, 255, 0.1);
-  --pg-archive-link-hover-border-color: #4d657f;
+  --pg-archive-panel-bg: #121d2c;
+  --pg-archive-panel-border-color: #8fa7c1;
+  --pg-archive-rail-color: rgba(148, 163, 184, 0.5);
+  --pg-archive-dot-color: #8fd5ff;
+  --pg-archive-accent: #8fd5ff;
+  --pg-archive-link-hover-bg: rgba(34, 211, 238, 0.1);
+  --pg-archive-link-hover-border-color: #78a8d0;
   --pg-link-accent: #1f5dff;
   --pg-heading-tracking: -0.012em;
   --pg-heading-weight: 800;
@@ -103,9 +128,9 @@ body[data-public-style-preset='terra-terminal'] {
   --pg-stat-emphasis-color: #101b28;
   --pg-contact-link-color: #1f5dff;
   --pg-contact-link-hover-color: #1047d1;
-  --pg-divider-line-color: #243140;
-  --pg-divider-icon-color: #243140;
-  --pg-divider-icon-bg: #eef2f6;
+  --pg-divider-line-color: #6f8eae;
+  --pg-divider-icon-color: #9dbcd9;
+  --pg-divider-icon-bg: #070b12;
   --pg-lock-color: #1f5dff;
   --pg-lock-bg: rgba(31, 93, 255, 0.14);
   --pg-lock-border-color: #4d657f;
@@ -114,12 +139,38 @@ body[data-public-style-preset='terra-terminal'] {
 }
 
 .dark body[data-public-style-preset='terra-terminal'] {
-  --pg-page-bg-color: #090d13;
+  --pg-page-bg-color: #060a11;
   --pg-page-bg-image:
-    linear-gradient(90deg, rgba(148, 163, 184, 0.14) 1px, transparent 1px),
-    linear-gradient(0deg, rgba(148, 163, 184, 0.14) 1px, transparent 1px),
-    linear-gradient(135deg, rgba(204, 255, 0, 0.1) 0%, transparent 52%);
-  --pg-page-bg-size: 28px 28px, 28px 28px, 100% 100%;
+    repeating-linear-gradient(
+      90deg,
+      rgba(34, 211, 238, 0) 0 38px,
+      rgba(34, 211, 238, 0.22) 38px 39px,
+      rgba(34, 211, 238, 0) 39px 76px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(34, 211, 238, 0) 0 38px,
+      rgba(34, 211, 238, 0.22) 38px 39px,
+      rgba(34, 211, 238, 0) 39px 76px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(15, 23, 42, 0) 0 18px,
+      rgba(15, 23, 42, 0.14) 18px 24px,
+      rgba(15, 23, 42, 0) 24px 76px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(15, 23, 42, 0) 0 18px,
+      rgba(15, 23, 42, 0.14) 18px 24px,
+      rgba(15, 23, 42, 0) 24px 76px
+    ),
+    radial-gradient(circle at 38px 38px, rgba(34, 211, 238, 0.45) 0 1.3px, transparent 2.2px),
+    radial-gradient(circle at 0 38px, rgba(34, 211, 238, 0.32) 0 1.1px, transparent 2px),
+    radial-gradient(circle at 38px 0, rgba(34, 211, 238, 0.32) 0 1.1px, transparent 2px),
+    linear-gradient(140deg, rgba(34, 211, 238, 0.08) 0%, rgba(15, 23, 42, 0.25) 48%, transparent 78%);
+  --pg-page-bg-size: 76px 76px, 76px 76px, 76px 76px, 76px 76px, 76px 76px, 76px 76px, 76px 76px, 100%
+    100%;
   --pg-page-bg-position: left top;
   --pg-card-border-color: #8fa7c1;
   --pg-card-bg: #0f1722;
@@ -150,22 +201,21 @@ body[data-public-style-preset='terra-terminal'] {
   --pg-floating-main-bg: #ccff00;
   --pg-floating-main-fg: #0b1206;
   --pg-floating-main-shadow: 6px 6px 0 rgba(204, 255, 0, 0.34);
-  --pg-progress-track-bg: rgba(148, 163, 184, 0.2);
+  --pg-progress-track-bg: rgba(11, 17, 25, 0.62);
   --pg-progress-border-width: 2px;
   --pg-progress-border-color: #8fa7c1;
   --pg-progress-fill-gradient: repeating-linear-gradient(
     90deg,
-    #d7ff50 0 12px,
-    #8cedff 12px 24px,
-    #9bb4ce 24px 36px
+    #d7ff50 0 14px,
+    #081018 14px 28px
   );
   --pg-archive-panel-bg: #121d2c;
   --pg-archive-panel-border-color: #8fa7c1;
   --pg-archive-rail-color: rgba(148, 163, 184, 0.5);
-  --pg-archive-dot-color: #ccff00;
-  --pg-archive-accent: #ccff00;
-  --pg-archive-link-hover-bg: rgba(204, 255, 0, 0.14);
-  --pg-archive-link-hover-border-color: #9bb2cb;
+  --pg-archive-dot-color: #8cedff;
+  --pg-archive-accent: #8cedff;
+  --pg-archive-link-hover-bg: rgba(34, 211, 238, 0.16);
+  --pg-archive-link-hover-border-color: #83a8cb;
   --pg-link-accent: #ccff00;
   --pg-search-trigger-bg: #121c2a;
   --pg-search-trigger-border-color: #8fa7c1;
@@ -217,7 +267,7 @@ body[data-public-style-preset='terra-terminal'] {
   --pg-lock-circle-color: #ccff00;
 }
 
-body[data-public-style-preset='terra-terminal'] .pg-public-scope [data-slot='card'],
+body[data-public-style-preset='terra-terminal'] .pg-public-scope [data-slot='card']:not(.pg-reading-no-bg),
 body[data-public-style-preset='terra-terminal'] .pg-public-drawer-panel {
   position: relative;
   clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
@@ -233,7 +283,7 @@ body[data-public-style-preset='terra-terminal'] .pg-public-search-trigger {
   box-shadow: inset 0 0 0 var(--pg-card-border-width) var(--pg-card-border-color);
 }
 
-body[data-public-style-preset='terra-terminal'] .pg-public-scope [data-slot='card']::before,
+body[data-public-style-preset='terra-terminal'] .pg-public-scope [data-slot='card']:not(.pg-reading-no-bg)::before,
 body[data-public-style-preset='terra-terminal'] .pg-public-drawer-panel::before {
   content: '';
   position: absolute;
@@ -248,7 +298,7 @@ body[data-public-style-preset='terra-terminal'] .pg-public-drawer-panel::before 
   z-index: 0;
 }
 
-body[data-public-style-preset='terra-terminal'] .pg-public-scope [data-slot='card']::after,
+body[data-public-style-preset='terra-terminal'] .pg-public-scope [data-slot='card']:not(.pg-reading-no-bg)::after,
 body[data-public-style-preset='terra-terminal'] .pg-public-drawer-panel::after {
   content: '';
   position: absolute;
@@ -266,4 +316,168 @@ body[data-public-style-preset='terra-terminal'] .pg-post-divider-line {
 body[data-public-style-preset='terra-terminal'] .pg-post-divider-icon {
   border: var(--pg-card-border-width) solid var(--pg-divider-line-color);
   clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+}
+
+/* Light mode readability for article content when mobile reading background is "none". */
+html:not(.dark) body[data-public-style-preset='terra-terminal'] .pg-reading-no-bg .mdx-content {
+  color: #d5e4f4;
+}
+
+html:not(.dark) body[data-public-style-preset='terra-terminal'] .pg-reading-no-bg .mdx-content :where(
+    p,
+    li,
+    blockquote,
+    td,
+    th
+  ) {
+  color: #d5e4f4;
+}
+
+html:not(.dark) body[data-public-style-preset='terra-terminal'] .pg-reading-no-bg .mdx-content :where(
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    strong
+  ) {
+  color: #f4faff;
+}
+
+html:not(.dark) body[data-public-style-preset='terra-terminal'] .pg-reading-no-bg .mdx-content a {
+  color: #8fd5ff;
+}
+
+html:not(.dark) body[data-public-style-preset='terra-terminal'] .pg-reading-no-bg .mdx-content :not(pre) > code {
+  color: #e8f4ff;
+  background: rgba(18, 33, 51, 0.72);
+  border-color: rgba(143, 167, 193, 0.48);
+}
+
+/* Light mode colors for post-list filters: "全部分类 / 全部标签". */
+html:not(.dark) body[data-public-style-preset='terra-terminal'] .pg-post-filters .pg-post-filter-select-trigger {
+  color: #d8e9fb !important;
+  border-color: #587391 !important;
+  background: rgba(12, 24, 38, 0.78) !important;
+}
+
+html:not(.dark) body[data-public-style-preset='terra-terminal'] .pg-post-filters .pg-post-filter-select-trigger[data-placeholder] {
+  color: #a8c0d9 !important;
+}
+
+html:not(.dark) body[data-public-style-preset='terra-terminal'] .pg-post-filters .pg-post-filter-select-trigger [data-slot='select-value'] {
+  color: inherit !important;
+}
+
+html:not(.dark) body[data-public-style-preset='terra-terminal'] .pg-post-filters .pg-post-filter-select-trigger svg {
+  color: #9db8d4 !important;
+}
+
+html:not(.dark) body[data-public-style-preset='terra-terminal'] .pg-post-filters .pg-post-filter-select-content {
+  color: #d8e9fb !important;
+  border-color: #587391 !important;
+  background: #0f1a29 !important;
+}
+
+html:not(.dark) body[data-public-style-preset='terra-terminal'] .pg-post-filters .pg-post-filter-select-item {
+  color: #cfe3f8 !important;
+}
+
+html:not(.dark) body[data-public-style-preset='terra-terminal'] .pg-post-filters .pg-post-filter-select-item[data-state='checked'] {
+  color: #f5fbff !important;
+  background: rgba(204, 255, 0, 0.16) !important;
+}
+
+html:not(.dark) body[data-public-style-preset='terra-terminal'] .pg-post-filters .pg-post-filter-select-item[data-highlighted] {
+  color: #f5fbff !important;
+  background: rgba(34, 211, 238, 0.18) !important;
+}
+
+/* Light mode: "最后编辑于" meta text */
+html:not(.dark) body[data-public-style-preset='terra-terminal'] .pg-post-updated-meta {
+  color: #8fd5ff !important;
+}
+
+html:not(.dark) body[data-public-style-preset='terra-terminal'] .pg-post-updated-meta svg {
+  color: inherit !important;
+}
+
+/* Light mode: right drawer TOC title ("目录") */
+html:not(.dark) body[data-public-style-preset='terra-terminal'] .pg-public-drawer-toc-title {
+  color: #e9f6ff !important;
+}
+
+/* In light mode, this preset keeps a dark page background.
+   Override common text utility colors outside card surfaces for readability. */
+html:not(.dark) body[data-public-style-preset='terra-terminal'] :where(
+    .pg-public-scope,
+    .pg-public-nav,
+    .pg-public-footer,
+    .pg-public-drawer-panel
+  ) .text-gray-900:not([data-slot='card'] *) {
+  color: #eff7ff !important;
+}
+
+html:not(.dark) body[data-public-style-preset='terra-terminal'] :where(
+    .pg-public-scope,
+    .pg-public-nav,
+    .pg-public-footer,
+    .pg-public-drawer-panel
+  ) .text-gray-800:not([data-slot='card'] *) {
+  color: #e2edf9 !important;
+}
+
+html:not(.dark) body[data-public-style-preset='terra-terminal'] :where(
+    .pg-public-scope,
+    .pg-public-nav,
+    .pg-public-footer,
+    .pg-public-drawer-panel
+  ) .text-gray-700:not([data-slot='card'] *) {
+  color: #d5e3f3 !important;
+}
+
+html:not(.dark) body[data-public-style-preset='terra-terminal'] :where(
+    .pg-public-scope,
+    .pg-public-nav,
+    .pg-public-footer,
+    .pg-public-drawer-panel
+  ) .text-gray-600:not([data-slot='card'] *) {
+  color: #bfd1e6 !important;
+}
+
+html:not(.dark) body[data-public-style-preset='terra-terminal'] :where(
+    .pg-public-scope,
+    .pg-public-nav,
+    .pg-public-footer,
+    .pg-public-drawer-panel
+  ) .text-gray-500:not([data-slot='card'] *) {
+  color: #a9c0d8 !important;
+}
+
+html:not(.dark) body[data-public-style-preset='terra-terminal'] :where(
+    .pg-public-scope,
+    .pg-public-nav,
+    .pg-public-footer,
+    .pg-public-drawer-panel
+  ) .text-gray-400:not([data-slot='card'] *) {
+  color: #97aec7 !important;
+}
+
+html:not(.dark) body[data-public-style-preset='terra-terminal'] :where(
+    .pg-public-scope,
+    .pg-public-nav,
+    .pg-public-footer,
+    .pg-public-drawer-panel
+  ) .hover\:text-gray-900:not([data-slot='card'] *):hover {
+  color: #f6fbff !important;
+}
+
+html:not(.dark) body[data-public-style-preset='terra-terminal'] :where(
+    .pg-public-scope,
+    .pg-public-nav,
+    .pg-public-footer,
+    .pg-public-drawer-panel
+  ) .hover\:text-gray-600:not([data-slot='card'] *):hover {
+  color: #d2e4f6 !important;
 }

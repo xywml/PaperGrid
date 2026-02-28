@@ -154,8 +154,14 @@ export function MobileToc({ isOpen, onOpenChange }: { isOpen?: boolean; onOpenCh
         className={`pg-public-drawer-panel relative z-10 ml-auto flex h-full w-72 transform flex-col bg-white p-6 shadow-2xl transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform dark:bg-gray-900 ${open ? 'translate-x-0 opacity-100' : 'translate-x-[calc(100%+24px)] opacity-0'}`}
       >
         <div className="mb-6 flex items-center justify-between">
-          <span className="text-lg font-bold tracking-tight">目录</span>
-          <Button variant="ghost" size="icon" onClick={() => setOpen(false)} aria-label="关闭目录">
+          <span className="pg-public-drawer-toc-title text-lg font-bold tracking-tight">目录</span>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="pg-public-drawer-icon-btn"
+            onClick={() => setOpen(false)}
+            aria-label="关闭目录"
+          >
             <X className="h-5 w-5" />
           </Button>
         </div>

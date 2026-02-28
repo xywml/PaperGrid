@@ -462,6 +462,7 @@
 
 .pg-public-nav .pg-public-nav-title {
   letter-spacing: var(--pg-heading-tracking);
+  color: var(--pg-nav-link-active-color) !important;
 }
 
 .pg-public-nav .pg-public-nav-brand {
@@ -545,6 +546,14 @@
 .pg-public-drawer-icon-btn:hover {
   color: var(--pg-drawer-link-hover-color) !important;
   background: var(--pg-drawer-link-hover-bg) !important;
+}
+
+.pg-public-drawer-user-name {
+  color: var(--pg-drawer-link-active-color) !important;
+}
+
+.pg-public-drawer-user-meta {
+  color: var(--pg-drawer-link-color) !important;
 }
 
 .pg-public-fab-btn {

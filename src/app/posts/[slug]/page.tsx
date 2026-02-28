@@ -334,7 +334,7 @@ export default async function PostPage({ params }: PostPageProps) {
               </span>
             </div>
             {post.updatedAt && post.publishedAt && new Date(post.updatedAt).getTime() - new Date(post.publishedAt).getTime() > 60000 && (
-              <div className="flex items-center gap-2 text-primary font-medium">
+              <div className="pg-post-updated-meta flex items-center gap-2 text-primary font-medium">
                 <Edit3 className="h-4 w-4" />
                 <span>
                   最后编辑于 {format(new Date(post.updatedAt), 'yyyy-MM-dd HH:mm')}

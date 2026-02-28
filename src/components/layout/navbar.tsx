@@ -139,7 +139,7 @@ export function Navbar({ settings }: { settings?: Record<string, unknown> }) {
         <div
           className={`pointer-events-none absolute inset-0 flex items-center justify-center px-12 transition-all duration-500 ${showProgressUI ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}
         >
-          <span className="pg-public-nav-title max-w-2xl truncate text-center text-sm font-bold text-gray-900 md:text-base dark:text-white">
+          <span className="pg-public-nav-title max-w-2xl truncate text-center text-sm font-bold md:text-base">
             {postTitle}
           </span>
         </div>
