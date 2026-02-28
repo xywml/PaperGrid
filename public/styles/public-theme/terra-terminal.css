@@ -1,0 +1,269 @@
+body[data-public-style-preset='terra-terminal'] {
+  --pg-page-bg-color: #eef2f6;
+  --pg-page-bg-image:
+    linear-gradient(90deg, rgba(31, 41, 51, 0.06) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(31, 41, 51, 0.06) 1px, transparent 1px),
+    linear-gradient(135deg, rgba(204, 255, 0, 0.06) 0%, transparent 48%);
+  --pg-page-bg-size: 28px 28px, 28px 28px, 100% 100%;
+  --pg-page-bg-position: left top;
+  --pg-shell-radius: 0.2rem;
+  --pg-control-radius: 0.14rem;
+  --pg-badge-radius: 0.18rem;
+  --pg-card-border-width: 2px;
+  --pg-card-border-color: #4d657f;
+  --pg-card-bg: #f8fafc;
+  --pg-card-shadow: 4px 4px 0 rgba(15, 23, 42, 0.76);
+  --pg-card-hover-shadow: 6px 6px 0 rgba(15, 23, 42, 0.82);
+  --pg-reading-card-shadow: 3px 3px 0 rgba(15, 23, 42, 0.68);
+  --pg-reading-card-hover-shadow: 5px 5px 0 rgba(15, 23, 42, 0.74);
+  --pg-nav-bg: #121a24;
+  --pg-nav-border-color: #4d657f;
+  --pg-nav-border-width: 2px;
+  --pg-nav-shadow: none;
+  --pg-nav-link-color: #b7c6d5;
+  --pg-nav-link-hover-color: #f8fbff;
+  --pg-nav-link-active-color: #f8fbff;
+  --pg-nav-indicator-color: #ccff00;
+  --pg-footer-bg: #121a24;
+  --pg-footer-border-color: #4d657f;
+  --pg-footer-border-width: 2px;
+  --pg-drawer-bg: #151f2a;
+  --pg-drawer-border-color: #4d657f;
+  --pg-drawer-border-width: 2px;
+  --pg-drawer-shadow: 10px 10px 0 rgba(15, 23, 42, 0.72);
+  --pg-drawer-link-color: #c4d3e3;
+  --pg-drawer-link-hover-color: #f7fbff;
+  --pg-drawer-link-hover-bg: rgba(204, 255, 0, 0.14);
+  --pg-drawer-link-active-bg: rgba(204, 255, 0, 0.22);
+  --pg-drawer-link-active-color: #ccff00;
+  --pg-floating-bg: #1b2633;
+  --pg-floating-icon: #d7e1eb;
+  --pg-floating-shadow: 4px 4px 0 rgba(15, 23, 42, 0.75);
+  --pg-floating-border-color: #4d657f;
+  --pg-floating-main-bg: #ccff00;
+  --pg-floating-main-fg: #0b1206;
+  --pg-floating-main-shadow: 6px 6px 0 rgba(15, 23, 42, 0.82);
+  --pg-paper-fold-size: 0px;
+  --pg-progress-track-bg: rgba(18, 26, 36, 0.22);
+  --pg-progress-border-width: 2px;
+  --pg-progress-border-color: #4d657f;
+  --pg-progress-fill-gradient: repeating-linear-gradient(
+    90deg,
+    #ccff00 0 12px,
+    #7ce6ff 12px 24px,
+    #8ea5bd 24px 36px
+  );
+  --pg-archive-panel-bg: #f3f8fe;
+  --pg-archive-panel-border-color: #4d657f;
+  --pg-archive-rail-color: rgba(31, 41, 51, 0.42);
+  --pg-archive-dot-color: #1f5dff;
+  --pg-archive-accent: #1f5dff;
+  --pg-archive-link-hover-bg: rgba(31, 93, 255, 0.1);
+  --pg-archive-link-hover-border-color: #4d657f;
+  --pg-link-accent: #1f5dff;
+  --pg-heading-tracking: -0.012em;
+  --pg-heading-weight: 800;
+  --pg-search-trigger-bg: #1b2734;
+  --pg-search-trigger-border-color: #5a7593;
+  --pg-search-trigger-text: #e5edf6;
+  --pg-search-trigger-hover-bg: #26384c;
+  --pg-search-trigger-hover-text: #f8fbff;
+  --pg-search-kbd-bg: #243548;
+  --pg-search-kbd-border-color: #5a7593;
+  --pg-search-kbd-text: #d4e1ee;
+  --pg-hero-primary-bg: #ccff00;
+  --pg-hero-primary-fg: #0b1206;
+  --pg-hero-primary-border-color: #4d657f;
+  --pg-hero-primary-hover-bg: #b6eb00;
+  --pg-hero-secondary-bg: #182635;
+  --pg-hero-secondary-fg: #eef6ff;
+  --pg-hero-secondary-border-color: #5a7593;
+  --pg-hero-secondary-hover-bg: #24384f;
+  --pg-hero-secondary-hover-fg: #ffffff;
+  --pg-social-btn-bg: #1b2a3a;
+  --pg-social-btn-fg: #e6eef8;
+  --pg-social-btn-border-color: #5a7593;
+  --pg-social-btn-hover-bg: #2a3d53;
+  --pg-social-btn-hover-fg: #ffffff;
+  --pg-badge-secondary-bg: #d9e5f2;
+  --pg-badge-secondary-fg: #142333;
+  --pg-badge-secondary-border-color: #4d657f;
+  --pg-badge-secondary-hover-bg: #c6d7ea;
+  --pg-badge-secondary-hover-fg: #0f1d2b;
+  --pg-badge-outline-bg: #eef4fa;
+  --pg-badge-outline-fg: #213244;
+  --pg-badge-outline-border-color: #4d657f;
+  --pg-badge-outline-hover-bg: #dce8f5;
+  --pg-badge-outline-hover-fg: #122334;
+  --pg-outline-btn-bg: #ecf3fa;
+  --pg-outline-btn-fg: #102030;
+  --pg-outline-btn-border-color: #4d657f;
+  --pg-outline-btn-hover-bg: #dce8f5;
+  --pg-outline-btn-hover-fg: #0b1824;
+  --pg-stat-emphasis-color: #101b28;
+  --pg-contact-link-color: #1f5dff;
+  --pg-contact-link-hover-color: #1047d1;
+  --pg-divider-line-color: #243140;
+  --pg-divider-icon-color: #243140;
+  --pg-divider-icon-bg: #eef2f6;
+  --pg-lock-color: #1f5dff;
+  --pg-lock-bg: rgba(31, 93, 255, 0.14);
+  --pg-lock-border-color: #4d657f;
+  --pg-lock-circle-bg: rgba(31, 93, 255, 0.2);
+  --pg-lock-circle-color: #102338;
+}
+
+.dark body[data-public-style-preset='terra-terminal'] {
+  --pg-page-bg-color: #090d13;
+  --pg-page-bg-image:
+    linear-gradient(90deg, rgba(148, 163, 184, 0.14) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(148, 163, 184, 0.14) 1px, transparent 1px),
+    linear-gradient(135deg, rgba(204, 255, 0, 0.1) 0%, transparent 52%);
+  --pg-page-bg-size: 28px 28px, 28px 28px, 100% 100%;
+  --pg-page-bg-position: left top;
+  --pg-card-border-color: #8fa7c1;
+  --pg-card-bg: #0f1722;
+  --pg-card-shadow: 4px 4px 0 rgba(204, 255, 0, 0.22);
+  --pg-card-hover-shadow: 6px 6px 0 rgba(204, 255, 0, 0.3);
+  --pg-reading-card-shadow: 3px 3px 0 rgba(204, 255, 0, 0.2);
+  --pg-reading-card-hover-shadow: 5px 5px 0 rgba(204, 255, 0, 0.28);
+  --pg-nav-bg: #0b1119;
+  --pg-nav-border-color: #8fa7c1;
+  --pg-nav-link-color: #9eb0c5;
+  --pg-nav-link-hover-color: #f2f8ff;
+  --pg-nav-link-active-color: #f2f8ff;
+  --pg-nav-indicator-color: #ccff00;
+  --pg-footer-bg: #0b1119;
+  --pg-footer-border-color: #8fa7c1;
+  --pg-drawer-bg: #0d141f;
+  --pg-drawer-border-color: #8fa7c1;
+  --pg-drawer-shadow: 10px 10px 0 rgba(204, 255, 0, 0.26);
+  --pg-drawer-link-color: #aebed1;
+  --pg-drawer-link-hover-color: #f7fbff;
+  --pg-drawer-link-hover-bg: rgba(204, 255, 0, 0.16);
+  --pg-drawer-link-active-bg: rgba(204, 255, 0, 0.28);
+  --pg-drawer-link-active-color: #d7ff50;
+  --pg-floating-bg: #121b28;
+  --pg-floating-icon: #d6e2ee;
+  --pg-floating-shadow: 4px 4px 0 rgba(204, 255, 0, 0.24);
+  --pg-floating-border-color: #8fa7c1;
+  --pg-floating-main-bg: #ccff00;
+  --pg-floating-main-fg: #0b1206;
+  --pg-floating-main-shadow: 6px 6px 0 rgba(204, 255, 0, 0.34);
+  --pg-progress-track-bg: rgba(148, 163, 184, 0.2);
+  --pg-progress-border-width: 2px;
+  --pg-progress-border-color: #8fa7c1;
+  --pg-progress-fill-gradient: repeating-linear-gradient(
+    90deg,
+    #d7ff50 0 12px,
+    #8cedff 12px 24px,
+    #9bb4ce 24px 36px
+  );
+  --pg-archive-panel-bg: #121d2c;
+  --pg-archive-panel-border-color: #8fa7c1;
+  --pg-archive-rail-color: rgba(148, 163, 184, 0.5);
+  --pg-archive-dot-color: #ccff00;
+  --pg-archive-accent: #ccff00;
+  --pg-archive-link-hover-bg: rgba(204, 255, 0, 0.14);
+  --pg-archive-link-hover-border-color: #9bb2cb;
+  --pg-link-accent: #ccff00;
+  --pg-search-trigger-bg: #121c2a;
+  --pg-search-trigger-border-color: #8fa7c1;
+  --pg-search-trigger-text: #dce8f5;
+  --pg-search-trigger-hover-bg: #1a2a3d;
+  --pg-search-trigger-hover-text: #f5fbff;
+  --pg-search-kbd-bg: #1b2d40;
+  --pg-search-kbd-border-color: #8fa7c1;
+  --pg-search-kbd-text: #dce8f5;
+  --pg-hero-primary-bg: #ccff00;
+  --pg-hero-primary-fg: #0b1206;
+  --pg-hero-primary-border-color: #8fa7c1;
+  --pg-hero-primary-hover-bg: #b9ee00;
+  --pg-hero-secondary-bg: #132133;
+  --pg-hero-secondary-fg: #e7f2ff;
+  --pg-hero-secondary-border-color: #8fa7c1;
+  --pg-hero-secondary-hover-bg: #1e3249;
+  --pg-hero-secondary-hover-fg: #ffffff;
+  --pg-social-btn-bg: #132133;
+  --pg-social-btn-fg: #e2ecf8;
+  --pg-social-btn-border-color: #8fa7c1;
+  --pg-social-btn-hover-bg: #233a56;
+  --pg-social-btn-hover-fg: #ffffff;
+  --pg-badge-secondary-bg: #203349;
+  --pg-badge-secondary-fg: #e7f2ff;
+  --pg-badge-secondary-border-color: #8fa7c1;
+  --pg-badge-secondary-hover-bg: #2b4360;
+  --pg-badge-secondary-hover-fg: #ffffff;
+  --pg-badge-outline-bg: #132133;
+  --pg-badge-outline-fg: #cddbec;
+  --pg-badge-outline-border-color: #8fa7c1;
+  --pg-badge-outline-hover-bg: #203349;
+  --pg-badge-outline-hover-fg: #f1f7ff;
+  --pg-outline-btn-bg: #132133;
+  --pg-outline-btn-fg: #deebf8;
+  --pg-outline-btn-border-color: #8fa7c1;
+  --pg-outline-btn-hover-bg: #203349;
+  --pg-outline-btn-hover-fg: #ffffff;
+  --pg-stat-emphasis-color: #f5fbff;
+  --pg-contact-link-color: #ccff00;
+  --pg-contact-link-hover-color: #e8ff89;
+  --pg-divider-line-color: #6a7f97;
+  --pg-divider-icon-color: #a5bad1;
+  --pg-divider-icon-bg: #090d13;
+  --pg-lock-color: #ccff00;
+  --pg-lock-bg: rgba(204, 255, 0, 0.2);
+  --pg-lock-border-color: #8fa7c1;
+  --pg-lock-circle-bg: rgba(204, 255, 0, 0.24);
+  --pg-lock-circle-color: #ccff00;
+}
+
+body[data-public-style-preset='terra-terminal'] .pg-public-scope [data-slot='card'],
+body[data-public-style-preset='terra-terminal'] .pg-public-drawer-panel {
+  position: relative;
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+  overflow: hidden;
+  border-color: transparent !important;
+}
+
+body[data-public-style-preset='terra-terminal'] .pg-public-scope [data-slot='button'],
+body[data-public-style-preset='terra-terminal'] .pg-public-scope [data-slot='input'],
+body[data-public-style-preset='terra-terminal'] .pg-public-search-trigger {
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  border-color: transparent !important;
+  box-shadow: inset 0 0 0 var(--pg-card-border-width) var(--pg-card-border-color);
+}
+
+body[data-public-style-preset='terra-terminal'] .pg-public-scope [data-slot='card']::before,
+body[data-public-style-preset='terra-terminal'] .pg-public-drawer-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(204, 255, 0, 0) 0 7px,
+    rgba(204, 255, 0, 0.05) 7px 8px
+  );
+  opacity: 0.45;
+  z-index: 0;
+}
+
+body[data-public-style-preset='terra-terminal'] .pg-public-scope [data-slot='card']::after,
+body[data-public-style-preset='terra-terminal'] .pg-public-drawer-panel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border: var(--pg-card-border-width) solid var(--pg-card-border-color);
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+  z-index: 1;
+}
+
+body[data-public-style-preset='terra-terminal'] .pg-post-divider-line {
+  border-top-width: 2px;
+}
+
+body[data-public-style-preset='terra-terminal'] .pg-post-divider-icon {
+  border: var(--pg-card-border-width) solid var(--pg-divider-line-color);
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+}

@@ -141,6 +141,9 @@ export default function AdminStylesPage() {
                 <SelectContent>
                   <SelectItem value="paper-grid">纸格笔记</SelectItem>
                   <SelectItem value="neo-brutal">新粗野风</SelectItem>
+                  <SelectItem value="terra-terminal">终端机能</SelectItem>
+                  <SelectItem value="schale-glass">清透视窗</SelectItem>
+                  <SelectItem value="valley-ledger">像素账本</SelectItem>
                 </SelectContent>
               </Select>
               <p className="mt-2 text-xs text-muted-foreground">

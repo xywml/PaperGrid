@@ -97,7 +97,7 @@ export function Navbar({ settings }: { settings?: Record<string, unknown> }) {
           <MobileNav showOnDesktop />
           <Link
             href="/"
-            className="max-w-[40vw] truncate text-base font-bold tracking-tight sm:max-w-none sm:text-lg"
+            className="pg-public-nav-brand max-w-[40vw] truncate text-base font-bold tracking-tight sm:max-w-none sm:text-lg"
           >
             {siteTitle}
           </Link>

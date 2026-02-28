@@ -166,11 +166,17 @@ export function MobileNav({
                 decoding="async"
               />
             </div>
-            <span className="text-lg font-bold tracking-tight">
+            <span className="pg-public-drawer-title text-lg font-bold tracking-tight">
               {isAdmin ? '管理后台' : siteTitle}
             </span>
           </div>
-          <Button variant="ghost" size="icon" onClick={() => setOpen(false)} aria-label="关闭菜单">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="pg-public-drawer-icon-btn"
+            onClick={() => setOpen(false)}
+            aria-label="关闭菜单"
+          >
             <X className="h-5 w-5" />
           </Button>
         </div>
@@ -230,6 +236,7 @@ export function MobileNav({
             ref={triggerRef}
             variant="ghost"
             size="icon"
+            className="pg-public-nav-icon-btn"
             onClick={() => setOpen(!open)}
             aria-expanded={open}
             aria-label={open ? '关闭菜单' : '打开菜单'}
