@@ -17,6 +17,7 @@ import {
   Images,
   ArrowLeftRight,
   Bot,
+  History,
 } from 'lucide-react'
 
 const Icons = {
@@ -33,6 +34,7 @@ const Icons = {
   Images,
   ArrowLeftRight,
   Bot,
+  History,
 }
 
 export function AdminNav({

@@ -32,6 +32,7 @@ const navItems = [
   { href: '/admin/api-keys', iconName: 'Key', label: '接口密钥' },
   { href: '/admin/ai', iconName: 'Bot', label: '智能助手' },
   { href: '/admin/import-export', iconName: 'ArrowLeftRight', label: '导入导出' },
+  { href: '/admin/changelog', iconName: 'History', label: '更新记录' },
   { href: '/admin/styles', iconName: 'Palette', label: '样式管理' },
   { href: '/admin/settings', iconName: 'Settings', label: '系统设置' },
 ]

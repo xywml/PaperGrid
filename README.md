@@ -58,7 +58,7 @@ services:
       # SQLITE_JOURNAL_MODE: "DELETE"
       # 反向代理后必须改成你的公网地址（https://your-domain），否则登录会报 UntrustedHost
       NEXTAUTH_URL: "http://localhost:6066"
-      # 仅本地开发可开启（生产环境不要设置）
+      # 仅本地开发可临时开启（生产环境不要设置）
       AUTH_TRUST_HOST: "1"
       # 可选：启用 /api/init（一次性），必须设置且仅通过请求头 x-init-token 传入
       # INIT_ADMIN_TOKEN: "请替换为随机字符串"
