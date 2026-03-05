@@ -1,5 +1,6 @@
 import { auth } from '@/lib/auth'
 import { redirect } from 'next/navigation'
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Suspense } from 'react'
 import { LogOut } from 'lucide-react'
@@ -36,6 +37,13 @@ const navItems = [
   { href: '/admin/styles', iconName: 'Palette', label: '样式管理' },
   { href: '/admin/settings', iconName: 'Settings', label: '系统设置' },
 ]
+
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: false,
+  },
+}
 
 export default async function AdminLayout({
   children,

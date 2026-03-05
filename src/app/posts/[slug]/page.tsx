@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
+import type { Metadata } from 'next'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -20,6 +21,7 @@ import { ViewCount } from '@/components/posts/view-count'
 import { extractHeadingsFromMarkdown } from '@/lib/markdown'
 import { ProtectedPostPage } from '@/components/posts/protected-post-page'
 import { isInternalImageUrl } from '@/lib/image-url'
+import { toCanonicalPath } from '@/lib/seo'
 
 export const revalidate = 60
 
@@ -547,7 +549,7 @@ export default async function PostPage({ params }: PostPageProps) {
 }
 
 // 生成元数据
-export async function generateMetadata({ params }: PostPageProps) {
+export async function generateMetadata({ params }: PostPageProps): Promise<Metadata> {
   const { slug } = await params
 
   const post = await prisma.post.findFirst({
@@ -571,7 +573,18 @@ export async function generateMetadata({ params }: PostPageProps) {
   return {
     title: post.title,
     description: post.excerpt || post.title,
+    alternates: {
+      canonical: toCanonicalPath(`/posts/${slug}`),
+    },
     openGraph: {
+      type: 'article',
+      url: toCanonicalPath(`/posts/${slug}`),
+      title: post.title,
+      description: post.excerpt || post.title,
+      images: post.coverImage ? [post.coverImage] : [],
+    },
+    twitter: {
+      card: post.coverImage ? 'summary_large_image' : 'summary',
       title: post.title,
       description: post.excerpt || post.title,
       images: post.coverImage ? [post.coverImage] : [],

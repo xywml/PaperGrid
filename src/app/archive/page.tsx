@@ -1,10 +1,19 @@
 import { Card, CardContent } from '@/components/ui/card'
+import type { Metadata } from 'next'
 import { CalendarDays } from 'lucide-react'
 import { ArchiveTimeline } from '@/components/posts/archive-timeline'
 import { getArchiveTimeline } from '@/lib/archive'
 import { SectionHeadingAccent } from '@/components/layout/section-heading-accent'
 
 export const revalidate = 60
+
+export const metadata: Metadata = {
+  title: '文章归档',
+  description: '按时间轴回顾全部文章，快速定位历史内容。',
+  alternates: {
+    canonical: '/archive',
+  },
+}
 
 export default async function ArchivePage() {
   const { years, totalPosts } = await getArchiveTimeline()

@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma'
+import type { Metadata } from 'next'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { FolderOpen } from 'lucide-react'
@@ -6,6 +7,14 @@ import Link from 'next/link'
 import { SectionHeadingAccent } from '@/components/layout/section-heading-accent'
 
 export const revalidate = 60
+
+export const metadata: Metadata = {
+  title: '文章分类',
+  description: '浏览所有文章分类，快速定位你感兴趣的主题。',
+  alternates: {
+    canonical: '/categories',
+  },
+}
 
 export default async function CategoriesPage() {
   const [categories, totalPosts] = await Promise.all([

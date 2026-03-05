@@ -1,9 +1,18 @@
 import { prisma } from '@/lib/prisma'
+import type { Metadata } from 'next'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import Link from 'next/link'
 import { SectionHeadingAccent } from '@/components/layout/section-heading-accent'
 
 export const revalidate = 60
+
+export const metadata: Metadata = {
+  title: '雅集',
+  description: '精选项目与作品展示，记录创作与实践。',
+  alternates: {
+    canonical: '/yaji',
+  },
+}
 
 export default async function YajiPage() {
   const projects = await prisma.project.findMany({

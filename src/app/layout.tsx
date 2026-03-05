@@ -19,6 +19,7 @@ import {
   getPublicStylePresetStylesheet,
   normalizePublicStylePreset,
 } from '@/lib/public-style-preset'
+import { getSiteUrl } from '@/lib/seo'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -40,9 +41,42 @@ export async function generateMetadata(): Promise<Metadata> {
   const title = (await getSetting<string>('site.title', '执笔为剑')) || '执笔为剑'
   const description = (await getSetting<string>('site.description', '分享技术文章、生活记录和作品展示的个人博客'))
   const faviconUrl = (await getSetting<string>('site.faviconUrl', '')) || ''
+  const metadataBase = getSiteUrl()
+
   return {
-    title,
+    metadataBase,
+    title: {
+      default: title,
+      template: `%s | ${title}`,
+    },
     description,
+    alternates: {
+      canonical: '/',
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+        'max-video-preview': -1,
+      },
+    },
+    openGraph: {
+      type: 'website',
+      locale: 'zh_CN',
+      url: '/',
+      siteName: title,
+      title,
+      description,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    },
     ...(faviconUrl ? { icons: { icon: faviconUrl } } : {}),
   }
 }

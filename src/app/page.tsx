@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma'
+import type { Metadata } from 'next'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -11,6 +12,14 @@ import { RecentCommentsTimeline } from '@/components/comments/recent-comments-ti
 import { PostMeta } from '@/components/posts/post-meta'
 
 export const revalidate = 60
+
+export const metadata: Metadata = {
+  title: '首页',
+  description: '分享技术文章、生活记录和作品展示的个人博客。',
+  alternates: {
+    canonical: '/',
+  },
+}
 
 export default async function HomePage() {
   const [settings, commentsEnabledRaw, latestPosts, categories, tags] = await Promise.all([

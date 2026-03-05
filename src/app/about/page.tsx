@@ -1,4 +1,5 @@
 import { Card, CardContent } from '@/components/ui/card'
+import type { Metadata } from 'next'
 import { Badge } from '@/components/ui/badge'
 import { Mail, Github, X, Tv, MapPin, Calendar, MessageSquareHeart } from 'lucide-react'
 import { getSetting } from '@/lib/settings'
@@ -8,6 +9,14 @@ import { SectionHeadingAccent } from '@/components/layout/section-heading-accent
 import { isValidHref } from '@/lib/utils'
 
 export const revalidate = 60
+
+export const metadata: Metadata = {
+  title: '关于我',
+  description: '了解站点作者、技术栈和联系方式。',
+  alternates: {
+    canonical: '/about',
+  },
+}
 
 export default async function AboutPage() {
   const [

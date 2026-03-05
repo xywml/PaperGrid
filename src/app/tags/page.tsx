@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma'
+import type { Metadata } from 'next'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Tag as TagIcon } from 'lucide-react'
@@ -6,6 +7,14 @@ import Link from 'next/link'
 import { SectionHeadingAccent } from '@/components/layout/section-heading-accent'
 
 export const revalidate = 60
+
+export const metadata: Metadata = {
+  title: '文章标签',
+  description: '浏览所有标签，探索不同主题下的文章内容。',
+  alternates: {
+    canonical: '/tags',
+  },
+}
 
 export default async function TagsPage() {
   const [tags, totalPosts] = await Promise.all([

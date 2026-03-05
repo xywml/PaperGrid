@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
+import type { Metadata } from 'next'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -9,6 +10,7 @@ import { zhCN } from 'date-fns/locale'
 import Link from 'next/link'
 import Image from 'next/image'
 import { isInternalImageUrl } from '@/lib/image-url'
+import { toCanonicalPath } from '@/lib/seo'
 
 export const revalidate = 60
 
@@ -339,8 +341,14 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
 }
 
 // 生成元数据
-export async function generateMetadata({ params }: CategoryPageProps) {
+export async function generateMetadata({ params, searchParams }: CategoryPageProps): Promise<Metadata> {
   const { slug } = await params
+  const { page: pageParam } = await searchParams
+  const page = Number.parseInt(pageParam || '1', 10)
+  const canonical = page > 1
+    ? toCanonicalPath(`/categories/${slug}`, { page: String(page) })
+    : toCanonicalPath(`/categories/${slug}`)
+
   const category = await prisma.category.findUnique({
     where: { slug },
     select: {
@@ -358,5 +366,8 @@ export async function generateMetadata({ params }: CategoryPageProps) {
   return {
     title: `${category.name} - 文章分类`,
     description: category.description || `浏览 ${category.name} 分类的所有文章`,
+    alternates: {
+      canonical,
+    },
   }
 }

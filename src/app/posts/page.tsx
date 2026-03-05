@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import type { Prisma } from '@prisma/client'
+import type { Metadata } from 'next'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -12,6 +13,7 @@ import { Suspense } from 'react'
 import { PostMeta } from '@/components/posts/post-meta'
 import { SectionHeadingAccent } from '@/components/layout/section-heading-accent'
 import { isInternalImageUrl } from '@/lib/image-url'
+import { toCanonicalPath } from '@/lib/seo'
 
 export const revalidate = 60
 
@@ -22,6 +24,35 @@ interface PostsPageProps {
     category?: string
     tag?: string
   }>
+}
+
+export async function generateMetadata({ searchParams }: PostsPageProps): Promise<Metadata> {
+  const params = await searchParams
+  const page = Number.parseInt(params.page || '1', 10)
+  const search = params.search?.trim() || ''
+  const category = params.category?.trim() || ''
+  const tag = params.tag?.trim() || ''
+
+  const canonical = toCanonicalPath('/posts', {
+    ...(page > 1 ? { page: String(page) } : {}),
+    ...(category ? { category } : {}),
+    ...(tag ? { tag } : {}),
+  })
+
+  const hasNonPaginationFilter = Boolean(search || category || tag)
+  return {
+    title: '文章列表',
+    description: '浏览所有已发布的技术文章、生活记录和作品展示。',
+    alternates: {
+      canonical,
+    },
+    robots: hasNonPaginationFilter
+      ? {
+          index: false,
+          follow: true,
+        }
+      : undefined,
+  }
 }
 
 export default async function PostsPage({ searchParams }: PostsPageProps) {
