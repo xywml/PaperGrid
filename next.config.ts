@@ -1,6 +1,7 @@
 import type { NextConfig } from 'next'
 import createNextIntlPlugin from 'next-intl/plugin'
 import createMDX from '@next/mdx'
+import { buildContentSecurityPolicy } from './src/lib/csp'
 
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts')
 
@@ -8,52 +9,10 @@ const withMDX = createMDX({
   extension: /\.mdx?$/,
 })
 
-function parseTrustedScriptOrigins(raw: string): string[] {
-  const origins = new Set<string>()
-
-  for (const entry of raw.split(',')) {
-    const candidate = entry.trim()
-    if (!candidate) continue
-
-    try {
-      const url = new URL(candidate)
-      if (url.protocol !== 'https:') {
-        console.warn(`[CSP] Ignored non-HTTPS script origin: ${candidate}`)
-        continue
-      }
-      origins.add(url.origin)
-    } catch {
-      console.warn(`[CSP] Ignored invalid script origin: ${candidate}`)
-    }
-  }
-
-  return Array.from(origins)
-}
-
-// Origins injected via admin "custom head code" setting.
-// Parsed at build/start time from env so that CSP stays in sync.
-const extraScriptOrigins = parseTrustedScriptOrigins(process.env.HEAD_INJECT_SCRIPT_ORIGINS || '')
-const allowUnsafeInlineScript = process.env.CSP_ALLOW_UNSAFE_INLINE_SCRIPT !== 'false'
-
-const scriptSrc = [
-  "'self'",
-  ...(allowUnsafeInlineScript ? ["'unsafe-inline'"] : []),
-  ...extraScriptOrigins,
-].join(' ')
-
-const contentSecurityPolicy = [
-  "default-src 'self'",
-  "base-uri 'self'",
-  "object-src 'none'",
-  "frame-ancestors 'none'",
-  "img-src 'self' data: https:",
-  "media-src 'self' https:",
-  "font-src 'self' data: https:",
-  "style-src 'self' 'unsafe-inline'",
-  `script-src ${scriptSrc}`,
-  "connect-src 'self' https:",
-  "frame-src 'self' https:",
-].join('; ')
+const contentSecurityPolicy = buildContentSecurityPolicy({
+  rawScriptOrigins: process.env.HEAD_INJECT_SCRIPT_ORIGINS || '',
+  allowUnsafeInlineScript: process.env.CSP_ALLOW_UNSAFE_INLINE_SCRIPT !== 'false',
+})
 
 const securityHeaders = [
   { key: 'Content-Security-Policy', value: contentSecurityPolicy },
