@@ -8,9 +8,8 @@ import { Calendar, Clock, Eye, Tag as TagIcon, ArrowLeft, Lock } from 'lucide-re
 import { formatDistanceToNow } from 'date-fns'
 import { zhCN } from 'date-fns/locale'
 import Link from 'next/link'
-import Image from 'next/image'
-import { isInternalImageUrl } from '@/lib/image-url'
 import { toCanonicalPath } from '@/lib/seo'
+import { PostCardCover } from '@/components/posts/post-card-cover'
 
 export const revalidate = 60
 
@@ -185,35 +184,21 @@ export default async function TagPage({ params, searchParams }: TagPageProps) {
             </Card>
           ) : (
             <>
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-6 sm:auto-rows-fr sm:grid-cols-2 lg:grid-cols-3">
                 {posts.map((post) => (
                   <Card
                     key={post.id}
-                    className="overflow-hidden hover:shadow-lg transition-shadow"
+                    className="group relative flex h-full flex-col overflow-hidden transition-shadow hover:shadow-lg"
                   >
-                    <Link href={`/posts/${post.slug}`}>
-                      {post.coverImage && (
-                        <div className="relative aspect-video w-full overflow-hidden bg-gray-100 dark:bg-gray-800">
-                          {isInternalImageUrl(post.coverImage) ? (
-                            <Image
-                              src={post.coverImage}
-                              alt={post.title}
-                              fill
-                              sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                              className="object-cover"
-                            />
-                          ) : (
-                            <img
-                              src={post.coverImage}
-                              alt={post.title}
-                              className="h-full w-full object-cover"
-                              loading="lazy"
-                              decoding="async"
-                            />
-                          )}
-                        </div>
-                      )}
-                      <CardHeader className="space-y-2 pb-0">
+                    {post.coverImage && (
+                      <PostCardCover
+                        coverImage={post.coverImage}
+                        title={post.title}
+                        sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                      />
+                    )}
+                    <Link href={`/posts/${post.slug}`} className={post.coverImage ? 'relative z-10 block flex-1' : 'block flex-1'}>
+                      <CardHeader className="flex h-full flex-col space-y-2 pb-0">
                         <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                           <Calendar className="h-4 w-4" />
                           <time>
@@ -243,16 +228,18 @@ export default async function TagPage({ params, searchParams }: TagPageProps) {
                         <CardTitle className="line-clamp-2 hover:text-blue-600 dark:hover:text-blue-400">
                           {post.title}
                         </CardTitle>
-                        {post.excerpt && (
-                          <p className="line-clamp-2 text-sm text-gray-600 dark:text-gray-400">
-                            {post.excerpt}
-                          </p>
-                        )}
+                        <div className="min-h-10">
+                          {post.excerpt ? (
+                            <p className="line-clamp-2 text-sm text-gray-600 dark:text-gray-400">
+                              {post.excerpt}
+                            </p>
+                          ) : null}
+                        </div>
                       </CardHeader>
                     </Link>
-                    <CardContent className="pt-4">
+                    <CardContent className={post.coverImage ? 'relative z-10 pt-4' : 'pt-4'}>
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2 flex-wrap">
+                        <div className="flex min-h-10 max-h-10 flex-wrap items-center gap-2 overflow-hidden">
                           {post.category && (
                             <Badge variant="secondary" className="pg-public-badge-secondary text-xs">
                               {post.category.name}
@@ -277,7 +264,7 @@ export default async function TagPage({ params, searchParams }: TagPageProps) {
                         </div>
                       </div>
                     </CardContent>
-                    <CardFooter className="pt-0">
+                    <CardFooter className={post.coverImage ? 'relative z-10 mt-auto pt-0' : 'mt-auto pt-0'}>
                       <Link href={`/posts/${post.slug}`} className="w-full">
                         <Button variant="outline" className="pg-public-outline-btn w-full" size="sm">
                           阅读全文

@@ -10,6 +10,7 @@ import { getPublicSettings, getSetting } from '@/lib/settings'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { RecentCommentsTimeline } from '@/components/comments/recent-comments-timeline'
 import { PostMeta } from '@/components/posts/post-meta'
+import { PostCardCover } from '@/components/posts/post-card-cover'
 
 export const revalidate = 60
 
@@ -34,6 +35,7 @@ export default async function HomePage() {
         title: true,
         slug: true,
         excerpt: true,
+        coverImage: true,
         publishedAt: true,
         readingTime: true,
         isProtected: true,
@@ -147,10 +149,17 @@ export default async function HomePage() {
                   {latestPosts.map((post) => (
                     <Card
                       key={post.id}
-                      className="overflow-hidden hover:shadow-lg transition-shadow"
+                      className="group relative overflow-hidden transition-shadow hover:shadow-lg"
                     >
-                      <Link href={`/posts/${post.slug}`}>
-                        <CardHeader className="space-y-2 pb-0">
+                      {post.coverImage && (
+                        <PostCardCover
+                          coverImage={post.coverImage}
+                          title={post.title}
+                          sizes="(min-width: 1280px) 42rem, (min-width: 1024px) 40rem, 100vw"
+                        />
+                      )}
+                      <Link href={`/posts/${post.slug}`} className={post.coverImage ? 'relative z-10 block' : 'block'}>
+                        <CardHeader className="space-y-1.5 pb-0">
                           <PostMeta
                             publishedAt={post.publishedAt}
                             authorName={post.author.name}
@@ -160,16 +169,18 @@ export default async function HomePage() {
                           <CardTitle className="line-clamp-2 text-xl hover:text-blue-600 dark:hover:text-blue-400">
                             {post.title}
                           </CardTitle>
-                          {post.excerpt && (
-                            <p className="line-clamp-2 text-sm text-gray-600 dark:text-gray-400">
-                              {post.excerpt}
-                            </p>
-                          )}
+                          <div className="min-h-8">
+                            {post.excerpt ? (
+                              <p className="line-clamp-2 text-sm text-gray-600 dark:text-gray-400">
+                                {post.excerpt}
+                              </p>
+                            ) : null}
+                          </div>
                         </CardHeader>
                       </Link>
-                      <CardContent className="pt-4">
+                      <CardContent className={post.coverImage ? 'relative z-10 pt-3' : 'pt-3'}>
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
+                          <div className="flex min-h-7 flex-wrap items-center gap-2">
                             {post.category && (
                               <Badge variant="secondary" className="pg-public-badge-secondary">
                                 {post.category.name}
