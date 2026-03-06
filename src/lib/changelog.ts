@@ -6,6 +6,13 @@ export type ChangelogItem = {
 
 export const CHANGELOG: ChangelogItem[] = [
   {
+    version: 'v1.0.23',
+    date: '2026-03-06',
+    highlights: [
+      'SEO优化。',
+    ],
+  },
+  {
     version: 'v1.0.22',
     date: '2026-03-05',
     highlights: [

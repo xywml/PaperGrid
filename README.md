@@ -74,6 +74,11 @@ services:
       # EMAIL_REPLY_DENYLIST: "deny1@example.com,deny2@example.com"
       # EMAIL_UNSUBSCRIBE_SECRET: "change-this-secret"
       # EMAIL_REPLY_UNSUBSCRIBE_EXPIRE_DAYS: "365"
+      # 自定义 Head 注入 – CSP 放行域名（可选）
+      # 在管理后台添加外部脚本后，需将脚本域名加到此处，否则会被 CSP 拦截
+      # HEAD_INJECT_SCRIPT_ORIGINS: "https://stats.example.com,https://www.googletagmanager.com"
+      # 可选：关闭 script-src 'unsafe-inline'（默认保留以兼容旧部署）
+      # CSP_ALLOW_UNSAFE_INLINE_SCRIPT: "false"
       NEXT_CACHE_DIR: "/data/.next-cache"
       MEDIA_ROOT: "/data/uploads"
     volumes:
@@ -177,6 +182,12 @@ NEXT_PUBLIC_APP_URL="http://localhost:6066"
 NEXT_PUBLIC_DEFAULT_LOCALE="zh"
 # 可选：日志级别（fatal/error/warn/info/debug/trace/silent）
 # LOG_LEVEL="info"
+
+# 自定义 Head 注入 – CSP 放行域名
+# 在管理后台「样式 → 自定义 Head 注入」添加外部脚本后，需将脚本域名加到此处，否则浏览器会因 CSP 拦截
+# HEAD_INJECT_SCRIPT_ORIGINS="https://stats.example.com,https://www.googletagmanager.com"
+# 可选：关闭 script-src 'unsafe-inline'（默认保留以兼容旧部署，确认无内联脚本后可设为 false）
+# CSP_ALLOW_UNSAFE_INLINE_SCRIPT="false"
 ```
 
 OAuth 回调填写（GitHub/Google）：

@@ -23,6 +23,9 @@ services:
       # EMAIL_REPLY_DENYLIST: "deny1@example.com,deny2@example.com"
       # EMAIL_UNSUBSCRIBE_SECRET: "change-this-secret"
       # EMAIL_REPLY_UNSUBSCRIBE_EXPIRE_DAYS: "365"
+      # 自定义 Head 注入 – CSP 放行域名（可选）
+      # HEAD_INJECT_SCRIPT_ORIGINS: "https://stats.example.com,https://www.googletagmanager.com"
+      # CSP_ALLOW_UNSAFE_INLINE_SCRIPT: "false"
     volumes:
       - papergrid_data:/data
     restart: unless-stopped
