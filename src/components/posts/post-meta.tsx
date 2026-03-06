@@ -16,20 +16,20 @@ export function PostMeta({
   readingTime,
   isProtected,
 }: PostMetaProps) {
+  const publishedLabel = publishedAt
+    ? formatDistanceToNow(new Date(publishedAt), {
+        addSuffix: true,
+        locale: zhCN,
+      }).replace(/^大约\s*/, '')
+    : ''
+
   const items: Array<{ key: string; content: ReactNode }> = [
     {
       key: 'date',
       content: (
         <>
           <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
-          <time>
-            {publishedAt
-              ? formatDistanceToNow(new Date(publishedAt), {
-                  addSuffix: true,
-                  locale: zhCN,
-                })
-              : ''}
-          </time>
+          <time>{publishedLabel}</time>
         </>
       ),
     },
@@ -42,7 +42,7 @@ export function PostMeta({
       content: (
         <>
           <Clock className="h-3 w-3 sm:h-4 sm:w-4" />
-          <span>{readingTime || 1} 分钟阅读</span>
+          <span>{readingTime || 1} 分钟</span>
         </>
       ),
     },

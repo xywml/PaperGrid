@@ -4,12 +4,11 @@ import type { Metadata } from 'next'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Calendar, Clock, Eye, Tag as TagIcon, ArrowLeft, Lock } from 'lucide-react'
-import { formatDistanceToNow } from 'date-fns'
-import { zhCN } from 'date-fns/locale'
+import { Eye, Tag as TagIcon, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { toCanonicalPath } from '@/lib/seo'
 import { PostCardCover } from '@/components/posts/post-card-cover'
+import { PostMeta } from '@/components/posts/post-meta'
 
 export const revalidate = 60
 
@@ -199,32 +198,12 @@ export default async function TagPage({ params, searchParams }: TagPageProps) {
                     )}
                     <Link href={`/posts/${post.slug}`} className={post.coverImage ? 'relative z-10 block flex-1' : 'block flex-1'}>
                       <CardHeader className="flex h-full flex-col space-y-2 pb-0">
-                        <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-                          <Calendar className="h-4 w-4" />
-                          <time>
-                            {post.publishedAt &&
-                              formatDistanceToNow(
-                                new Date(post.publishedAt),
-                                { addSuffix: true, locale: zhCN }
-                              )}
-                          </time>
-                          <span>•</span>
-                          <span>{post.author.name}</span>
-                          <span>•</span>
-                          <div className="flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            <span>{post.readingTime || 1} 分钟阅读</span>
-                          </div>
-                          {post.isProtected && (
-                            <>
-                              <span>•</span>
-                              <div className="pg-lock-inline flex items-center gap-1">
-                                <Lock className="h-3 w-3" />
-                                <span>加密</span>
-                              </div>
-                            </>
-                          )}
-                        </div>
+                        <PostMeta
+                          publishedAt={post.publishedAt}
+                          authorName={post.author.name}
+                          readingTime={post.readingTime}
+                          isProtected={post.isProtected}
+                        />
                         <CardTitle className="line-clamp-2 hover:text-blue-600 dark:hover:text-blue-400">
                           {post.title}
                         </CardTitle>
