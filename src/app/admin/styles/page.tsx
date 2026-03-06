@@ -3,9 +3,10 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/hooks/use-toast'
-import { Loader2 } from 'lucide-react'
+import { Loader2, ShieldAlert } from 'lucide-react'
 import {
   DEFAULT_PUBLIC_STYLE_PRESET,
   type PublicStylePreset,
@@ -51,6 +52,7 @@ export default function AdminStylesPage() {
     useState<PublicStylePreset>(DEFAULT_PUBLIC_STYLE_PRESET)
   const [mobileReadingBackground, setMobileReadingBackground] =
     useState<MobileReadingBackground>(DEFAULT_MOBILE_READING_BACKGROUND)
+  const [customHeadCode, setCustomHeadCode] = useState('')
   const { toast } = useToast()
 
   const fetchSettings = useCallback(async () => {
@@ -70,6 +72,10 @@ export default function AdminStylesPage() {
         const rawVal = readSettingCompatString(setting, ['style', 'value', 'text'])
           ?? DEFAULT_MOBILE_READING_BACKGROUND
         setMobileReadingBackground(normalizeMobileReadingBackground(rawVal))
+
+        const headCodeSetting = (data.settings || []).find((it: Setting) => it.key === 'site.customHeadCode')
+        const rawHeadCode = readSettingCompatString(headCodeSetting, ['text', 'value']) ?? ''
+        setCustomHeadCode(rawHeadCode)
       } else {
         toast({ title: '错误', description: data.error || '获取样式设置失败', variant: 'destructive' })
       }
@@ -95,6 +101,7 @@ export default function AdminStylesPage() {
           updates: [
             { key: 'ui.publicStylePreset', value: { preset: publicStylePreset } },
             { key: 'ui.mobileReadingBackground', value: { style: mobileReadingBackground } },
+            { key: 'site.customHeadCode', value: { text: customHeadCode } },
           ],
         }),
       })
@@ -171,6 +178,52 @@ export default function AdminStylesPage() {
               <p className="mt-2 text-xs text-muted-foreground">
                 仅影响移动端文章正文区域，在纸格笔记与新粗野风下都可用：
                 方块背景更聚焦阅读，无背景更贴近页面底纹。
+              </p>
+            </div>
+
+            <div className="flex items-center justify-end">
+              <Button onClick={save} disabled={saving || loading}>
+                {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                保存设置
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>自定义 Head 注入</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900 dark:border-amber-900/50 dark:bg-amber-900/20 dark:text-amber-100">
+              <ShieldAlert className="mt-0.5 h-4 w-4 flex-shrink-0" />
+              <div>
+                <p className="font-medium">安全限制</p>
+                <ul className="mt-1 list-disc pl-4 text-xs leading-relaxed text-amber-800/80 dark:text-amber-100/80">
+                  <li>仅允许 <code>&lt;script&gt;</code>、<code>&lt;meta&gt;</code>、<code>&lt;link&gt;</code> 标签</li>
+                  <li>脚本必须通过 <code>src</code> 引入外部 HTTPS 地址，<strong>禁止内联代码</strong></li>
+                  <li>所有 <code>on*</code> 事件属性会被自动移除</li>
+                  <li>需要在环境变量 <code>HEAD_INJECT_SCRIPT_ORIGINS</code> 中添加脚本域名以放行 CSP</li>
+                </ul>
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                注入代码
+              </label>
+              <Textarea
+                value={customHeadCode}
+                onChange={(e) => setCustomHeadCode(e.target.value)}
+                placeholder={'<script defer src="https://example.com/script.js" data-website-id="xxx"></script>'}
+                className="mt-2 font-mono text-sm"
+                rows={5}
+                maxLength={4096}
+                disabled={loading}
+              />
+              <p className="mt-2 text-xs text-muted-foreground">
+                适用于第三方统计（Umami、Google Analytics 等）或验证标签。最多 4096 个字符。
               </p>
             </div>
 

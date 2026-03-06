@@ -8,6 +8,14 @@ import {
   normalizePublicStylePreset,
 } from '@/lib/public-style-preset'
 import { normalizeMobileReadingBackground } from '@/lib/reading-style'
+import { parseHeadInjection } from '@/lib/head-inject'
+
+class SettingsValidationError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'SettingsValidationError'
+  }
+}
 
 type AutoCreateSettingConfig = {
   value: Prisma.JsonValue
@@ -109,6 +117,13 @@ const AUTO_CREATE_SETTINGS: Record<string, AutoCreateSettingConfig> = {
     secret: false,
     description: '公安备案信息',
   },
+  'site.customHeadCode': {
+    value: { text: '' },
+    group: 'site',
+    editable: true,
+    secret: false,
+    description: '自定义 Head 注入代码（仅支持外部 HTTPS 脚本、meta、link 标签）',
+  },
 }
 
 function normalizeSettingUpdateValue(key: string, value: Prisma.InputJsonValue): Prisma.InputJsonValue {
@@ -138,6 +153,20 @@ function normalizeSettingUpdateValue(key: string, value: Prisma.InputJsonValue):
   if (key === 'ui.mobileReadingBackground') {
     const rawStyle = readStringValue(['style', 'value', 'text'])
     return { style: normalizeMobileReadingBackground(rawStyle) }
+  }
+
+  if (key === 'site.customHeadCode') {
+    const rawText = readStringValue(['text', 'value'])
+    const text = typeof rawText === 'string' ? rawText.slice(0, 4096) : ''
+
+    // Validate: non-empty input must keep at least one safe element after parsing.
+    const parsed = parseHeadInjection(text)
+    const hasSafeOutput = parsed.scripts.length > 0 || parsed.metas.length > 0 || parsed.links.length > 0
+    if (text.trim() && !hasSafeOutput) {
+      throw new SettingsValidationError('自定义 Head 注入内容无效：仅支持合法的 script/meta/link 标签，且脚本必须为 HTTPS 外链')
+    }
+
+    return { text }
   }
 
   return value
@@ -252,6 +281,9 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ results })
   } catch (error) {
     console.error('更新设置失败:', error)
+    if (error instanceof SettingsValidationError) {
+      return NextResponse.json({ error: error.message }, { status: 400 })
+    }
     return NextResponse.json({ error: '更新设置失败' }, { status: 500 })
   }
 }

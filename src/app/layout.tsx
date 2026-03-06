@@ -20,6 +20,7 @@ import {
   normalizePublicStylePreset,
 } from '@/lib/public-style-preset'
 import { getSiteUrl } from '@/lib/seo'
+import { CustomHeadScripts } from '@/components/layout/custom-head-scripts'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -87,10 +88,12 @@ export default async function RootLayout({
   children: React.ReactNode
 }>) {
   const currentYear = String(new Date().getUTCFullYear())
-  const [defaultTheme, publicSettings] = await Promise.all([
+  const [defaultTheme, publicSettings, customHeadCodeRaw] = await Promise.all([
     getSetting<string>('site.defaultTheme', 'system'),
     getPublicSettings(),
+    getSetting<string>('site.customHeadCode', ''),
   ])
+  const customHeadCode = customHeadCodeRaw || ''
   const publicStylePresetRaw =
     typeof publicSettings['ui.publicStylePreset'] === 'string'
       ? publicSettings['ui.publicStylePreset']
@@ -103,6 +106,7 @@ export default async function RootLayout({
     <html lang="zh" suppressHydrationWarning>
       <head>
         <link rel="stylesheet" href={publicPresetStylesheet} />
+        <CustomHeadScripts raw={customHeadCode} />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${notoSerif.variable} antialiased font-serif`}

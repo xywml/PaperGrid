@@ -4,6 +4,7 @@ import { prisma } from './prisma'
 const SETTING_VALUE_FIELD_BY_KEY: Record<string, string> = {
   'ui.publicStylePreset': 'preset',
   'ui.mobileReadingBackground': 'style',
+  'site.customHeadCode': 'text',
 }
 
 const COMMON_SETTING_FIELDS = ['value', 'text', 'enabled', 'style', 'preset'] as const
