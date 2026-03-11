@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Check, Copy } from 'lucide-react'
+import { copyTextToClipboard } from '@/lib/copy-to-clipboard'
 
 export function CodeCopyButton() {
   const [copied, setCopied] = useState(false)
@@ -9,8 +10,8 @@ export function CodeCopyButton() {
   return (
     <button
       type="button"
-      className="flex items-center rounded-md p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-      title="复制代码"
+      className="flex items-center rounded-md p-1 transition-colors hover:bg-gray-200 dark:hover:bg-gray-700"
+      title={copied ? '已复制' : '复制代码'}
       onClick={async (e) => {
         const root = e.currentTarget.closest('[data-code-block]')
         const codeEl = root?.querySelector('code') as HTMLElement | null
@@ -18,7 +19,8 @@ export function CodeCopyButton() {
         if (!text) return
 
         try {
-          await navigator.clipboard.writeText(text)
+          const copiedSuccessfully = await copyTextToClipboard(text)
+          if (!copiedSuccessfully) return
           setCopied(true)
           window.setTimeout(() => setCopied(false), 1500)
         } catch {
@@ -34,4 +36,3 @@ export function CodeCopyButton() {
     </button>
   )
 }
-

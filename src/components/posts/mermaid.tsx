@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/ui/dialog'
+import { normalizeMermaidForCompatibility } from '@/lib/mermaid-compat'
 
 interface MermaidProps {
   content: string
@@ -25,13 +26,18 @@ export function Mermaid({ content }: MermaidProps) {
       try {
         const mod = await import('mermaid')
         if (cancelled) return
-        const m = ((mod as unknown as { default?: MermaidLike }).default ?? (mod as unknown as MermaidLike))
+        const m =
+          (mod as unknown as { default?: MermaidLike }).default ?? (mod as unknown as MermaidLike)
         mermaidRef.current = m
         m.initialize({
           startOnLoad: false,
           theme: 'default',
           securityLevel: 'loose',
           fontFamily: 'inherit',
+          flowchart: {
+            htmlLabels: true,
+            useMaxWidth: true,
+          },
         })
         setReady(true)
       } catch (err) {
@@ -52,11 +58,22 @@ export function Mermaid({ content }: MermaidProps) {
 
     if (ref.current && content) {
       let cancelled = false
+      const renderDiagram = async (source: string) => {
+        const id = `mermaid-${Math.random().toString(36).slice(2, 11)}`
+        return mermaid.render(id, source)
+      }
+
       try {
         setHasError(false)
-        const id = `mermaid-${Math.random().toString(36).slice(2, 11)}`
-        mermaid
-          .render(id, content)
+        const normalizedContent = normalizeMermaidForCompatibility(content)
+
+        renderDiagram(content)
+          .catch(async (initialError: unknown) => {
+            if (normalizedContent === content) {
+              throw initialError
+            }
+            return renderDiagram(normalizedContent)
+          })
           .then(({ svg }: { svg: string }) => {
             if (cancelled) return
             setSvgCode(svg)
@@ -81,7 +98,7 @@ export function Mermaid({ content }: MermaidProps) {
 
   if (hasError) {
     return (
-      <pre className="p-4 bg-red-50 text-red-500 rounded-lg overflow-x-auto text-sm">
+      <pre className="overflow-x-auto rounded-lg bg-red-50 p-4 text-sm text-red-500">
         <code>{content}</code>
       </pre>
     )
@@ -90,15 +107,15 @@ export function Mermaid({ content }: MermaidProps) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <div 
-          className="flex justify-center my-8 bg-white p-4 rounded-lg overflow-x-auto grayscale dark:invert cursor-zoom-in hover:opacity-90 transition-opacity" 
-          ref={ref} 
+        <div
+          className="my-8 flex cursor-zoom-in justify-center overflow-x-auto rounded-lg bg-white p-4 grayscale transition-opacity hover:opacity-90 dark:invert"
+          ref={ref}
         />
       </DialogTrigger>
-      <DialogContent className="max-w-[95vw] max-h-[95vh] border-none bg-white p-6 shadow-none sm:max-w-[95vw] overflow-auto">
+      <DialogContent className="max-h-[95vh] max-w-[95vw] overflow-auto border-none bg-white p-6 shadow-none sm:max-w-[95vw]">
         <DialogTitle className="sr-only">Mermaid Diagram</DialogTitle>
-        <div 
-          className="flex items-center justify-center min-h-[50vh] w-full"
+        <div
+          className="flex min-h-[50vh] w-full items-center justify-center"
           dangerouslySetInnerHTML={{ __html: svgCode }}
         />
       </DialogContent>

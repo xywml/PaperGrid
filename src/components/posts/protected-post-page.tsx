@@ -3,7 +3,17 @@
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Calendar, Clock, Eye, User, ArrowLeft, ArrowRight, Edit3, Scissors, Lock } from 'lucide-react'
+import {
+  Calendar,
+  Clock,
+  Eye,
+  User,
+  ArrowLeft,
+  ArrowRight,
+  Edit3,
+  Scissors,
+  Lock,
+} from 'lucide-react'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { TableOfContents, type HeadingItem } from '@/components/posts/table-of-contents'
@@ -89,51 +99,55 @@ export function ProtectedPostPage({
   defaultAvatarUrl,
   mobileReadingBackground,
 }: ProtectedPostPageProps) {
-  const { cardClassName: contentCardClassName, contentClassName: contentPaddingClassName } = getReadingContentClasses(mobileReadingBackground)
+  const { cardClassName: contentCardClassName, contentClassName: contentPaddingClassName } =
+    getReadingContentClasses(mobileReadingBackground)
   const [content, setContent] = useState<string | null>(null)
   const [headings, setHeadings] = useState<HeadingItem[]>([])
   const [unlockToken, setUnlockToken] = useState<string | null>(null)
   const [fetching, setFetching] = useState(false)
   const [loadError, setLoadError] = useState('')
 
-  const loadContent = useCallback(async (token: string) => {
-    setFetching(true)
-    setLoadError('')
-    try {
-      const res = await fetch(`/api/posts/protected?slug=${post.slug}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      const data = await res.json()
-      if (!res.ok) {
-        if (res.status === 401 || res.status === 403) {
-          try {
-            sessionStorage.removeItem(getStorageKey(post.id))
-          } catch {
-            // ignore
+  const loadContent = useCallback(
+    async (token: string) => {
+      setFetching(true)
+      setLoadError('')
+      try {
+        const res = await fetch(`/api/posts/protected?slug=${post.slug}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        const data = await res.json()
+        if (!res.ok) {
+          if (res.status === 401 || res.status === 403) {
+            try {
+              sessionStorage.removeItem(getStorageKey(post.id))
+            } catch {
+              // ignore
+            }
+            setUnlockToken(null)
           }
-          setUnlockToken(null)
+          setContent(null)
+          setLoadError(data.error || '解锁已失效，请重新输入密码')
+          return
         }
-        setContent(null)
-        setLoadError(data.error || '解锁已失效，请重新输入密码')
-        return
+        const nextContent = typeof data.content === 'string' ? data.content : ''
+        setContent(nextContent)
+        const nextHeadings = extractHeadingsFromMarkdown(nextContent, 3).map((heading, index) => ({
+          id: `heading-${index}`,
+          text: heading.text,
+          level: heading.level,
+        }))
+        setHeadings(nextHeadings)
+      } catch (error) {
+        console.error('加载受保护内容失败:', error)
+        setLoadError('加载内容失败，请稍后重试')
+      } finally {
+        setFetching(false)
       }
-      const nextContent = typeof data.content === 'string' ? data.content : ''
-      setContent(nextContent)
-      const nextHeadings = extractHeadingsFromMarkdown(nextContent, 3).map((heading, index) => ({
-        id: `heading-${index}`,
-        text: heading.text,
-        level: heading.level,
-      }))
-      setHeadings(nextHeadings)
-    } catch (error) {
-      console.error('加载受保护内容失败:', error)
-      setLoadError('加载内容失败，请稍后重试')
-    } finally {
-      setFetching(false)
-    }
-  }, [post.id, post.slug])
+    },
+    [post.id, post.slug]
+  )
 
   useEffect(() => {
     try {
@@ -147,16 +161,19 @@ export function ProtectedPostPage({
     }
   }, [post.id, loadContent])
 
-  const handleUnlock = useCallback((payload: { token?: string }) => {
-    if (!payload.token) return
-    try {
-      sessionStorage.setItem(getStorageKey(post.id), payload.token)
-    } catch {
-      // ignore
-    }
-    setUnlockToken(payload.token)
-    loadContent(payload.token)
-  }, [post.id, loadContent])
+  const handleUnlock = useCallback(
+    (payload: { token?: string }) => {
+      if (!payload.token) return
+      try {
+        sessionStorage.setItem(getStorageKey(post.id), payload.token)
+      } catch {
+        // ignore
+      }
+      setUnlockToken(payload.token)
+      loadContent(payload.token)
+    },
+    [post.id, loadContent]
+  )
 
   const canShowContent = content !== null
 
@@ -165,24 +182,25 @@ export function ProtectedPostPage({
       <PostTitleSync title={post.title} />
 
       {/* 文章头部 */}
-      <article className="py-12 sm:py-16 bg-transparent">
+      <article className="bg-transparent py-12 sm:py-16">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           {/* 返回按钮 */}
-          <Link href="/posts" className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white mb-6">
+          <Link
+            href="/posts"
+            className="mb-6 inline-flex items-center text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+          >
             <ArrowLeft className="mr-2 h-4 w-4" />
             返回文章列表
           </Link>
 
           {/* 文章标题 */}
-          <h1 className="text-3xl font-serif font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl md:text-5xl mb-6">
+          <h1 className="mb-6 font-serif text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl md:text-5xl dark:text-white">
             {post.title}
           </h1>
 
           {/* 文章摘要 */}
           {post.excerpt && (
-            <p className="text-xl text-gray-600 dark:text-gray-400 mb-8">
-              {post.excerpt}
-            </p>
+            <p className="mb-8 text-xl text-gray-600 dark:text-gray-400">{post.excerpt}</p>
           )}
 
           {/* 文章元信息 */}
@@ -206,16 +224,14 @@ export function ProtectedPostPage({
                   <ViewCount slug={post.slug} initialCount={post.viewCount?.count || 0} />
                 ) : (
                   <span>{post.viewCount?.count || 0}</span>
-                )}{" "}
+                )}{' '}
                 次阅读
               </span>
             </div>
             {post.updatedAtLabel && (
-              <div className="pg-post-updated-meta flex items-center gap-2 text-primary font-medium">
+              <div className="pg-post-updated-meta text-primary flex items-center gap-2 font-medium">
                 <Edit3 className="h-4 w-4" />
-                <span>
-                  最后编辑于 {post.updatedAtLabel}
-                </span>
+                <span>最后编辑于 {post.updatedAtLabel}</span>
               </div>
             )}
             <div className="pg-lock-indicator text-xs">
@@ -225,7 +241,7 @@ export function ProtectedPostPage({
           </div>
 
           {/* 分类和标签 */}
-          <div className="flex flex-wrap items-center gap-2 mt-4">
+          <div className="mt-4 flex flex-wrap items-center gap-2">
             {post.category && (
               <Link href={`/posts?category=${post.category.slug}`}>
                 <Badge variant="secondary" className="pg-public-badge-secondary cursor-pointer">
@@ -245,7 +261,7 @@ export function ProtectedPostPage({
       </article>
 
       {/* 分割线与装饰 */}
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 mb-6">
+      <div className="mx-auto mb-6 max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="relative">
           <div className="absolute inset-0 flex items-center" aria-hidden="true">
             <div className="pg-post-divider-line w-full border-t border-dashed border-gray-300 dark:border-gray-700"></div>
@@ -261,9 +277,9 @@ export function ProtectedPostPage({
       {/* 文章内容 */}
       <section className="py-12">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
             {/* 主要内容 */}
-            <div className="lg:col-span-3">
+            <div className="min-w-0 lg:col-span-3">
               {/* 封面图 */}
               {post.coverImage && (
                 <div className="mb-8 overflow-hidden rounded-lg">
@@ -290,8 +306,8 @@ export function ProtectedPostPage({
               )}
 
               {/* MDX内容 / 密码门禁 */}
-              <Card className={contentCardClassName}>
-                <CardContent className={contentPaddingClassName}>
+              <Card className={`min-w-0 ${contentCardClassName}`}>
+                <CardContent className={`min-w-0 ${contentPaddingClassName}`}>
                   {canShowContent ? (
                     <MDXContentClient content={content} />
                   ) : (
@@ -303,12 +319,12 @@ export function ProtectedPostPage({
                         onUnlock={handleUnlock}
                       />
                       {fetching && (
-                        <p className="mt-4 text-sm text-gray-500 dark:text-gray-400 text-center">
+                        <p className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
                           正在加载内容...
                         </p>
                       )}
                       {loadError && (
-                        <p className="mt-4 text-sm text-red-600 dark:text-red-400 text-center">
+                        <p className="mt-4 text-center text-sm text-red-600 dark:text-red-400">
                           {loadError}
                         </p>
                       )}
@@ -327,8 +343,8 @@ export function ProtectedPostPage({
                         className="group flex items-start gap-3 text-left"
                       >
                         <div className="flex-1">
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">上一篇</p>
-                          <p className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 line-clamp-2">
+                          <p className="mb-1 text-xs text-gray-500 dark:text-gray-400">上一篇</p>
+                          <p className="line-clamp-2 text-sm font-medium text-gray-900 group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400">
                             {prevPost.title}
                           </p>
                         </div>
@@ -344,8 +360,8 @@ export function ProtectedPostPage({
                       >
                         <ArrowRight className="h-5 w-5 text-gray-400 group-hover:text-blue-600" />
                         <div className="flex-1">
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">下一篇</p>
-                          <p className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 line-clamp-2">
+                          <p className="mb-1 text-xs text-gray-500 dark:text-gray-400">下一篇</p>
+                          <p className="line-clamp-2 text-sm font-medium text-gray-900 group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400">
                             {nextPost.title}
                           </p>
                         </div>
@@ -385,7 +401,7 @@ export function ProtectedPostPage({
                     <div className="flex items-center gap-3">
                       <Avatar className="h-12 w-12 border-2 border-gray-900 dark:border-white">
                         <AvatarImage src={defaultAvatarUrl || post.author.image || undefined} />
-                        <AvatarFallback className="bg-gray-50 dark:bg-gray-800 text-lg font-serif font-bold text-gray-900 dark:text-white">
+                        <AvatarFallback className="bg-gray-50 font-serif text-lg font-bold text-gray-900 dark:bg-gray-800 dark:text-white">
                           {(ownerName || post.author.name || '千叶').charAt(0).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
@@ -411,11 +427,8 @@ export function ProtectedPostPage({
                       <ul className="space-y-3">
                         {relatedPosts.map((related) => (
                           <li key={related.id}>
-                            <Link
-                              href={`/posts/${related.slug}`}
-                              className="group block"
-                            >
-                              <p className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 line-clamp-2">
+                            <Link href={`/posts/${related.slug}`} className="group block">
+                              <p className="line-clamp-2 text-sm font-medium text-gray-900 group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400">
                                 {related.title}
                               </p>
                               <div className="mt-1 flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">

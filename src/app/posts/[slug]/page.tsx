@@ -3,10 +3,18 @@ import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Separator } from '@/components/ui/separator'
 import { MDXContent } from '@/components/posts/mdx-content'
-import { Calendar, Clock, Eye, User, ArrowLeft, ArrowRight, Edit3, Scissors, Lock } from 'lucide-react'
+import {
+  Calendar,
+  Clock,
+  Eye,
+  User,
+  ArrowLeft,
+  ArrowRight,
+  Edit3,
+  Scissors,
+  Lock,
+} from 'lucide-react'
 import { formatDistanceToNow, format } from 'date-fns'
 import { zhCN } from 'date-fns/locale'
 import Link from 'next/link'
@@ -34,7 +42,14 @@ interface PostPageProps {
 export default async function PostPage({ params }: PostPageProps) {
   const { slug } = await params
 
-  const [commentsEnabledRaw, allowGuest, ownerNameRaw, defaultAvatarUrl, ownerRoleRaw, mobileReadingBackgroundRaw] = await Promise.all([
+  const [
+    commentsEnabledRaw,
+    allowGuest,
+    ownerNameRaw,
+    defaultAvatarUrl,
+    ownerRoleRaw,
+    mobileReadingBackgroundRaw,
+  ] = await Promise.all([
     getSetting<boolean>('comments.enabled', true),
     getSetting<boolean>('comments.allowGuest', false),
     getSetting<string>('site.ownerName', '千叶'),
@@ -46,7 +61,8 @@ export default async function PostPage({ params }: PostPageProps) {
   const ownerName = ownerNameRaw || '千叶'
   const ownerRole = ownerRoleRaw || '全栈开发者'
   const mobileReadingBackground = normalizeMobileReadingBackground(mobileReadingBackgroundRaw)
-  const { cardClassName: contentCardClassName, contentClassName: contentPaddingClassName } = getReadingContentClasses(mobileReadingBackground)
+  const { cardClassName: contentCardClassName, contentClassName: contentPaddingClassName } =
+    getReadingContentClasses(mobileReadingBackground)
 
   const formatRelativeTimeLabel = (value: string | Date | null | undefined) => {
     if (!value) return ''
@@ -58,7 +74,7 @@ export default async function PostPage({ params }: PostPageProps) {
 
   const formatUpdatedAtLabel = (
     updatedAt: string | Date | null | undefined,
-    publishedAt: string | Date | null | undefined,
+    publishedAt: string | Date | null | undefined
   ) => {
     if (!updatedAt || !publishedAt) return null
     if (new Date(updatedAt).getTime() - new Date(publishedAt).getTime() <= 60000) return null
@@ -184,7 +200,8 @@ export default async function PostPage({ params }: PostPageProps) {
       relatedPostsPromise,
     ])
 
-    const { content: _content, ...safePost } = basePost
+    const { content, ...safePost } = basePost
+    void content
     const safePostWithLabels = {
       ...safePost,
       publishedLabel: formatRelativeTimeLabel(safePost.publishedAt),
@@ -289,24 +306,25 @@ export default async function PostPage({ params }: PostPageProps) {
     <div className="min-h-screen">
       <PostTitleSync title={post.title} />
       {/* 文章头部 */}
-      <article className="py-12 sm:py-16 bg-transparent">
+      <article className="bg-transparent py-12 sm:py-16">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           {/* 返回按钮 */}
-          <Link href="/posts" className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white mb-6">
+          <Link
+            href="/posts"
+            className="mb-6 inline-flex items-center text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+          >
             <ArrowLeft className="mr-2 h-4 w-4" />
             返回文章列表
           </Link>
 
           {/* 文章标题 */}
-          <h1 className="text-3xl font-serif font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl md:text-5xl mb-6">
+          <h1 className="mb-6 font-serif text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl md:text-5xl dark:text-white">
             {post.title}
           </h1>
 
           {/* 文章摘要 */}
           {post.excerpt && (
-            <p className="text-xl text-gray-600 dark:text-gray-400 mb-8">
-              {post.excerpt}
-            </p>
+            <p className="mb-8 text-xl text-gray-600 dark:text-gray-400">{post.excerpt}</p>
           )}
 
           {/* 文章元信息 */}
@@ -335,18 +353,18 @@ export default async function PostPage({ params }: PostPageProps) {
                 <ViewCount slug={slug} initialCount={post.viewCount?.count || 0} /> 次阅读
               </span>
             </div>
-            {post.updatedAt && post.publishedAt && new Date(post.updatedAt).getTime() - new Date(post.publishedAt).getTime() > 60000 && (
-              <div className="pg-post-updated-meta flex items-center gap-2 text-primary font-medium">
-                <Edit3 className="h-4 w-4" />
-                <span>
-                  最后编辑于 {format(new Date(post.updatedAt), 'yyyy-MM-dd HH:mm')}
-                </span>
-              </div>
-            )}
+            {post.updatedAt &&
+              post.publishedAt &&
+              new Date(post.updatedAt).getTime() - new Date(post.publishedAt).getTime() > 60000 && (
+                <div className="pg-post-updated-meta text-primary flex items-center gap-2 font-medium">
+                  <Edit3 className="h-4 w-4" />
+                  <span>最后编辑于 {format(new Date(post.updatedAt), 'yyyy-MM-dd HH:mm')}</span>
+                </div>
+              )}
           </div>
 
           {/* 分类和标签 */}
-          <div className="flex flex-wrap items-center gap-2 mt-4">
+          <div className="mt-4 flex flex-wrap items-center gap-2">
             {post.category && (
               <Link href={`/posts?category=${post.category.slug}`}>
                 <Badge variant="secondary" className="pg-public-badge-secondary cursor-pointer">
@@ -365,7 +383,7 @@ export default async function PostPage({ params }: PostPageProps) {
         </div>
       </article>
       {/* 分割线与装饰 */}
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 mb-6">
+      <div className="mx-auto mb-6 max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="relative">
           <div className="absolute inset-0 flex items-center" aria-hidden="true">
             <div className="pg-post-divider-line w-full border-t border-dashed border-gray-300 dark:border-gray-700"></div>
@@ -380,9 +398,9 @@ export default async function PostPage({ params }: PostPageProps) {
       {/* 文章内容 */}
       <section className="py-12">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
             {/* 主要内容 */}
-            <div className="lg:col-span-3">
+            <div className="min-w-0 lg:col-span-3">
               {/* 封面图 */}
               {post.coverImage && (
                 <div className="mb-8 overflow-hidden rounded-lg">
@@ -409,8 +427,8 @@ export default async function PostPage({ params }: PostPageProps) {
               )}
 
               {/* MDX内容 */}
-              <Card className={contentCardClassName}>
-                <CardContent className={contentPaddingClassName}>
+              <Card className={`min-w-0 ${contentCardClassName}`}>
+                <CardContent className={`min-w-0 ${contentPaddingClassName}`}>
                   <MDXContent content={post.content} />
                 </CardContent>
               </Card>
@@ -425,8 +443,8 @@ export default async function PostPage({ params }: PostPageProps) {
                         className="group flex items-start gap-3 text-left"
                       >
                         <div className="flex-1">
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">上一篇</p>
-                          <p className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 line-clamp-2">
+                          <p className="mb-1 text-xs text-gray-500 dark:text-gray-400">上一篇</p>
+                          <p className="line-clamp-2 text-sm font-medium text-gray-900 group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400">
                             {prevPost.title}
                           </p>
                         </div>
@@ -442,8 +460,8 @@ export default async function PostPage({ params }: PostPageProps) {
                       >
                         <ArrowRight className="h-5 w-5 text-gray-400 group-hover:text-blue-600" />
                         <div className="flex-1">
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">下一篇</p>
-                          <p className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 line-clamp-2">
+                          <p className="mb-1 text-xs text-gray-500 dark:text-gray-400">下一篇</p>
+                          <p className="line-clamp-2 text-sm font-medium text-gray-900 group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400">
                             {nextPost.title}
                           </p>
                         </div>
@@ -458,7 +476,11 @@ export default async function PostPage({ params }: PostPageProps) {
               {/* 评论区 */}
               {commentsEnabled && (
                 <div className="mt-8">
-                  <CommentSection postSlug={slug} allowGuest={!!allowGuest} defaultAvatarUrl={defaultAvatarUrl || undefined} />
+                  <CommentSection
+                    postSlug={slug}
+                    allowGuest={!!allowGuest}
+                    defaultAvatarUrl={defaultAvatarUrl || undefined}
+                  />
                 </div>
               )}
             </div>
@@ -478,7 +500,7 @@ export default async function PostPage({ params }: PostPageProps) {
                     <div className="flex items-center gap-3">
                       <Avatar className="h-12 w-12 border-2 border-gray-900 dark:border-white">
                         <AvatarImage src={defaultAvatarUrl || post.author.image || undefined} />
-                        <AvatarFallback className="bg-gray-50 dark:bg-gray-800 text-lg font-serif font-bold text-gray-900 dark:text-white">
+                        <AvatarFallback className="bg-gray-50 font-serif text-lg font-bold text-gray-900 dark:bg-gray-800 dark:text-white">
                           {(ownerName || post.author.name || '千叶').charAt(0).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
@@ -504,11 +526,8 @@ export default async function PostPage({ params }: PostPageProps) {
                       <ul className="space-y-3">
                         {relatedPosts.map((related) => (
                           <li key={related.id}>
-                            <Link
-                              href={`/posts/${related.slug}`}
-                              className="group block"
-                            >
-                              <p className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 line-clamp-2">
+                            <Link href={`/posts/${related.slug}`} className="group block">
+                              <p className="line-clamp-2 text-sm font-medium text-gray-900 group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400">
                                 {related.title}
                               </p>
                               <div className="mt-1 flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
