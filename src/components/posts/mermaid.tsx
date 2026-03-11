@@ -33,6 +33,7 @@ export function Mermaid({ content }: MermaidProps) {
           startOnLoad: false,
           theme: 'default',
           securityLevel: 'loose',
+          suppressErrorRendering: true,
           fontFamily: 'inherit',
           flowchart: {
             htmlLabels: true,
@@ -65,6 +66,10 @@ export function Mermaid({ content }: MermaidProps) {
 
       try {
         setHasError(false)
+        setSvgCode('')
+        if (ref.current) {
+          ref.current.innerHTML = ''
+        }
         const normalizedContent = normalizeMermaidForCompatibility(content)
 
         renderDiagram(content)
@@ -83,10 +88,12 @@ export function Mermaid({ content }: MermaidProps) {
           })
           .catch((err: unknown) => {
             console.error('Mermaid render error:', err)
+            setSvgCode('')
             setHasError(true)
           })
       } catch (err) {
         console.error('Mermaid initialization error:', err)
+        setSvgCode('')
         setHasError(true)
       }
 
@@ -97,11 +104,7 @@ export function Mermaid({ content }: MermaidProps) {
   }, [content, ready])
 
   if (hasError) {
-    return (
-      <pre className="overflow-x-auto rounded-lg bg-red-50 p-4 text-sm text-red-500">
-        <code>{content}</code>
-      </pre>
-    )
+    return <div ref={ref} aria-hidden="true" className="hidden" />
   }
 
   return (

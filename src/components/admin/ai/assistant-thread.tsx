@@ -16,7 +16,7 @@ import {
   type ToolCallMessagePartComponent,
   useLocalRuntime,
 } from '@assistant-ui/react'
-import { StreamdownTextPrimitive } from '@assistant-ui/react-streamdown'
+import { StreamdownTextPrimitive, type MermaidErrorComponentProps } from '@assistant-ui/react-streamdown'
 import { code as streamdownCode } from '@streamdown/code'
 import { math as streamdownMath } from '@streamdown/math'
 import { mermaid as streamdownMermaid } from '@streamdown/mermaid'
@@ -57,6 +57,7 @@ const STREAMDOWN_PLUGINS = {
   mermaid: streamdownMermaid,
 } as const
 const SmoothStreamdownTextPrimitive = INTERNAL.withSmoothContextProvider(StreamdownTextPrimitive)
+const HiddenMermaidError = (_props: MermaidErrorComponentProps) => null
 
 function extractTextFromMessageContent(content: unknown) {
   if (typeof content === 'string') {
@@ -239,6 +240,7 @@ const MarkdownTextPart: TextMessagePartComponent = () => {
     <SmoothStreamdownTextPrimitive
       plugins={STREAMDOWN_PLUGINS}
       shikiTheme={['github-light', 'github-dark']}
+      mermaid={{ errorComponent: HiddenMermaidError }}
       controls={{
         code: true,
         table: true,
