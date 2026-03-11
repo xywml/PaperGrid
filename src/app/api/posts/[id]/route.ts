@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server'
 import { PostStatus } from '@prisma/client'
 import readingTime from 'reading-time'
 import bcrypt from 'bcryptjs'
+import { revalidatePublicPostPaths } from '@/lib/post-revalidate'
 
 // GET /api/posts/[id] - 获取单个文章
 export async function GET(
@@ -256,6 +257,10 @@ export async function PATCH(
       },
     })
 
+    if (existingPost.status === PostStatus.PUBLISHED || post.status === PostStatus.PUBLISHED) {
+      revalidatePublicPostPaths(post.slug)
+    }
+
     return NextResponse.json({ post })
   } catch (error) {
     console.error('更新文章失败:', error)
@@ -292,6 +297,10 @@ export async function DELETE(
     await prisma.post.delete({
       where: { id },
     })
+
+    if (existingPost.status === PostStatus.PUBLISHED) {
+      revalidatePublicPostPaths(existingPost.slug)
+    }
 
     return NextResponse.json({ message: '删除成功' })
   } catch (error) {

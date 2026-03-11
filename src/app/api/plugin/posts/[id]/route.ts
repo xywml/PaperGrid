@@ -4,6 +4,7 @@ import { PostStatus } from '@prisma/client'
 import { requireApiKey } from '@/lib/api-keys'
 import readingTime from 'reading-time'
 import bcrypt from 'bcryptjs'
+import { revalidatePublicPostPaths } from '@/lib/post-revalidate'
 
 const ALLOWED_POST_STATUS = new Set<PostStatus>([
   PostStatus.DRAFT,
@@ -419,6 +420,10 @@ export async function PATCH(
       },
     })
 
+    if (existingPost.status === PostStatus.PUBLISHED || post.status === PostStatus.PUBLISHED) {
+      revalidatePublicPostPaths(post.slug)
+    }
+
     return NextResponse.json({ post }, { headers: authResult.headers })
   } catch (error) {
     console.error('插件更新文章失败:', error)
@@ -448,6 +453,10 @@ export async function DELETE(
     }
 
     await prisma.post.delete({ where: { id } })
+
+    if (existingPost.status === PostStatus.PUBLISHED) {
+      revalidatePublicPostPaths(existingPost.slug)
+    }
 
     return NextResponse.json({ message: '删除成功' }, { headers: authResult.headers })
   } catch (error) {

@@ -1,4 +1,3 @@
-import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
@@ -30,13 +29,26 @@ import { extractHeadingsFromMarkdown } from '@/lib/markdown'
 import { ProtectedPostPage } from '@/components/posts/protected-post-page'
 import { isInternalImageUrl } from '@/lib/image-url'
 import { toCanonicalPath } from '@/lib/seo'
+import {
+  getPublicPostPageData,
+  getPublishedPostBySlug,
+  getPublishedPostSlugs,
+} from '@/lib/public-post-page'
 
 export const revalidate = 60
+export const dynamicParams = true
 
 interface PostPageProps {
   params: Promise<{
     slug: string
   }>
+}
+
+export async function generateStaticParams() {
+  const posts = await getPublishedPostSlugs()
+  return posts.map((post) => ({
+    slug: post.slug,
+  }))
 }
 
 export default async function PostPage({ params }: PostPageProps) {
@@ -81,125 +93,15 @@ export default async function PostPage({ params }: PostPageProps) {
     return format(new Date(updatedAt), 'yyyy-MM-dd HH:mm')
   }
 
-  // 获取文章详情
-  const basePost = await prisma.post.findFirst({
-    where: {
-      slug,
-      status: 'PUBLISHED',
-    },
-    select: {
-      id: true,
-      title: true,
-      slug: true,
-      content: true,
-      excerpt: true,
-      coverImage: true,
-      status: true,
-      publishedAt: true,
-      updatedAt: true,
-      readingTime: true,
-      categoryId: true,
-      isProtected: true,
-      author: {
-        select: {
-          name: true,
-          image: true,
-        },
-      },
-      category: {
-        select: {
-          name: true,
-          slug: true,
-        },
-      },
-      postTags: {
-        select: {
-          tag: {
-            select: {
-              id: true,
-              name: true,
-              slug: true,
-            },
-          },
-        },
-      },
-      viewCount: {
-        select: {
-          count: true,
-        },
-      },
-    },
-  })
+  const postData = await getPublicPostPageData(slug)
 
-  if (!basePost) {
+  if (!postData) {
     notFound()
   }
 
+  const { post: basePost, prevPost, nextPost, relatedPosts } = postData
+
   if (basePost.isProtected) {
-    const relatedPostsPromise = basePost.category
-      ? prisma.post.findMany({
-          where: {
-            status: 'PUBLISHED',
-            categoryId: basePost.categoryId,
-            id: {
-              not: basePost.id,
-            },
-          },
-          take: 4,
-          orderBy: {
-            publishedAt: 'desc',
-          },
-          select: {
-            id: true,
-            title: true,
-            slug: true,
-            excerpt: true,
-            coverImage: true,
-            publishedAt: true,
-            isProtected: true,
-            viewCount: {
-              select: { count: true },
-            },
-          },
-        })
-      : Promise.resolve([])
-
-    const [prevPost, nextPost, relatedPosts] = await Promise.all([
-      prisma.post.findFirst({
-        where: {
-          status: 'PUBLISHED',
-          publishedAt: {
-            lt: basePost.publishedAt!,
-          },
-        },
-        orderBy: {
-          publishedAt: 'desc',
-        },
-        select: {
-          id: true,
-          title: true,
-          slug: true,
-        },
-      }),
-      prisma.post.findFirst({
-        where: {
-          status: 'PUBLISHED',
-          publishedAt: {
-            gt: basePost.publishedAt!,
-          },
-        },
-        orderBy: {
-          publishedAt: 'asc',
-        },
-        select: {
-          id: true,
-          title: true,
-          slug: true,
-        },
-      }),
-      relatedPostsPromise,
-    ])
-
     const { content, ...safePost } = basePost
     void content
     const safePostWithLabels = {
@@ -228,71 +130,6 @@ export default async function PostPage({ params }: PostPageProps) {
   }
 
   const post = { ...basePost, content: basePost.content || '' }
-
-  const relatedPostsPromise = post.category
-    ? prisma.post.findMany({
-        where: {
-          status: 'PUBLISHED',
-          categoryId: post.categoryId,
-          id: {
-            not: post.id,
-          },
-        },
-        take: 4,
-        orderBy: {
-          publishedAt: 'desc',
-        },
-        select: {
-          id: true,
-          title: true,
-          slug: true,
-          excerpt: true,
-          coverImage: true,
-          publishedAt: true,
-          isProtected: true,
-          viewCount: {
-            select: { count: true },
-          },
-        },
-      })
-    : Promise.resolve([])
-
-  // 获取上一篇和下一篇文章 + 同分类相关文章
-  const [prevPost, nextPost, relatedPosts] = await Promise.all([
-    prisma.post.findFirst({
-      where: {
-        status: 'PUBLISHED',
-        publishedAt: {
-          lt: post.publishedAt!,
-        },
-      },
-      orderBy: {
-        publishedAt: 'desc',
-      },
-      select: {
-        id: true,
-        title: true,
-        slug: true,
-      },
-    }),
-    prisma.post.findFirst({
-      where: {
-        status: 'PUBLISHED',
-        publishedAt: {
-          gt: post.publishedAt!,
-        },
-      },
-      orderBy: {
-        publishedAt: 'asc',
-      },
-      select: {
-        id: true,
-        title: true,
-        slug: true,
-      },
-    }),
-    relatedPostsPromise,
-  ])
 
   const headings: HeadingItem[] = extractHeadingsFromMarkdown(post.content, 3).map(
     (heading, index) => ({
@@ -571,17 +408,7 @@ export default async function PostPage({ params }: PostPageProps) {
 export async function generateMetadata({ params }: PostPageProps): Promise<Metadata> {
   const { slug } = await params
 
-  const post = await prisma.post.findFirst({
-    where: {
-      slug,
-      status: 'PUBLISHED',
-    },
-    select: {
-      title: true,
-      excerpt: true,
-      coverImage: true,
-    },
-  })
+  const post = await getPublishedPostBySlug(slug)
 
   if (!post) {
     return {

@@ -5,6 +5,7 @@ import { PostStatus, type Prisma } from '@prisma/client'
 import slugify from 'slugify'
 import readingTime from 'reading-time'
 import bcrypt from 'bcryptjs'
+import { revalidatePublicPostPaths } from '@/lib/post-revalidate'
 
 // GET /api/posts - 获取文章列表
 export async function GET(req: Request) {
@@ -259,6 +260,8 @@ export async function POST(req: Request) {
         },
       },
     })
+
+    revalidatePublicPostPaths(post.status === PostStatus.PUBLISHED ? post.slug : undefined)
 
     return NextResponse.json({ post }, { status: 201 })
   } catch (error) {

@@ -5,6 +5,7 @@ import slugify from 'slugify'
 import { requireApiKey } from '@/lib/api-keys'
 import readingTime from 'reading-time'
 import bcrypt from 'bcryptjs'
+import { revalidatePublicPostPaths } from '@/lib/post-revalidate'
 
 const ALLOWED_POST_STATUS = new Set<PostStatus>([
   PostStatus.DRAFT,
@@ -453,6 +454,8 @@ export async function POST(req: Request) {
         },
       },
     })
+
+    revalidatePublicPostPaths(post.status === PostStatus.PUBLISHED ? post.slug : undefined)
 
     return NextResponse.json({ post }, { status: 201, headers: authResult.headers })
   } catch (error) {
