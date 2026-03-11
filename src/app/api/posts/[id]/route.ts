@@ -147,6 +147,9 @@ export async function PATCH(
       if (parsedPublishedAt && Number.isNaN(parsedPublishedAt.getTime())) {
         return NextResponse.json({ error: '发布时间格式错误' }, { status: 400 })
       }
+      if (parsedPublishedAt && parsedPublishedAt.getTime() > Date.now()) {
+        return NextResponse.json({ error: '发布时间不能大于当前时间' }, { status: 400 })
+      }
     }
 
     const nextIsProtected = typeof isProtected === 'boolean' ? isProtected : existingPost.isProtected

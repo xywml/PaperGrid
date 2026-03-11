@@ -183,6 +183,9 @@ export async function POST(req: Request) {
     if (parsedPublishedAt && Number.isNaN(parsedPublishedAt.getTime())) {
       return NextResponse.json({ error: '发布时间格式错误' }, { status: 400 })
     }
+    if (parsedPublishedAt && parsedPublishedAt.getTime() > Date.now()) {
+      return NextResponse.json({ error: '发布时间不能大于当前时间' }, { status: 400 })
+    }
 
     const protectPost = isProtected === true
     let passwordHash: string | null = null

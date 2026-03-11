@@ -106,6 +106,13 @@ function PostEditorContent() {
     return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
   }
 
+  const toIsoDateTime = (value: string) => {
+    if (!value) return ''
+    const d = new Date(value)
+    if (Number.isNaN(d.getTime())) return value
+    return d.toISOString()
+  }
+
   useEffect(() => {
     const created = searchParams.get('created')
     const status = (searchParams.get('status') as PostStatusValue | null) ?? 'DRAFT'
@@ -304,6 +311,8 @@ function PostEditorContent() {
       const method = postId ? 'PATCH' : 'POST'
       const payload: Record<string, unknown> = {
         ...formData,
+        createdAt: toIsoDateTime(formData.createdAt),
+        publishedAt: toIsoDateTime(formData.publishedAt),
         status: targetStatus,
         tags: selectedTagIds,
       }
@@ -375,6 +384,7 @@ function PostEditorContent() {
 
   const publishStatus = formData.status === 'ARCHIVED' ? 'ARCHIVED' : 'PUBLISHED'
   const submitDisabled = saving || isUploadingImages
+  const publishDateMax = toInputDateTime(new Date())
 
   if (loading) {
     return (
@@ -506,6 +516,7 @@ function PostEditorContent() {
                   type="datetime-local"
                   value={formData.publishedAt}
                   onChange={(e) => setFormData({ ...formData, publishedAt: e.target.value })}
+                  max={publishDateMax}
                   disabled={saving}
                 />
                 <p className="text-muted-foreground text-xs">
