@@ -121,6 +121,7 @@ export async function PATCH(
       categoryId,
       tags,
       createdAt,
+      publishedAt,
       isProtected,
       password,
     } = body
@@ -134,6 +135,18 @@ export async function PATCH(
         : null
     if (parsedCreatedAt && Number.isNaN(parsedCreatedAt.getTime())) {
       return NextResponse.json({ error: '创建时间格式错误' }, { status: 400 })
+    }
+
+    const hasPublishedAtField = Object.prototype.hasOwnProperty.call(body, 'publishedAt')
+    let parsedPublishedAt: Date | null | undefined = undefined
+    if (hasPublishedAtField) {
+      parsedPublishedAt =
+        typeof publishedAt === 'string' && publishedAt.trim().length > 0
+          ? new Date(publishedAt)
+          : null
+      if (parsedPublishedAt && Number.isNaN(parsedPublishedAt.getTime())) {
+        return NextResponse.json({ error: '发布时间格式错误' }, { status: 400 })
+      }
     }
 
     const nextIsProtected = typeof isProtected === 'boolean' ? isProtected : existingPost.isProtected
@@ -162,6 +175,25 @@ export async function PATCH(
       }
     }
 
+    const nextStatus = (status as PostStatus | undefined) ?? existingPost.status
+    let nextPublishedAt = existingPost.publishedAt
+
+    if (parsedPublishedAt !== undefined) {
+      if (parsedPublishedAt) {
+        nextPublishedAt = parsedPublishedAt
+      } else {
+        nextPublishedAt =
+          nextStatus === PostStatus.PUBLISHED
+            ? existingPost.publishedAt ?? new Date()
+            : null
+      }
+    } else if (status !== undefined) {
+      nextPublishedAt =
+        nextStatus === PostStatus.PUBLISHED && !existingPost.publishedAt
+          ? new Date()
+          : existingPost.publishedAt
+    }
+
     // 更新文章
     const post = await prisma.post.update({
       where: { id },
@@ -173,14 +205,10 @@ export async function PATCH(
         }),
         ...(excerpt !== undefined && { excerpt }),
         ...(coverImage !== undefined && { coverImage }),
-        ...(status !== undefined && {
-          status,
-          publishedAt: status === PostStatus.PUBLISHED && !existingPost.publishedAt
-            ? new Date()
-            : existingPost.publishedAt,
-        }),
+        ...(status !== undefined && { status }),
         ...(locale !== undefined && { locale }),
         ...(parsedCreatedAt ? { createdAt: parsedCreatedAt } : {}),
+        ...(hasPublishedAtField || status !== undefined ? { publishedAt: nextPublishedAt } : {}),
         ...(normalizedCategoryId !== undefined && { categoryId: normalizedCategoryId }),
         ...(typeof isProtected === 'boolean' && { isProtected }),
         ...(passwordHashUpdate !== undefined && { passwordHash: passwordHashUpdate }),

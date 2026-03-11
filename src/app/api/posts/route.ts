@@ -130,6 +130,7 @@ export async function POST(req: Request) {
       categoryId,
       tags,
       createdAt,
+      publishedAt,
       isProtected,
       password,
     } = body
@@ -175,6 +176,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: '创建时间格式错误' }, { status: 400 })
     }
 
+    const parsedPublishedAt =
+      typeof publishedAt === 'string' && publishedAt.trim().length > 0
+        ? new Date(publishedAt)
+        : null
+    if (parsedPublishedAt && Number.isNaN(parsedPublishedAt.getTime())) {
+      return NextResponse.json({ error: '发布时间格式错误' }, { status: 400 })
+    }
+
     const protectPost = isProtected === true
     let passwordHash: string | null = null
     if (protectPost) {
@@ -188,6 +197,10 @@ export async function POST(req: Request) {
       passwordHash = await bcrypt.hash(rawPassword, 10)
     }
 
+    const nextStatus = status || PostStatus.DRAFT
+    const resolvedPublishedAt =
+      parsedPublishedAt ?? (nextStatus === PostStatus.PUBLISHED ? new Date() : null)
+
     // 创建文章
     const post = await prisma.post.create({
       data: {
@@ -197,14 +210,14 @@ export async function POST(req: Request) {
         readingTime: Math.max(1, Math.round(readingTime(String(content)).minutes)),
         excerpt,
         coverImage,
-        status: status || PostStatus.DRAFT,
+        status: nextStatus,
         locale: locale || 'zh',
         authorId: session.user.id,
         categoryId: resolvedCategoryId,
         isProtected: protectPost,
         passwordHash,
         ...(parsedCreatedAt ? { createdAt: parsedCreatedAt } : {}),
-        publishedAt: status === PostStatus.PUBLISHED ? new Date() : null,
+        publishedAt: resolvedPublishedAt,
         postTags: tags
           ? {
               create: tags.map((tagId: string) => ({

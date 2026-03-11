@@ -83,6 +83,7 @@ function PostEditorContent() {
     locale: 'zh',
     categoryId: '',
     createdAt: '',
+    publishedAt: '',
     isProtected: false,
     password: '',
   })
@@ -185,6 +186,7 @@ function PostEditorContent() {
               locale: data.post.locale,
               categoryId: data.post.categoryId || '',
               createdAt: toInputDateTime(data.post.createdAt),
+              publishedAt: toInputDateTime(data.post.publishedAt),
               isProtected: Boolean(data.post.isProtected),
               password: '',
             })
@@ -346,6 +348,7 @@ function PostEditorContent() {
           setFormData((prev) => ({
             ...prev,
             status: publish ? savedStatus : prev.status,
+            publishedAt: toInputDateTime(data.post.publishedAt),
           }))
         }
         setHasPassword(formData.isProtected)
@@ -484,15 +487,31 @@ function PostEditorContent() {
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="createdAt">创建时间</Label>
-              <Input
-                id="createdAt"
-                type="datetime-local"
-                value={formData.createdAt}
-                onChange={(e) => setFormData({ ...formData, createdAt: e.target.value })}
-                disabled={saving}
-              />
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="createdAt">创建时间</Label>
+                <Input
+                  id="createdAt"
+                  type="datetime-local"
+                  value={formData.createdAt}
+                  onChange={(e) => setFormData({ ...formData, createdAt: e.target.value })}
+                  disabled={saving}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="publishedAt">发布时间</Label>
+                <Input
+                  id="publishedAt"
+                  type="datetime-local"
+                  value={formData.publishedAt}
+                  onChange={(e) => setFormData({ ...formData, publishedAt: e.target.value })}
+                  disabled={saving}
+                />
+                <p className="text-muted-foreground text-xs">
+                  留空时，首次发布会自动使用当前时间。
+                </p>
+              </div>
             </div>
 
             <div className="grid gap-4 md:grid-cols-3">
