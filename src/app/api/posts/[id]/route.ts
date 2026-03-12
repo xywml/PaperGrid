@@ -103,6 +103,27 @@ export async function PATCH(
     // 检查文章是否存在
     const existingPost = await prisma.post.findUnique({
       where: { id },
+      select: {
+        status: true,
+        slug: true,
+        publishedAt: true,
+        isProtected: true,
+        passwordHash: true,
+        category: {
+          select: {
+            slug: true,
+          },
+        },
+        postTags: {
+          select: {
+            tag: {
+              select: {
+                slug: true,
+              },
+            },
+          },
+        },
+      },
     })
 
     if (!existingPost) {
@@ -258,7 +279,7 @@ export async function PATCH(
     })
 
     if (existingPost.status === PostStatus.PUBLISHED || post.status === PostStatus.PUBLISHED) {
-      revalidatePublicPostPaths(post.slug)
+      revalidatePublicPostPaths(existingPost, post)
     }
 
     return NextResponse.json({ post })
@@ -285,6 +306,24 @@ export async function DELETE(
     // 检查文章是否存在
     const existingPost = await prisma.post.findUnique({
       where: { id },
+      select: {
+        status: true,
+        slug: true,
+        category: {
+          select: {
+            slug: true,
+          },
+        },
+        postTags: {
+          select: {
+            tag: {
+              select: {
+                slug: true,
+              },
+            },
+          },
+        },
+      },
     })
 
     if (!existingPost) {
@@ -299,7 +338,7 @@ export async function DELETE(
     })
 
     if (existingPost.status === PostStatus.PUBLISHED) {
-      revalidatePublicPostPaths(existingPost.slug)
+      revalidatePublicPostPaths(existingPost)
     }
 
     return NextResponse.json({ message: '删除成功' })

@@ -22,6 +22,7 @@ import { PostTitleSync } from '@/components/posts/post-title-sync'
 import { PostPasswordGate } from '@/components/posts/post-password-gate'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { ViewCount } from '@/components/posts/view-count'
+import { RelatedPostsList } from '@/components/posts/related-posts-list'
 import { extractHeadingsFromMarkdown } from '@/lib/markdown'
 import { getReadingContentClasses, type MobileReadingBackground } from '@/lib/reading-style'
 import { MDXContentClient } from '@/components/posts/mdx-content-client'
@@ -223,7 +224,7 @@ export function ProtectedPostPage({
                 {canShowContent ? (
                   <ViewCount slug={post.slug} initialCount={post.viewCount?.count || 0} />
                 ) : (
-                  <span>{post.viewCount?.count || 0}</span>
+                  <ViewCount slug={post.slug} initialCount={post.viewCount?.count || 0} mode="read" />
                 )}{' '}
                 次阅读
               </span>
@@ -424,32 +425,7 @@ export function ProtectedPostPage({
                       <h3 className="font-semibold">相关文章</h3>
                     </CardHeader>
                     <CardContent>
-                      <ul className="space-y-3">
-                        {relatedPosts.map((related) => (
-                          <li key={related.id}>
-                            <Link href={`/posts/${related.slug}`} className="group block">
-                              <p className="line-clamp-2 text-sm font-medium text-gray-900 group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400">
-                                {related.title}
-                              </p>
-                              <div className="mt-1 flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                                <span>{related.publishedLabel}</span>
-                                <span>•</span>
-                                <Eye className="inline h-3 w-3" />
-                                <span>{related.viewCount?.count || 0}</span>
-                                {related.isProtected && (
-                                  <>
-                                    <span>•</span>
-                                    <span className="pg-lock-inline inline-flex items-center gap-1">
-                                      <Lock className="inline h-3 w-3" />
-                                      <span>加密</span>
-                                    </span>
-                                  </>
-                                )}
-                              </div>
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
+                      <RelatedPostsList posts={relatedPosts} />
                     </CardContent>
                   </Card>
                 )}

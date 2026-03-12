@@ -4,6 +4,8 @@ import { mkdir, readFile, readdir, rm, unlink, writeFile } from 'node:fs/promise
 import { exportBackupData, importBackupData, parseBooleanFlag } from './backup'
 import { exportMigrationMarkdownZip, importMigrationMarkdown, type MigrationSource } from './migration'
 import { logger } from '@/lib/logger'
+import { revalidateAllPublicPostContent } from '@/lib/post-revalidate'
+import { revalidateAllPublicSettings } from '@/lib/settings-revalidate'
 
 export type ImportExportTaskType =
   | 'backup_export'
@@ -16,6 +18,11 @@ export type ImportExportTaskStatus = 'pending' | 'running' | 'succeeded' | 'fail
 type TaskOptions = {
   includeSensitive?: boolean
   source?: MigrationSource
+}
+
+type PendingTaskRevalidation = {
+  publicPosts?: boolean
+  publicSettings?: boolean
 }
 
 type TaskRecord = {
@@ -34,6 +41,8 @@ type TaskRecord = {
   outputMimeType: string | null
   result: unknown
   error: string | null
+  pendingRevalidation: PendingTaskRevalidation | null
+  revalidatedAt: string | null
 }
 
 export type PublicTaskRecord = {
@@ -111,6 +120,68 @@ function taskFilePath(taskId: string, suffix: string) {
 
 function sanitizeFileName(input: string) {
   return input.replace(/[^\w.\-]+/g, '_').slice(0, 120) || 'file'
+}
+
+function normalizePendingTaskRevalidation(value: unknown): PendingTaskRevalidation | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null
+  }
+
+  const record = value as Record<string, unknown>
+  const pendingRevalidation: PendingTaskRevalidation = {}
+
+  if (record.publicPosts === true) {
+    pendingRevalidation.publicPosts = true
+  }
+
+  if (record.publicSettings === true) {
+    pendingRevalidation.publicSettings = true
+  }
+
+  return pendingRevalidation.publicPosts || pendingRevalidation.publicSettings
+    ? pendingRevalidation
+    : null
+}
+
+function normalizeTaskRecord(task: TaskRecord): TaskRecord {
+  return {
+    ...task,
+    pendingRevalidation: normalizePendingTaskRevalidation(task.pendingRevalidation),
+    revalidatedAt: typeof task.revalidatedAt === 'string' ? task.revalidatedAt : null,
+  }
+}
+
+function hasPendingTaskRevalidation(task: TaskRecord) {
+  return Boolean(
+    !task.revalidatedAt &&
+      task.pendingRevalidation &&
+      (task.pendingRevalidation.publicPosts || task.pendingRevalidation.publicSettings)
+  )
+}
+
+async function ensureTaskRevalidated(task: TaskRecord) {
+  if (task.status !== 'succeeded' || !hasPendingTaskRevalidation(task)) {
+    return task
+  }
+
+  try {
+    if (task.pendingRevalidation?.publicSettings) {
+      revalidateAllPublicSettings()
+    }
+
+    if (task.pendingRevalidation?.publicPosts) {
+      revalidateAllPublicPostContent()
+    }
+
+    return await updateTask(task.id, (current) => ({
+      ...current,
+      pendingRevalidation: null,
+      revalidatedAt: current.revalidatedAt || nowIso(),
+    }))
+  } catch (error) {
+    taskLogger.error({ err: error, taskId: task.id }, '执行任务缓存失效失败')
+    return task
+  }
 }
 
 async function safeUnlink(filePath: string) {
@@ -258,7 +329,7 @@ async function recoverUnfinishedTasks() {
       const jsonPath = path.join(TASK_DATA_DIR, fileName)
       try {
         const raw = await readFile(jsonPath, 'utf8')
-        const task = JSON.parse(raw) as TaskRecord
+        const task = normalizeTaskRecord(JSON.parse(raw) as TaskRecord)
         if (!task || typeof task.id !== 'string') continue
         validateTaskId(task.id)
         if (task.status !== 'pending' && task.status !== 'running') continue
@@ -317,7 +388,7 @@ async function readTask(taskId: string): Promise<TaskRecord> {
   validateTaskId(taskId)
   const raw = await readFile(taskJsonPath(taskId), 'utf8')
   const parsed = JSON.parse(raw) as TaskRecord
-  return parsed
+  return normalizeTaskRecord(parsed)
 }
 
 async function writeTask(task: TaskRecord) {
@@ -387,10 +458,32 @@ async function runBackupImport(task: TaskRecord): Promise<TaskRecord> {
     includeSensitive,
     userId: task.createdById,
   })
+  const pendingRevalidation: PendingTaskRevalidation = {}
+
+  if (
+    result.summary.posts.created > 0 ||
+    result.summary.posts.updated > 0 ||
+    result.summary.categories.created > 0 ||
+    result.summary.categories.updated > 0 ||
+    result.summary.tags.created > 0 ||
+    result.summary.tags.updated > 0 ||
+    result.summary.autoCreatedFromPosts.categories > 0 ||
+    result.summary.autoCreatedFromPosts.tags > 0
+  ) {
+    pendingRevalidation.publicPosts = true
+  }
+
+  if (result.summary.settings.created > 0 || result.summary.settings.updated > 0) {
+    pendingRevalidation.publicSettings = true
+  }
 
   return {
     ...task,
     result,
+    pendingRevalidation:
+      pendingRevalidation.publicPosts || pendingRevalidation.publicSettings
+        ? pendingRevalidation
+        : null,
   }
 }
 
@@ -423,10 +516,21 @@ async function runMigrationImport(task: TaskRecord): Promise<TaskRecord> {
     source,
     userId: task.createdById,
   })
+  const pendingRevalidation: PendingTaskRevalidation = {}
+
+  if (
+    result.summary.posts.created > 0 ||
+    result.summary.posts.updated > 0 ||
+    result.summary.categories.created > 0 ||
+    result.summary.tags.created > 0
+  ) {
+    pendingRevalidation.publicPosts = true
+  }
 
   return {
     ...task,
     result,
+    pendingRevalidation: pendingRevalidation.publicPosts ? pendingRevalidation : null,
   }
 }
 
@@ -557,6 +661,8 @@ export async function createTask(input: {
     outputMimeType: null,
     result: null,
     error: null,
+    pendingRevalidation: null,
+    revalidatedAt: null,
   }
 
   await writeTask(task)
@@ -567,13 +673,13 @@ export async function createTask(input: {
 
 export async function getTask(taskId: string) {
   await ensureTaskDirs()
-  const task = await readTask(taskId)
+  const task = await ensureTaskRevalidated(await readTask(taskId))
   return toPublicTask(task)
 }
 
 export async function getTaskDownload(taskId: string) {
   await ensureTaskDirs()
-  const task = await readTask(taskId)
+  const task = await ensureTaskRevalidated(await readTask(taskId))
 
   if (task.status !== 'succeeded' || !task.outputFilePath || !task.outputFileName) {
     throw new Error('任务结果尚不可下载')

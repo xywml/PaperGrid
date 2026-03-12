@@ -203,7 +203,30 @@ export async function PATCH(
 
     const { id } = await params
 
-    const existingPost = await prisma.post.findUnique({ where: { id } })
+    const existingPost = await prisma.post.findUnique({
+      where: { id },
+      select: {
+        status: true,
+        slug: true,
+        publishedAt: true,
+        isProtected: true,
+        passwordHash: true,
+        category: {
+          select: {
+            slug: true,
+          },
+        },
+        postTags: {
+          select: {
+            tag: {
+              select: {
+                slug: true,
+              },
+            },
+          },
+        },
+      },
+    })
     if (!existingPost) {
       return NextResponse.json({ error: '文章不存在' }, { status: 404 })
     }
@@ -421,7 +444,7 @@ export async function PATCH(
     })
 
     if (existingPost.status === PostStatus.PUBLISHED || post.status === PostStatus.PUBLISHED) {
-      revalidatePublicPostPaths(post.slug)
+      revalidatePublicPostPaths(existingPost, post)
     }
 
     return NextResponse.json({ post }, { headers: authResult.headers })
@@ -447,7 +470,27 @@ export async function DELETE(
 
     const { id } = await params
 
-    const existingPost = await prisma.post.findUnique({ where: { id } })
+    const existingPost = await prisma.post.findUnique({
+      where: { id },
+      select: {
+        status: true,
+        slug: true,
+        category: {
+          select: {
+            slug: true,
+          },
+        },
+        postTags: {
+          select: {
+            tag: {
+              select: {
+                slug: true,
+              },
+            },
+          },
+        },
+      },
+    })
     if (!existingPost) {
       return NextResponse.json({ error: '文章不存在' }, { status: 404 })
     }
@@ -455,7 +498,7 @@ export async function DELETE(
     await prisma.post.delete({ where: { id } })
 
     if (existingPost.status === PostStatus.PUBLISHED) {
-      revalidatePublicPostPaths(existingPost.slug)
+      revalidatePublicPostPaths(existingPost)
     }
 
     return NextResponse.json({ message: '删除成功' }, { headers: authResult.headers })

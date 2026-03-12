@@ -1,4 +1,4 @@
-import { cache } from 'react'
+import { unstable_cache } from 'next/cache'
 import { prisma } from './prisma'
 
 const SETTING_VALUE_FIELD_BY_KEY: Record<string, string> = {
@@ -8,6 +8,10 @@ const SETTING_VALUE_FIELD_BY_KEY: Record<string, string> = {
 }
 
 const COMMON_SETTING_FIELDS = ['value', 'text', 'enabled', 'style', 'preset'] as const
+
+const SETTING_CACHE_TAG_PREFIX = 'setting:'
+
+export const ALL_SETTINGS_CACHE_TAG = 'setting:all'
 
 function unwrapSettingValue(key: string, value: unknown): unknown {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return undefined
@@ -25,13 +29,15 @@ function unwrapSettingValue(key: string, value: unknown): unknown {
   return entries.length === 1 ? entries[0][1] : undefined
 }
 
-const getSettingRecord = cache(async (key: string) => {
-  return prisma.setting.findUnique({
-    where: { key },
-  })
-})
+function normalizeSettingKeys(keys: Iterable<string>) {
+  return Array.from(new Set(Array.from(keys, (key) => key.trim()).filter(Boolean))).sort()
+}
 
-const PUBLIC_SETTING_KEYS = [
+export function getSettingCacheTag(key: string) {
+  return `${SETTING_CACHE_TAG_PREFIX}${key}`
+}
+
+export const PUBLIC_SETTING_KEYS = [
   'site.title',
   'site.description',
   'site.ownerName',
@@ -66,34 +72,79 @@ const PUBLIC_SETTING_KEYS = [
   'site.footer_mps',
   'site.footer_copyright',
   'site.footer_powered_by',
-]
+] as const
 
-const getPublicSettingsCached = cache(async () => {
-  const settings = await prisma.setting.findMany({
-    where: {
-      key: { in: PUBLIC_SETTING_KEYS },
-    },
-  })
+export const POST_PAGE_SETTING_KEYS = [
+  'comments.enabled',
+  'comments.allowGuest',
+  'site.ownerName',
+  'site.defaultAvatarUrl',
+  'profile.role',
+  'ui.mobileReadingBackground',
+] as const
 
-  const result: Record<string, unknown> = {}
-  for (const s of settings) {
-    result[s.key] = unwrapSettingValue(s.key, s.value)
+async function getSettingsSnapshot(keys: readonly string[]) {
+  const normalizedKeys = normalizeSettingKeys(keys)
+  if (normalizedKeys.length === 0) {
+    return {} as Record<string, unknown>
   }
 
-  return result
-})
+  return unstable_cache(
+    async () => {
+      const settings = await prisma.setting.findMany({
+        where: {
+          key: { in: normalizedKeys },
+        },
+      })
+
+      const result: Record<string, unknown> = {}
+      for (const s of settings) {
+        result[s.key] = unwrapSettingValue(s.key, s.value)
+      }
+
+      return result
+    },
+    ['settings-snapshot', ...normalizedKeys],
+    {
+      tags: [ALL_SETTINGS_CACHE_TAG, ...normalizedKeys.map(getSettingCacheTag)],
+      revalidate: false,
+    }
+  )()
+}
+
+export type PostPageSettings = {
+  commentsEnabled: boolean
+  allowGuest: boolean
+  ownerName: string
+  defaultAvatarUrl: string
+  ownerRole: string
+  mobileReadingBackground: string
+}
 
 export async function getSetting<T = unknown>(key: string, defaultValue?: T): Promise<T | undefined> {
-  const setting = await getSettingRecord(key)
-  
-  if (!setting || !setting.value) {
+  const normalizedKey = key.trim()
+  if (!normalizedKey) {
     return defaultValue
   }
 
-  const value = unwrapSettingValue(key, setting.value)
-  return (value ?? defaultValue) as T
+  const settings = await getSettingsSnapshot([normalizedKey])
+  return (settings[normalizedKey] ?? defaultValue) as T
 }
 
 export async function getPublicSettings() {
-  return getPublicSettingsCached()
+  return getSettingsSnapshot(PUBLIC_SETTING_KEYS)
+}
+
+export async function getPostPageSettings(): Promise<PostPageSettings> {
+  const settings = await getSettingsSnapshot(POST_PAGE_SETTING_KEYS)
+
+  return {
+    commentsEnabled: (settings['comments.enabled'] as boolean | undefined) ?? true,
+    allowGuest: (settings['comments.allowGuest'] as boolean | undefined) ?? false,
+    ownerName: (settings['site.ownerName'] as string | undefined) || '千叶',
+    defaultAvatarUrl: (settings['site.defaultAvatarUrl'] as string | undefined) || '',
+    ownerRole: (settings['profile.role'] as string | undefined) || '全栈开发者',
+    mobileReadingBackground:
+      (settings['ui.mobileReadingBackground'] as string | undefined) || 'grid',
+  }
 }

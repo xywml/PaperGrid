@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/lib/auth'
 import { NextResponse } from 'next/server'
+import { revalidatePublicTaxonomyPaths } from '@/lib/post-revalidate'
 
 // PATCH /api/categories/[id] - 更新分类
 export async function PATCH(
@@ -51,6 +52,10 @@ export async function PATCH(
       },
     })
 
+    revalidatePublicTaxonomyPaths({
+      categorySlugs: [existingCategory.slug, category.slug],
+    })
+
     return NextResponse.json({ category })
   } catch (error) {
     console.error('更新分类失败:', error)
@@ -99,6 +104,10 @@ export async function DELETE(
     // 删除分类
     await prisma.category.delete({
       where: { id },
+    })
+
+    revalidatePublicTaxonomyPaths({
+      categorySlugs: [existingCategory.slug],
     })
 
     return NextResponse.json({ message: '删除成功' })

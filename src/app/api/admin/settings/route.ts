@@ -9,6 +9,7 @@ import {
 } from '@/lib/public-style-preset'
 import { normalizeMobileReadingBackground } from '@/lib/reading-style'
 import { parseHeadInjection } from '@/lib/head-inject'
+import { revalidateForUpdatedSettings } from '@/lib/settings-revalidate'
 
 class SettingsValidationError extends Error {
   constructor(message: string) {
@@ -246,6 +247,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     const results: Array<{ key: string; updated: boolean; reason?: string }> = []
+    const changedKeys = new Set<string>()
 
     for (const u of updates) {
       const normalizedValue = normalizeSettingUpdateValue(u.key, u.value)
@@ -264,6 +266,7 @@ export async function PATCH(request: NextRequest) {
             },
           })
           results.push({ key: u.key, updated: true })
+          changedKeys.add(u.key)
           continue
         }
         results.push({ key: u.key, updated: false, reason: '不存在' })
@@ -276,7 +279,10 @@ export async function PATCH(request: NextRequest) {
 
       await prisma.setting.update({ where: { key: u.key }, data: { value: normalizedValue } })
       results.push({ key: u.key, updated: true })
+      changedKeys.add(u.key)
     }
+
+    revalidateForUpdatedSettings(changedKeys)
 
     return NextResponse.json({ results })
   } catch (error) {

@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/lib/auth'
 import { NextResponse } from 'next/server'
+import { revalidatePublicTaxonomyPaths } from '@/lib/post-revalidate'
 
 // GET /api/categories - 获取分类列表
 export async function GET() {
@@ -62,6 +63,10 @@ export async function POST(req: Request) {
         slug,
         description,
       },
+    })
+
+    revalidatePublicTaxonomyPaths({
+      categorySlugs: [category.slug],
     })
 
     return NextResponse.json({ category }, { status: 201 })

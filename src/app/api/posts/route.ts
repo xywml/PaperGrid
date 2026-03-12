@@ -261,7 +261,9 @@ export async function POST(req: Request) {
       },
     })
 
-    revalidatePublicPostPaths(post.status === PostStatus.PUBLISHED ? post.slug : undefined)
+    if (post.status === PostStatus.PUBLISHED) {
+      revalidatePublicPostPaths(post)
+    }
 
     return NextResponse.json({ post }, { status: 201 })
   } catch (error) {

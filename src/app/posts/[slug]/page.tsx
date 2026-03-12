@@ -12,19 +12,18 @@ import {
   ArrowRight,
   Edit3,
   Scissors,
-  Lock,
 } from 'lucide-react'
-import { formatDistanceToNow, format } from 'date-fns'
-import { zhCN } from 'date-fns/locale'
+import { format } from 'date-fns'
 import Link from 'next/link'
 import Image from 'next/image'
 import { TableOfContents, type HeadingItem } from '@/components/posts/table-of-contents'
 import { CommentSection } from '@/components/comments/comment-section'
 import { PostTitleSync } from '@/components/posts/post-title-sync'
-import { getSetting } from '@/lib/settings'
+import { getPostPageSettings } from '@/lib/settings'
 import { getReadingContentClasses, normalizeMobileReadingBackground } from '@/lib/reading-style'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { ViewCount } from '@/components/posts/view-count'
+import { RelatedPostsList } from '@/components/posts/related-posts-list'
 import { extractHeadingsFromMarkdown } from '@/lib/markdown'
 import { ProtectedPostPage } from '@/components/posts/protected-post-page'
 import { isInternalImageUrl } from '@/lib/image-url'
@@ -35,7 +34,7 @@ import {
   getPublishedPostSlugs,
 } from '@/lib/public-post-page'
 
-export const revalidate = 60
+export const revalidate = false
 export const dynamicParams = true
 
 interface PostPageProps {
@@ -54,34 +53,21 @@ export async function generateStaticParams() {
 export default async function PostPage({ params }: PostPageProps) {
   const { slug } = await params
 
-  const [
-    commentsEnabledRaw,
-    allowGuest,
-    ownerNameRaw,
-    defaultAvatarUrl,
-    ownerRoleRaw,
-    mobileReadingBackgroundRaw,
-  ] = await Promise.all([
-    getSetting<boolean>('comments.enabled', true),
-    getSetting<boolean>('comments.allowGuest', false),
-    getSetting<string>('site.ownerName', '千叶'),
-    getSetting<string>('site.defaultAvatarUrl', ''),
-    getSetting<string>('profile.role', '全栈开发者'),
-    getSetting<string>('ui.mobileReadingBackground', 'grid'),
-  ])
-  const commentsEnabled = commentsEnabledRaw ?? true
-  const ownerName = ownerNameRaw || '千叶'
-  const ownerRole = ownerRoleRaw || '全栈开发者'
-  const mobileReadingBackground = normalizeMobileReadingBackground(mobileReadingBackgroundRaw)
+  const postPageSettings = await getPostPageSettings()
+  const commentsEnabled = postPageSettings.commentsEnabled
+  const allowGuest = postPageSettings.allowGuest
+  const ownerName = postPageSettings.ownerName
+  const defaultAvatarUrl = postPageSettings.defaultAvatarUrl
+  const ownerRole = postPageSettings.ownerRole
+  const mobileReadingBackground = normalizeMobileReadingBackground(
+    postPageSettings.mobileReadingBackground
+  )
   const { cardClassName: contentCardClassName, contentClassName: contentPaddingClassName } =
     getReadingContentClasses(mobileReadingBackground)
 
-  const formatRelativeTimeLabel = (value: string | Date | null | undefined) => {
+  const formatPublishedAtLabel = (value: string | Date | null | undefined) => {
     if (!value) return ''
-    return formatDistanceToNow(new Date(value), {
-      addSuffix: true,
-      locale: zhCN,
-    })
+    return format(new Date(value), 'yyyy-MM-dd HH:mm')
   }
 
   const formatUpdatedAtLabel = (
@@ -106,12 +92,12 @@ export default async function PostPage({ params }: PostPageProps) {
     void content
     const safePostWithLabels = {
       ...safePost,
-      publishedLabel: formatRelativeTimeLabel(safePost.publishedAt),
+      publishedLabel: formatPublishedAtLabel(safePost.publishedAt),
       updatedAtLabel: formatUpdatedAtLabel(safePost.updatedAt, safePost.publishedAt),
     }
     const relatedPostsWithLabels = relatedPosts.map((item) => ({
       ...item,
-      publishedLabel: formatRelativeTimeLabel(item.publishedAt),
+      publishedLabel: formatPublishedAtLabel(item.publishedAt),
     }))
     return (
       <ProtectedPostPage
@@ -130,6 +116,10 @@ export default async function PostPage({ params }: PostPageProps) {
   }
 
   const post = { ...basePost, content: basePost.content || '' }
+  const relatedPostsWithLabels = relatedPosts.map((item) => ({
+    ...item,
+    publishedLabel: formatPublishedAtLabel(item.publishedAt),
+  }))
 
   const headings: HeadingItem[] = extractHeadingsFromMarkdown(post.content, 3).map(
     (heading, index) => ({
@@ -172,13 +162,7 @@ export default async function PostPage({ params }: PostPageProps) {
             </div>
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
-              <time>
-                {post.publishedAt &&
-                  formatDistanceToNow(new Date(post.publishedAt), {
-                    addSuffix: true,
-                    locale: zhCN,
-                  })}
-              </time>
+              <time>{formatPublishedAtLabel(post.publishedAt)}</time>
             </div>
             <div className="flex items-center gap-2">
               <Clock className="h-4 w-4" />
@@ -360,38 +344,7 @@ export default async function PostPage({ params }: PostPageProps) {
                       <h3 className="font-semibold">相关文章</h3>
                     </CardHeader>
                     <CardContent>
-                      <ul className="space-y-3">
-                        {relatedPosts.map((related) => (
-                          <li key={related.id}>
-                            <Link href={`/posts/${related.slug}`} className="group block">
-                              <p className="line-clamp-2 text-sm font-medium text-gray-900 group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400">
-                                {related.title}
-                              </p>
-                              <div className="mt-1 flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                                <span>
-                                  {related.publishedAt &&
-                                    formatDistanceToNow(new Date(related.publishedAt), {
-                                      addSuffix: true,
-                                      locale: zhCN,
-                                    })}
-                                </span>
-                                <span>•</span>
-                                <Eye className="inline h-3 w-3" />
-                                <span>{related.viewCount?.count || 0}</span>
-                                {related.isProtected && (
-                                  <>
-                                    <span>•</span>
-                                    <span className="pg-lock-inline inline-flex items-center gap-1">
-                                      <Lock className="inline h-3 w-3" />
-                                      <span>加密</span>
-                                    </span>
-                                  </>
-                                )}
-                              </div>
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
+                      <RelatedPostsList posts={relatedPostsWithLabels} />
                     </CardContent>
                   </Card>
                 )}

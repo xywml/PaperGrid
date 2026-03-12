@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/lib/auth'
 import { NextResponse } from 'next/server'
+import { revalidatePublicTaxonomyPaths } from '@/lib/post-revalidate'
 
 // PATCH /api/tags/[id] - 更新标签
 export async function PATCH(
@@ -50,6 +51,10 @@ export async function PATCH(
       },
     })
 
+    revalidatePublicTaxonomyPaths({
+      tagSlugs: [existingTag.slug, tag.slug],
+    })
+
     return NextResponse.json({ tag })
   } catch (error) {
     console.error('更新标签失败:', error)
@@ -90,6 +95,10 @@ export async function DELETE(
     // 删除标签(即使有关联文章也可以删除,Prisma 会自动解除关联)
     await prisma.tag.delete({
       where: { id },
+    })
+
+    revalidatePublicTaxonomyPaths({
+      tagSlugs: [existingTag.slug],
     })
 
     return NextResponse.json({ message: '删除成功' })
