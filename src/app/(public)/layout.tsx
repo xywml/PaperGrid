@@ -6,6 +6,7 @@ import { BackToTop } from '@/components/layout/back-to-top'
 import { CustomHeadScripts } from '@/components/layout/custom-head-scripts'
 import { StartupLoader } from '@/components/loading/startup-loader'
 import { PageTransition } from '@/components/layout/page-transition'
+import { ClickHalo } from '@/components/effects/click-halo'
 import { getPublicSettings, getSetting } from '@/lib/settings'
 import { getPublicCategories } from '@/lib/public-categories'
 
@@ -33,6 +34,7 @@ export default async function PublicLayout({ children }: { children: React.React
         />
         <BackToTop />
         <RevealContent />
+        <ClickHalo />
       </div>
     </ReadingProvider>
   )
