@@ -1,0 +1,178 @@
+/* BA cursor FX with light/dark palettes:
+   - light: azure-cyan trail, cyan-white burst shards;
+   - dark: white trail and shards over the near-black navy page, ink-blue glow. */
+.layer {
+  position: fixed;
+  inset: 0;
+  z-index: 95;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.trailSvg {
+  position: absolute;
+  inset: 0;
+}
+
+/* Both trail layers are filled comet ribbons (fill color applied inline per
+   theme). The blurred glow copy sits under the crisp core body. */
+.trailGlow {
+  stroke: none;
+  opacity: 0;
+  filter: blur(5px);
+  transition: opacity 0.12s;
+}
+
+.trailPath {
+  stroke: none;
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+
+.shard {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: shardFloat 1s ease-out both;
+}
+
+.spawns {
+  position: absolute;
+  inset: 0;
+}
+
+.burst {
+  position: absolute;
+  pointer-events: none;
+}
+
+.burstSvg {
+  position: absolute;
+  left: -48px;
+  top: -48px;
+  overflow: visible;
+}
+
+.flash {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  border-radius: 50%;
+  animation: flashPop 0.38s ease-out both;
+}
+
+.ringA,
+.ringB {
+  fill: none;
+  stroke-linecap: round;
+}
+
+.ringA {
+  stroke-width: 2.8;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: dissolveCw 0.58s cubic-bezier(0.2, 0.8, 0.35, 1) both;
+}
+
+.ringB {
+  stroke-width: 1.6;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: dissolveCcw 0.5s cubic-bezier(0.2, 0.8, 0.35, 1) 0.04s both;
+}
+
+.tri {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: triPop 0.55s cubic-bezier(0.22, 0.8, 0.35, 1) both;
+}
+
+@keyframes dissolveCw {
+  0% {
+    opacity: 0;
+    stroke-dashoffset: 55;
+    transform: scale(0.72) rotate(-18deg);
+  }
+  15% {
+    opacity: 1;
+  }
+  65% {
+    opacity: 0.95;
+    transform: scale(1.04) rotate(20deg);
+  }
+  100% {
+    opacity: 0;
+    stroke-dashoffset: -115;
+    transform: scale(1.24) rotate(52deg);
+  }
+}
+
+@keyframes dissolveCcw {
+  0% {
+    opacity: 0;
+    stroke-dashoffset: 25;
+    transform: scale(0.78) rotate(20deg);
+  }
+  18% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 0;
+    stroke-dashoffset: 90;
+    transform: scale(1.18) rotate(-40deg);
+  }
+}
+
+@keyframes triPop {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.4);
+  }
+  25% {
+    opacity: 1;
+    transform: translate(calc(var(--tx, 0px) * 0.35), calc(var(--ty, 0px) * 0.35)) scale(1.15);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--tx, 0px), var(--ty, 0px)) scale(0.7);
+  }
+}
+
+@keyframes shardFloat {
+  0% {
+    opacity: 0;
+    transform: scale(0.4) translate(0, 0);
+  }
+  20% {
+    opacity: 0.75;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.7) translate(var(--dx, 4px), var(--dy, -8px));
+  }
+}
+
+@keyframes flashPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  25% {
+    opacity: 1;
+    transform: scale(1.3);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trailPath,
+  .trailGlow,
+  .spawns {
+    display: none;
+  }
+}
